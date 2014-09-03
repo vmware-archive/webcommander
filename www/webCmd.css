@@ -335,7 +335,7 @@ ul, ol {
 .fbg .c2 { padding:0 16px; width:480px;}
 .fbg .c3 { padding:0 0 0 16px; width:260px;}
 .fbg .c1 img { margin:8px;}
-.fbg .c3 img { margin:8px 16px 4px 0; float:left; background-color:#323235; border:0px}
+.fbg .c3 img { margin-bottom:10px; float:top; background-color:#323235; border:0px}
 .clr { clear:both; padding:0; margin:0; width:100%; font-size:0px; line-height:0px;}	
 
 .slide-out-div {

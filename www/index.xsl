@@ -169,16 +169,10 @@ THE SOFTWARE.
 					<a href="#"><img src="images/shou.png" width="58" height="58" alt="pix" /></a>
 				</div>
 				<div class="col c2">
-					<h2><span>Introduction</span></h2>
-					<p>WebCommander is a set of web applications that help you to do complicated or time cosuming tasks easily. 
-					Basically anything you want to do to a vSphere VM could be done. You can use those web applications without 
-					setting up your own environment. You can also use those web applications programmatically from any existing 
-					language or framework so long as it may call web service. <br/>
-					For instance, Unified View Setup (<a href="http://uvs.eng.vmware.com" target="_blank">UVS</a>) can be used to group Web 
-					Commander actions together into an action list, which is repeatable and can use variables and keywords like LASTGOODBUILD.
-					</p>
+					<a class="twitter-timeline" height="200" href="https://twitter.com/search?q=webcommander" data-border-color="#959595" data-theme="dark" data-widget-id="507213777024995329">Tweets about "webcommander"</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 				</div>
-				<div class="col c3"><br/>
+				<div class="col c3">
 					<img class="animation" src="images/logo-vmware.png" width="200" height="200" />
 				</div>
 				<div class="clr"></div>
