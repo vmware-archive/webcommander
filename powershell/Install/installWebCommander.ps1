@@ -29,7 +29,7 @@ Param (
 	$vmName, 
 	$guestUser="administrator", 
 	$guestPassword=$env:defaultPassword,
-	$packageUrl="https://github.com/vmware/webcommander/archive/master.zip",
+	$packageUrl="http://download3.vmware.com/software/vmw-tools/webcommander/WebCommander_v3.0.zip",
 	$authentication="windows",
 	$defaultPassword=$env:defaultPassword
 )
@@ -52,7 +52,7 @@ if (verifyIp($vmName)) {
 	$vm.enablePsRemote()
 }
 $remoteWin = newRemoteWin $ip $guestUser $guestPassword
-$remoteWin.sendFile("..\setup.ps1","c:\temp\setup.ps1")
+$remoteWin.sendFile(".\install\setup.ps1","c:\temp\setup.ps1")
 $cmd = "c:\temp\setup.ps1 '$packageUrl' '$authentication' '$guestPassword' '$defaultPassword'"
 $result = $remoteWin.executePsTxtRemote($cmd, "trigger setup script in remote machine")
 writeStdout $result
