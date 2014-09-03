@@ -1,0 +1,416 @@
+/*
+Copyright (c) 2012-2014 VMware, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+/* Author: Jerry Liu, liuj@vmware.com */ 
+
+body { 
+	margin:0px; 
+	padding:0px; 
+	width:100%; 
+	background:#1697D1; 
+	color:white; 
+	font:normal 13px 'Roboto Condensed';
+	background-image:url('images/bgcorner.png');
+	background-repeat:no-repeat;
+	background-attachment:flow;
+	background-position:top right;
+	/*background-size: 500px Auto;*/
+}
+
+pre {
+	white-space: pre-wrap;       /* css-3 */
+	white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+	white-space: -pre-wrap;      /* Opera 4-6 */
+	white-space: -o-pre-wrap;    /* Opera 7 */
+	word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+#container {
+	position:absolute;
+	top:100px;
+	width:100%;
+}
+
+#footer, #result {
+	margin:0;
+	padding:40px;
+	background:#323235;
+	border-top:5px solid gold;
+	background-image:url('images/bgcornerbottom.png');
+	background-repeat:no-repeat;
+	background-attachment:flow;
+	background-position:bottom right;
+	background-size: 350px Auto;
+	min-height:240px;
+}
+
+.round-corner { 
+	margin: 0 75px 30px 75px;
+	padding: 20px; 
+	background: #fbfbfc;
+	border-radius: 20px;
+}
+
+.round-corner-result { 
+	margin: 0 150px 60px 150px;
+	padding: 30px 50px 30px 50px; 
+	background: #fbfbfc;
+	border-radius: 20px;
+	min-height:120px;
+	color:black;
+}
+
+@media screen and (min-width: 2081px) {
+	#index {
+		-webkit-column-count: 8;
+		-moz-column-count: 8;
+		column-count: 8;
+	}
+	#index li { 
+		font:normal 16px 'Roboto Condensed';
+	}
+}
+
+@media screen and (max-width: 2080px) and (min-width: 1681px) {
+	#index {
+		-webkit-column-count: 7;
+		-moz-column-count: 7;
+		column-count: 7;
+	}
+	#index li { 
+		font:normal 15px 'Roboto Condensed';
+	}
+}
+
+@media screen and (max-width: 1680px) and (min-width: 1281px) {
+	#index {
+		-webkit-column-count: 6;
+		-moz-column-count: 6;
+		column-count: 6;
+	}
+	#index li { 
+		font:normal 14px 'Roboto Condensed';
+	}
+}
+
+@media screen and (max-width: 1280px) {
+	#index {
+		-webkit-column-count: 5;
+		-moz-column-count: 5;
+		column-count: 5;
+	}
+	#index li { 
+		font:normal 13px 'Roboto Condensed';
+	}
+}
+
+i {
+	color:gold;
+	font:bold;
+}
+
+
+a.cmdName, a.cmdName:hover {
+	color:black;
+}
+
+a.devName, a.devName:hover {
+	color:gold;
+}
+
+a.logo, a.logo:hover {
+	text-decoration:none;
+	color:#ffffff;
+}
+
+a.code, a.code:hover {
+	text-decoration:none;
+	color:#ffffff;
+}
+
+h2 {
+	font:normal 24px 'Roboto Condensed';
+	color:black;
+}
+
+#logo { 
+	position:absolute;
+	top:30px;
+	left:50px;
+	margin:0px; 
+	padding:0px; 
+	font:normal 39px/1.2em 'Roboto Condensed'; 
+	letter-spacing:-2px;
+}
+
+#returnCode { 
+	position:absolute;
+	top:20px;
+	right:50px;
+	color:white; 
+	font:normal 39px/1.2em 'Roboto Condensed'; 
+	letter-spacing:-2px;
+}
+
+h3{
+	color:gold;
+	text-shadow: -1px -1px #000,1px 1px #000;
+	font:bold 30px 'Roboto Condensed';
+} 
+      
+#logo span { color:gold;}
+
+#commandname { 
+	position:absolute;
+	top:22px;
+	left:360px;
+	margin:0; 
+	padding-left:15px; 
+	padding-right:15px;
+	border-left:2px solid white;
+	border-right:2px solid gold; 
+}
+
+#btnGetDatastore { 
+	margin:0px 0 0 10; 
+}
+
+#developer { 
+	position:absolute;
+	top:50px;
+	left:400px;
+	margin:0px; 
+	padding:0px; 
+}
+
+#script1 { 
+	position:absolute;
+	top:50px;
+	left:500px;
+	margin:0px; 
+	padding:0px; 
+}
+
+#content {
+	position:absolute;
+	top:100px;
+	width:100%;
+}
+
+#table { 
+	margin:0 120px 30px 120px; 
+	padding:50px; 
+	background:#fbfbfc;
+	border-radius:20px;
+}
+
+#annotation { 
+	margin:0 120px 20px 120px; 
+	padding:20px 20px 20px 20px; 
+	background:#3a99d5;
+	border-radius:20px;
+	text-align:center;
+	color:#2e3037;
+	font:bold 16px 'Roboto Condensed';
+}
+
+
+h1 {
+    margin: 0 0 10px 0
+}
+
+#paraTable, .exceptionTable {
+	margin:30px;
+	border-collapse:collapse;
+	border:1px solid black;
+	width:80%;
+}
+
+#paraTable  td{
+	text-align:left;
+	padding:5px;
+	color: black;
+	border:1px solid black;
+	font:normal 14px/1.8em 'Roboto Condensed';
+}
+
+#paraTable td.itemTitle {
+	font:bold 12pt 'Roboto Condensed';
+	text-align:right;
+}
+
+.exceptionTable  td{
+	text-align:left;
+	padding:5px;
+	color: black;
+	border:1px solid black;
+	font:normal 14px/1.8em 'Roboto Condensed';
+}
+
+#paraTable  th{
+	background:#323235;
+	color:gold;
+	padding:5px;
+	font:normal 14px/1.8em 'Roboto Condensed';
+}
+
+#paraTable th.groupTitle {
+	font:bold 'Roboto Condensed';
+}
+
+.tip {
+	font:9pt;
+	font-style:italic;
+	color:#959595;
+}
+
+.exceptionTable  th{
+	background:#323235;
+	color:gold;
+	padding:5px;
+	font:bold 14px/1.8em 'Roboto Condensed';
+}
+
+ul, ol { 
+	margin:0; 
+	padding:0; 
+	list-style:none; 
+	color:#black;
+} 
+
+#result li{
+	font:normal 18px 'Roboto Condensed';
+}
+
+#index li { 
+	overflow: auto;
+	padding: 7px; 
+	height:60px;
+}
+
+#index li:hover {
+	background: #ccc;
+	cursor: pointer;
+}
+
+#index li img {
+	float: left;
+	margin: 0 15px 0 0;
+	width: 60px;
+	height: 60px;
+	border-style:none;
+}
+
+.selectText{
+	border: double;
+}
+
+.fbg { padding:0px 0 0 0; border-top:1px solid #5e5f62; background:#484e55 url(../images/fbg_bg.gif) bottom repeat-x; margin:0px 0 10px 0;}
+.fbg_resize { margin:0 auto; padding:5px 5px; width:1080px;}
+.fbg  h2 { color:#dedddd;}
+.fbg  p { color:#959595;}
+.fbg  a { color:#3a99d5; text-decoration:none;}
+.fbg  img { padding:4px; border:1px solid #cfd2d4; background-color:#fff;}
+.fbg .col { margin:0; float:left;}
+.fbg .c1 { padding:0 16px 0 0; width:266px;}
+.fbg .c2 { padding:0 16px; width:480px;}
+.fbg .c3 { padding:0 0 0 16px; width:260px;}
+.fbg .c1 img { margin:8px;}
+.fbg .c3 img { margin:8px 16px 4px 0; float:left; background-color:#323235; border:0px}
+.clr { clear:both; padding:0; margin:0; width:100%; font-size:0px; line-height:0px;}	
+
+.slide-out-div {
+	padding: 20px;
+	width: 250px;
+	background: #ccc;
+	border: 1px solid #29216d;
+}      
+
+* {
+    margin:0;
+    padding:0;
+}
+
+.sidebar-root{
+    position : relative;
+    overflow : hidden;
+}
+
+.sidebar-root div.sidebar-container{
+    position: absolute;
+}
+
+div.sidebar-container {
+    width:200px;
+    height:600px;
+    position:fixed;
+    background-color:#323235;
+    filter: alpha(opacity=87);
+    -moz-opacity:0.87;
+    opacity:0.87;
+    -moz-box-shadow:0px 0px 20px #323235;
+    -webkit-box-shadow:0px 0px 20px #323235;
+    box-shadow:0px 0px 20px #323235;
+}
+
+div.sidebar-container.left {
+    top:50%;
+    left:0px;
+    -moz-border-radius-bottomright: 10px;
+    -moz-border-radius-topright: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
+    border-bottom-right-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+div.sidebar-inject {
+    position:absolute;
+}
+div.sidebar-inject.left {
+    background:url("images/inject-left.png") center no-repeat;
+    top:0px;
+    right:0px;
+    width : 50px;
+}
+div.sidebar-body {
+    margin:20px;
+    position:absolute;
+    top:0px;
+    left:0px;
+    color:#FFFFFF;
+}
+div#category-list{
+	width: 200px; 
+	height: 500px; 
+	overflow: auto;
+	font:bold 15px 'Roboto Condensed';
+	margin-bottom:5px;
+}
+div#category-header {
+	color:gold;
+	font:bold 17px 'Roboto Condensed';
+	margin-bottom:20px;
+}
+input,textarea,select{
+	font:normal 14px/1.8em 'Roboto Condensed';
+}

@@ -1,0 +1,67 @@
+<!--
+Copyright (c) 2012-2014 VMware, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+
+<!-- Author: Jerry Liu, liuj@vmware.com -->
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>webCommander - workflow</title>
+<link href='//fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css' />
+<link href="workflow.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+<script src="//code.jquery.com/jquery-1.9.1.js"></script>
+<script src="//code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+<script src="workflow.js"></script>
+</head>
+<body>
+<div id="logo">
+	<img src="images/logo-b.png" /> > <a href="webcmd.php" class="logo">web<span>Commander</span></a> > <font face="courier">workflow</font>
+</div>
+<div id="execute">
+	<input class="execute" type="image" id="import" title="Import from JSON" src="images/button-import-icon.png" /> 
+	<input class="execute" type="image" id="export" title="Export to JSON" src="images/button-export-icon.png" /> 
+	<input class="execute" type="image" id="serial" title="Run in serial" src="images/button-serial-icon.png" />
+	<input class="execute" type="image" id="parallel" title="Run in parallel" src="images/button-parallel-icon.png" />
+	<input class="execute" type="image" id="toggleAll" title="Toggle display all commands" src="images/button-toggle-all-icon.png" />
+	<input class="execute" type="image" id="onOffAll" title="Enable / Disable all commands" src="images/button-on-all-icon.png" />
+</div>
+<div id="sortable">
+	<div class="command">
+		<p class="heading">
+			<span class="status"></span>
+			<span class="right">
+				<input class="add" type="image" title="Add a new command" src="images/button-add-icon.png" /> 
+				<input class="delete" type="image" title="Delete this command" src="images/button-delete-icon.png" /> 
+				<input class="toggle" type="image" title="Toggle display" src="images/button-switch-icon.png" /> 
+				<input class="onoff" type="image" title="Enable / Disable this command" src="images/button-on-icon.png" />
+			</span>
+		</p>
+		<div class="body">
+			<div class="content"></div>
+			<div class="detail"></div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
