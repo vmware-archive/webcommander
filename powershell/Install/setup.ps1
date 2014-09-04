@@ -25,7 +25,7 @@ THE SOFTWARE.
 Param (
 	$packageUrl = 'https://github.com/vmware/webcommander/archive/master.zip',
 	$authentication = 'Windows',
-	$adminPassword = 'Passw0rd', # administrator password of the windows machien where webcommander is located
+	$adminPassword = 'Passw0rd', # administrator password of the windows machine where webcommander is located
 	$defaultPassword = 'Passw0rd' # default password used to communicate with vSphere, VM and remote machine
 )
 
