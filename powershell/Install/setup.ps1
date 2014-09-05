@@ -32,17 +32,11 @@ Param (
 $packageName = ($packageUrl.split("/"))[-1]
 
 $errorActionPreference = "Stop"
-if ((get-host).version.major -lt 4) {
-	write-warning "Powershell 4.0 is required.
-		Please install Powershell 4.0 and then run this script again."
-	exit
+
+if (test-path "$env:windir\syswow64\") {
+	& "$env:windir\syswow64\windowspowershell\v1.0\powershell.exe" `
+		-command "set-executionpolicy RemoteSigned -force"
 }
-if ($env:Processor_Architecture -ne "AMD64") { 
-	write-warning "This script must run in AMD64 Powershell.
-		Please launch AMD64 Powershell to run this script again."
-	exit
-}
-& "$env:windir\syswow64\windowspowershell\v1.0\powershell.exe" -command "set-executionpolicy unrestricted -force"
 if (!(test-path C:\WebCommander -pathType container)) {
 	mkdir C:\WebCommander -force -ea SilentlyContinue | out-null
 }
@@ -74,16 +68,16 @@ $installIis = {
 	if (!$test) {
 		write-output "Installing IIS..."
 		if (get-command install-windowsfeature -ea silentlycontinue) {
-			$installcmd = 'Install-WindowsFeature -name Web-Server -IncludeManagementTools'
-		} elseif (get-command add-windowsfeature -ea silentlycontinue){
-			$installcmd = 'add-WindowsFeature -name Web-Server'
+			$installcmd = 'Install-WindowsFeature -name Web-Server -IncludeManagementTools -IncludeAllSubFeature -confirm:$false -wa 0 | out-null'
+		} elseif (get-command add-windowsfeature -ea silentlycontinue) {
+			$installcmd = 'add-WindowsFeature -name Web-Server -IncludeAllSubFeature -confirm:$false -wa 0 | out-null'
+		} elseif (get-command ServerManagerCmd -ea silentlycontinue) {
+			$installcmd = 'start-process "c:\windows\system32\ServerManagerCmd.exe" -argumentlist " -install web-server -a" -wait'
 		} else {
-			write-warning "`t Powershell version is outdated."
-			write-warning "`t Please install Powershell v4, and run this script again."
-			exit
+            $installcmd = 'start-process "c:\windows\system32\PkgMgr.exe" -argumentlist " /iu:IIS-WebServerRole;IIS-Security;IIS-WindowsAuthentication" -wait'
 		}
 		try {
-			invoke-expression ($installcmd + ' -IncludeAllSubFeature -confirm:$false -wa 0 | out-null')
+			invoke-expression $installcmd
 		} catch {
 			write-warning "`t Failed to install IIS."
 			write-warning "`t Please install it and all sub components manually, and run this script again."
@@ -168,6 +162,7 @@ $extractWebCommander = {
 }
 
 $addWebCommanderSite = {
+    import-module webadministration 
 	try {
 		get-website | stop-website
 	} catch {
@@ -286,8 +281,10 @@ $configWsman = {
 	#restart-service winrm
 }
 
-& $installIis
-$website = get-website | ?{$_.name -eq "WebCommander"}
+try {
+	import-module webadministration
+	$website = get-website | ?{$_.name -eq "WebCommander"}
+} catch {}
 if ($website) {
 	write-output "WebCommander website already exists."
 	write-output "`t Updating it with $packageUrl..."
@@ -298,10 +295,12 @@ if ($website) {
 	write-output "`t WebCommander website updated successfully."
 } else {
 	& $download
+	& $installIis
 	& $installWpi
 	& $installPowerCli
 	& $installPhp
 	& $extractWebCommander
+	import-module webadministration
 	& $addWebCommanderSite
 	& $configAuthentication $authentication
 	& $installAdvancedLogging
