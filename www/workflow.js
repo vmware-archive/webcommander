@@ -634,11 +634,13 @@ $(function() {
 		select_cmd = '<select class="cmdlist"><option selected disabled>Select a command to run</option>';
 		var cmd_list = $(webcmd).find('command[hidden!="1"]');
 		cmd_list = $(cmd_list)
-			//.sort(function(a, b){
-			//	return $(a).attr('description') == $(b).attr('description') ? 0 : $(a).attr('description') < $(b).attr('description') ? -1 : 1
-			//})
+			.sort(function(a, b){
+				var x = $(a).find('functionality').first().text() + $(a).attr('synopsis');
+				var y = $(b).find('functionality').first().text() + $(b).attr('synopsis');
+				return x == y ? 0 : x < y ? -1 : 1
+			})
 			.each(function(){
-				select_cmd += '<option value="' + $(this).attr('name') + '">' + $(this).find('category').first().text() + " > " + $(this).attr('description') + '</option>';
+				select_cmd += '<option value="' + $(this).attr('name') + '">' + $(this).find('functionality').first().text() + " > " + $(this).attr('synopsis') + '</option>';
 			}); 
 		select_cmd += '</select>';
 		$('.status').before(select_cmd);
@@ -693,12 +695,12 @@ $(function() {
             });
 			var table = '<form name="'; 
 			table += cmd; 
-			table += '"><table width="100%" class="parameter"><tr><th width="20%">Name</th><th width="30%">Value</th><th width="50%">Description</th></tr>';
+			table += '"><table width="100%" class="parameter"><tr><th width="20%">Name</th><th width="30%">Value</th><th width="50%">Help Message</th></tr>';
 			$(xml).find('parameter').each(function(){
 				var param = $(this);
 				var name = param.attr('name');
 				table += '<tr><td>' + name;
-				if (param.attr('optional') == '0'){table += ' *';}
+				if (param.attr('mandatory') == '1'){table += ' *';}
 				table += '</td><td>';
 				var type = param.attr('type');
 				switch (type){
@@ -745,7 +747,7 @@ $(function() {
 					default:
 						break;
 				};
-				table += '</td><td>'  + param.attr('description') + '</td></tr>';
+				table += '</td><td>'  + param.attr('helpmessage') + '</td></tr>';
 			});
 			table += '<tr><td>Define workflow variable</td><td>';
 			table += '<input type="text" size="20" name="wf_key" placeholder="variable name"></input> = ';

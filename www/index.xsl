@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 <!-- Author: Jerry Liu, liuj@vmware.com -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-	<xsl:key name="keyEmpByName" match="//category" use="." />
+	<xsl:key name="keyEmpByName" match="//functionality" use="." />
 	<xsl:output method="html"/>
 	<xsl:template match="webcommander">
 		<html>
@@ -47,7 +47,7 @@ THE SOFTWARE.
 				<div id="filter-sidebar">
 					<div id="category-header">Filter Commands</div>
 					<div id="category-list">
-						<xsl:for-each select="//category[generate-id() = generate-id(key('keyEmpByName', .)[1])]">
+						<xsl:for-each select="//functionality[generate-id() = generate-id(key('keyEmpByName', .)[1])]">
 							<xsl:sort select="."/>
 							<p><input type="checkbox" class="catchk">
 								<xsl:attribute name="name">
@@ -79,76 +79,76 @@ THE SOFTWARE.
 				<xsl:for-each select="command[not(@hidden)]">
 					<xsl:sort select="./script" />
 					<li>
-						<xsl:variable name="categoryList">
-							<xsl:for-each select="./categories/category">
+						<xsl:variable name="functionalityList">
+							<xsl:for-each select="./functionalities/functionality">
 								<xsl:value-of select="." />
 								<xsl:if test="not(position()=last())"><xsl:text> </xsl:text></xsl:if>
 							</xsl:for-each>
 						</xsl:variable>
 						<xsl:attribute name="class">
-							<xsl:value-of select="$categoryList" />
+							<xsl:value-of select="$functionalityList" />
 						</xsl:attribute>
 						<a class="cmdName" target="_self">
 							<xsl:attribute name="href">
 								<xsl:value-of select="concat('webCmd.php?command=', @name)"/>
 							</xsl:attribute>
 							<xsl:choose>
-								<xsl:when test="./categories/*[1] = 'VM'">
+								<xsl:when test="./functionalities/*[1] = 'VM'">
 									<img src="images/icon-vm.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'vSphere'">
+								<xsl:when test="./functionalities/*[1] = 'vSphere'">
 									<img src="images/icon-vsphere.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'Snapshot'">
+								<xsl:when test="./functionalities/*[1] = 'Snapshot'">
 									<img src="images/icon-snapshot.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'Broker'">
+								<xsl:when test="./functionalities/*[1] = 'Broker'">
 									<img src="images/icon-view.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'VMX'">
+								<xsl:when test="./functionalities/*[1] = 'VMX'">
 									<img src="images/icon-vmx.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'Log'">
+								<xsl:when test="./functionalities/*[1] = 'Log'">
 									<img src="images/icon-log.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'Install'">
+								<xsl:when test="./functionalities/*[1] = 'Install'">
 									<img src="images/icon-install.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'Uninstall'">
+								<xsl:when test="./functionalities/*[1] = 'Uninstall'">
 									<img src="images/icon-uninstall.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'Remote_Console'">
+								<xsl:when test="./functionalities/*[1] = 'Remote_Console'">
 									<img src="images/icon-remote.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'AD'">
+								<xsl:when test="./functionalities/*[1] = 'AD'">
 									<img src="images/icon-ad.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'Build'">
+								<xsl:when test="./functionalities/*[1] = 'Build'">
 									<img src="images/icon-build.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'Script'">
+								<xsl:when test="./functionalities/*[1] = 'Script'">
 									<img src="images/icon-script.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'Powershell'">
+								<xsl:when test="./functionalities/*[1] = 'Powershell'">
 									<img src="images/icon-powershell.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'SQL_Server'">
+								<xsl:when test="./functionalities/*[1] = 'SQL_Server'">
 									<img src="images/icon-sql.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'Broker_RDS'">
+								<xsl:when test="./functionalities/*[1] = 'Broker_RDS'">
 									<img src="images/icon-rds.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'Workflow'">
+								<xsl:when test="./functionalities/*[1] = 'Workflow'">
 									<img src="images/icon-run.png" alt="icon" />
 								</xsl:when>
-								<xsl:when test="./categories/*[1] = 'Windows'">
+								<xsl:when test="./functionalities/*[1] = 'Windows'">
 									<img src="images/icon-windows.png" alt="icon" />
 								</xsl:when>
 								<xsl:otherwise>
 									<img src="images/icon-default.jpg" alt="icon" />
 								</xsl:otherwise>
 							</xsl:choose>
-							<xsl:value-of select="@description"/>
+							<xsl:value-of select="@synopsis"/>
 						</a>	
 					</li>
 				</xsl:for-each>						

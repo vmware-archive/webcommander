@@ -55,8 +55,10 @@ THE SOFTWARE.
 			<body>
 				<xsl:call-template name="header"/>
 				<xsl:call-template name="returnCode"/>
-				<xsl:if test="/webcommander/annotation">
-					<xsl:call-template name="annotation"/>
+				<xsl:if test="/webcommander/description">
+					<xsl:if test="returnCode = '4000'">
+						<xsl:call-template name="description"/>
+					</xsl:if>
 				</xsl:if>
 				<div id="container">
 					<xsl:call-template name="parameters"/>
@@ -108,17 +110,16 @@ THE SOFTWARE.
 		<div id="returnCode"><a href="webcmd.php?command=showReturnCode" class="code" target="_blank"><xsl:value-of select="returnCode"/></a></div>
 	</xsl:template>
 	
-	<xsl:template name="annotation">
-		<div id="dialog" title="Command Annotation"><xsl:copy-of disable-output-escaping="yes" select="annotation"/></div>
+	<xsl:template name="description">
+		<div id="dialog" title="Command Description"><xsl:copy-of disable-output-escaping="yes" select="description"/></div>
 		<script>
 			$(function() {
 				var dialogWidth;
 				if ($("#widthSetter").length) {
 					dialogWidth = $("#widthSetter").width() + 24;
 				} else {
-					dialogWidth = 300;
+					dialogWidth = 500;
 				}
-				//$( "#dialog" ).dialog("resize", "auto");
 				$( "#dialog" ).dialog({width:dialogWidth});
 			});
 		</script>
@@ -133,7 +134,7 @@ THE SOFTWARE.
 							<tr>
 								<th>Parameter</th>
 								<th>Value</th>
-								<th>Description</th>
+								<th>Help Message</th>
 							</tr>
 							<xsl:for-each select="parameters/parameter">
 								<xsl:call-template name="parameter"/>
@@ -180,7 +181,7 @@ THE SOFTWARE.
 		<tr>
 			<td class="style2-right">
 				<xsl:choose>
-					<xsl:when test="@optional = '0'">
+					<xsl:when test="@mandatory = '1'">
 						<font style="color:red"><xsl:value-of select="@name"/></font>
 					</xsl:when>
 					<xsl:otherwise>
@@ -249,7 +250,7 @@ THE SOFTWARE.
 					<br/><input type="button" id="btnGetMoreIso" value="Get more ISO" />
 				</xsl:if>
 			</td>
-			<td class="style2-right"><xsl:value-of select="@description"/></td>
+			<td class="style2-right"><xsl:value-of select="@helpmessage"/></td>
 		</tr>
 	</xsl:template>
 					

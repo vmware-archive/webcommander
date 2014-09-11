@@ -202,8 +202,8 @@ if ( $command == ""){
 		$xmloutput .= '<?xml-stylesheet type="text/xsl" href="webCmd.xsl"?>';
 		$scriptName = (string)$target->script;
 		$xmloutput .= '<webcommander cmd="' . $command . '" developer="' . $target["developer"] . '" script="' . $scriptName . '">';
-		$annotation = $target->xpath("annotation");
-		if ( $annotation ){$xmloutput .= $annotation[0]->asXML();}
+		$description = $target->xpath("description");
+		if ( $description ){$xmloutput .= $description[0]->asXML();}
 		$xmloutput .= '<parameters>';
 		$params = $target->xpath("parameters/parameter");
 		$missParam = false;
@@ -216,14 +216,14 @@ if ( $command == ""){
 			$name = (string)$param["name"];
 			$param->addAttribute("value", $_REQUEST[$name]);
 			$xmloutput .= $param->asXML();
-			if ((string)$param["optional"] == "0" && $_REQUEST[$name] == "" && $_FILES[$name] == "") {
+			if ((string)$param["mandatory"] == "1" && $_REQUEST[$name] == "" && $_FILES[$name] == "") {
 				$missParam = true;
 			}
 			if ($_FILES[$name] != "") {
 				//if($_FILES[$name]["size"] > 200000 or $_FILES[$name]["error"] > 0)
 				if($_FILES[$name]["error"] > 0)
 				{	
-					if ($param["optional"] == "0" ) {$missFile = true;}
+					if ($param["mandatory"] == "1" ) {$missFile = true;}
 				} else {
 					$clientIp = getIpAddress();
 					$folder = "../www/upload/" . $clientIp;

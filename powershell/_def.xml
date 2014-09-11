@@ -24,29 +24,29 @@ THE SOFTWARE.
 
 <!DOCTYPE webcommander[
 <!ENTITY commonViServerParam '
-<parameter optional="0" name="serverAddress" description="IP or FQDN of the ESX or VC server where the target VM is located" />
-<parameter optional="1" name="serverUser" description="User name to connect to the server (default is root)" type="selectText">
+<parameter mandatory="1" name="serverAddress" helpmessage="IP or FQDN of the ESX or VC server where the target VM is located" />
+<parameter mandatory="0" name="serverUser" helpmessage="User name to connect to the server (default is root)" type="selectText">
 	<options>
 		<option value="root">root</option>
 		<option value="administrator">administrator</option>
 	</options>
 </parameter>
-<parameter optional="1" name="serverPassword" description="Password of the user (default is VMware standard)" type="password" />
+<parameter mandatory="0" name="serverPassword" helpmessage="Password of the user (default is VMware standard)" type="password" />
 '>
 <!ENTITY vmParam '
-<parameter optional="0" name="vmName" description="Name of the target VM" />
-<parameter optional="1" name="guestUser" description="User of guest OS (default is administrator)" />
-<parameter optional="1" name="guestPassword" description="Password of guest OS (default is VMware standard)" type="password" /> 
+<parameter mandatory="1" name="vmName" helpmessage="Name of the target VM" />
+<parameter mandatory="0" name="guestUser" helpmessage="User of guest OS (default is administrator)" />
+<parameter mandatory="0" name="guestPassword" helpmessage="Password of guest OS (default is VMware standard)" type="password" /> 
 '>
 <!ENTITY commonVcParam '
-<parameter optional="0" name="vcAddress" description="IP or FQDN of the VC server" />
-<parameter optional="1" name="vcUser" description="User name to connect to VC server (default is administrator)" />
-<parameter optional="1" name="vcPassword" description="Password of the user (default is VMware standard)" type="password" /> 
+<parameter mandatory="1" name="vcAddress" helpmessage="IP or FQDN of the VC server" />
+<parameter mandatory="0" name="vcUser" helpmessage="User name to connect to VC server (default is administrator)" />
+<parameter mandatory="0" name="vcPassword" helpmessage="Password of the user (default is VMware standard)" type="password" /> 
 '>
 <!ENTITY commonDomainParam '
-<parameter optional="0" name="domainName" description="Name of the domain" />
-<parameter optional="1" name="domainUser" description="User name to connect to domain (default is administrator)" />
-<parameter optional="1" name="domainPassword" description="Password of the user (default is VMware standard)" type="password" /> 
+<parameter mandatory="1" name="domainName" helpmessage="Name of the domain" />
+<parameter mandatory="0" name="domainUser" helpmessage="User name to connect to domain (default is administrator)" />
+<parameter mandatory="0" name="domainPassword" helpmessage="Password of the user (default is VMware standard)" type="password" /> 
 '>
 <!ENTITY falseOrTrue '
 <options>
@@ -55,14 +55,14 @@ THE SOFTWARE.
 </options> 
 '>
 <!ENTITY commonBuildParam '
-<parameter optional="1" name="product" description="Name of the product of the build" />
-<parameter optional="1" name="branch" description="Name of the branch of the build " />
-<parameter optional="0" name="build" description="Number of the build to install" type="selectText">
+<parameter mandatory="0" name="product" helpmessage="Name of the product of the build" />
+<parameter mandatory="0" name="branch" helpmessage="Name of the branch of the build " />
+<parameter mandatory="1" name="build" helpmessage="Number of the build to install" type="selectText">
 	<options/>
 </parameter>
 '>
 <!ENTITY rdsSessionCounter '
-<parameter optional="0" name="counter" description="What to count" type="option">
+<parameter mandatory="1" name="counter" helpmessage="What to count" type="option">
 	<options>
 		<option value="getAllLocalSessionCount">AllLocalSessionCount</option>  
 		<option value="getAllAppSessionCount">AllAppSessionCount</option>
@@ -76,13 +76,13 @@ THE SOFTWARE.
 '>
 ]>
 <webcommander>
-	<command name="adNewDomain" description="Create a child domain" developer="liuj">
+	<command name="adNewDomain" synopsis="Create a child domain" developer="liuj">
 		<script>ad\adNewDomain1</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="domainName" description="Name of the new domain" />
-			<parameter optional="0" name="domainMode" description="Domain mode" type="option">
+			<parameter mandatory="1" name="domainName" helpmessage="Name of the new domain" />
+			<parameter mandatory="1" name="domainMode" helpmessage="Domain mode" type="option">
 				<options>
 					<option value="Win2003">Win2003</option>
 					<option value="Win2008">Win2008</option>
@@ -90,24 +90,24 @@ THE SOFTWARE.
 					<option value="Win2012">Win2012</option>
 				</options>
 			</parameter>
-			<parameter optional="1" name="safeModePassword" description="Safe mode administrator password (default is VMware standard)" type="password" />
-			<parameter optional="0" name="parentDomainName" description="Name of the parent domain" />
-			<parameter optional="1" name="parentDomainUser" description="User of the parent domain (default is administrator)" />
-			<parameter optional="1" name="parentDomainPassword" description="Password of the parent domain (default is VMware standard)" type="password" />
-			<parameter optional="0" name="parentDomainControllerAddress" description="FQDN of the parent domain controller" />
+			<parameter mandatory="0" name="safeModePassword" helpmessage="Safe mode administrator password (default is VMware standard)" type="password" />
+			<parameter mandatory="1" name="parentDomainName" helpmessage="Name of the parent domain" />
+			<parameter mandatory="0" name="parentDomainUser" helpmessage="User of the parent domain (default is administrator)" />
+			<parameter mandatory="0" name="parentDomainPassword" helpmessage="Password of the parent domain (default is VMware standard)" type="password" />
+			<parameter mandatory="1" name="parentDomainControllerAddress" helpmessage="FQDN of the parent domain controller" />
 		</parameters>
-		<categories>
-			<category>AD</category>
-		</categories>
+		<functionalities>
+			<functionality>AD</functionality>
+		</functionalities>
 	</command>
-	<command name="adNewForest" description="Create a forest" developer="liuj">
+	<command name="adNewForest" synopsis="Create a forest" developer="liuj">
 		<script>ad\adNewForest1</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="domainName" description="Name of the new domain" />
-			<parameter optional="0" name="netbiosName" description="Netbios name of the new domain" />
-			<parameter optional="0" name="forestMode" description="Forest mode" type="option">
+			<parameter mandatory="1" name="domainName" helpmessage="Name of the new domain" />
+			<parameter mandatory="1" name="netbiosName" helpmessage="Netbios name of the new domain" />
+			<parameter mandatory="1" name="forestMode" helpmessage="Forest mode" type="option">
 				<options>
 					<option value="Win2003">Win2003</option>
 					<option value="Win2008">Win2008</option>
@@ -115,716 +115,716 @@ THE SOFTWARE.
 					<option value="Win2012">Win2012</option>
 				</options>
 			</parameter>
-			<parameter optional="1" name="safeModePassword" description="Safe mode administrator password (default is VMware standard)" type="password" />
+			<parameter mandatory="0" name="safeModePassword" helpmessage="Safe mode administrator password (default is VMware standard)" type="password" />
 		</parameters>
-		<categories>
-			<category>AD</category>
-		</categories>
+		<functionalities>
+			<functionality>AD</functionality>
+		</functionalities>
 	</command>
-	<command name="adNewUserAndGroup" description="Create new users and groups" developer="liuj">
+	<command name="adNewUserAndGroup" synopsis="Create new users and groups" developer="liuj">
 		<script>ad\adNewUserAndGroup1</script>
-		<annotation>
+		<description>
 			<p>Users will be averagely added into each group.</p>
 			<p>For instance, when there are 100 users and 10 groups:</p>
 			<p>user-1 to user-10 will be in group-1, user-11 to user-20 will be in group-2, etc.</p>
-		</annotation>
+		</description>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="userPrefix" description="Prefix of user name" />
-			<parameter optional="1" name="totalUser" description="Number of users to create, default is '1'" />
-			<parameter optional="1" name="userPassword" description="User password (default is VMware standard)" type="password" />
-			<parameter optional="0" name="groupPrefix" description="Prefix of group name" />
-			<parameter optional="1" name="totalGroup" description="Number of groups to create, default is '1'" />
+			<parameter mandatory="1" name="userPrefix" helpmessage="Prefix of user name" />
+			<parameter mandatory="0" name="totalUser" helpmessage="Number of users to create, default is '1'" />
+			<parameter mandatory="0" name="userPassword" helpmessage="User password (default is VMware standard)" type="password" />
+			<parameter mandatory="1" name="groupPrefix" helpmessage="Prefix of group name" />
+			<parameter mandatory="0" name="totalGroup" helpmessage="Number of groups to create, default is '1'" />
 		</parameters>
-		<categories>
-			<category>AD</category>
-		</categories>
+		<functionalities>
+			<functionality>AD</functionality>
+		</functionalities>
 	</command>
-	<command name="adJoinDomain" description="Join domain" developer="liuj">
+	<command name="adJoinDomain" synopsis="Join domain" developer="liuj">
 		<script>ad\adJoinDomain</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 			&commonDomainParam;
-			<parameter optional="0" name="dnsIp" description="IP address of DNS server" />
+			<parameter mandatory="1" name="dnsIp" helpmessage="IP address of DNS server" />
 		</parameters>
-		<categories>
-			<category>AD</category>
-		</categories>
+		<functionalities>
+			<functionality>AD</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerAddComposer" description="Add composer" developer="liuj">
+	<command name="brokerAddComposer" synopsis="Add composer" developer="liuj">
 		<script>broker\brokerAddComposer</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 			&commonVcParam;
-			<parameter optional="0" name="composerAddress" description="IP or FQDN of the composer server" />
-			<parameter optional="1" name="composerUser" description="User name to connect to composer server (default is local\administrator)" />
-			<parameter optional="1" name="composerPassword" description="Password of the user (default is VMware standard)" type="password" />
-			<parameter optional="1" name="port" description="Composer port number, default is 18443" />
+			<parameter mandatory="1" name="composerAddress" helpmessage="IP or FQDN of the composer server" />
+			<parameter mandatory="0" name="composerUser" helpmessage="User name to connect to composer server (default is local\administrator)" />
+			<parameter mandatory="0" name="composerPassword" helpmessage="Password of the user (default is VMware standard)" type="password" />
+			<parameter mandatory="0" name="port" helpmessage="Composer port number, default is 18443" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerAddComposerDomain" description="Add composer domain" developer="liuj">
+	<command name="brokerAddComposerDomain" synopsis="Add composer domain" developer="liuj">
 		<script>broker\brokerAddComposerDomain</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 			&commonVcParam;
-			<parameter optional="0" name="domainName" description="Domain name" />
-			<parameter optional="1" name="domainUser" description="Domain user name (default is administrator)" />
-			<parameter optional="1" name="domainPassword" description="Password of the user (default is VMware standard)" type="password" />
+			<parameter mandatory="1" name="domainName" helpmessage="Domain name" />
+			<parameter mandatory="0" name="domainUser" helpmessage="Domain user name (default is administrator)" />
+			<parameter mandatory="0" name="domainPassword" helpmessage="Password of the user (default is VMware standard)" type="password" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerAddLicense" description="Add license" developer="liuj">
+	<command name="brokerAddLicense" synopsis="Add license" developer="liuj">
 		<script>broker\brokerAddLicense</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="license" description="License key" />
+			<parameter mandatory="1" name="license" helpmessage="License key" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerAddLinkedClonePool" description="Add linked clone pool" developer="liuj">
+	<command name="brokerAddLinkedClonePool" synopsis="Add linked clone pool" developer="liuj">
 		<script>broker\brokerAddLinkedClonePool</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="vcAddress" description="VC address showed in admin UI" />
-			<parameter optional="0" name="composerDomainName" description="Composer domain name" />
-			<parameter optional="0" name="poolId" description="Unique name used to identify this pool" />
-			<parameter optional="1" name="namePrefix" description="Name prefix, default is 'poolID-'" />
-			<parameter optional="0" name="parentVmPath" description="Path to a virtual machine to be used as the parent VM for this desktop pool." />
-			<parameter optional="0" name="parentSnapshotPath" description="Path to the snapshot that is to be used as the image for this pool, i.e. /clean or /clean/test0" />
-			<parameter optional="0" name="vmFolderPath" description="Specify a location for this new directory as a vCenter folder path." />
-			<parameter optional="0" name="resourcePoolPath" description="Path to a resource pool to be used for this desktop pool." />
-			<parameter optional="0" name="datastoreSpecs" description="List of datastore specs for storage of desktop VMs and data disks, separated by semicolons using the format: '[Overcommit,usage]/path/to/datastore'" />
-			<parameter optional="1" name="dataDiskLetter" description="Data disk letter, default is 'U'" />
-			<parameter optional="1" name="dataDiskSize" description="Data disk size, default is 2048" />
-			<parameter optional="1" name="tempDiskSize" description="Temp disk size, default is 1024" />
-			<parameter optional="0" name="min" description="Minimum number of desktops to be provisioned in this pool" />
-			<parameter optional="0" name="max" description="Maximum number of desktops to be provisioned in this pool" />
-			<parameter optional="1" name="poolType" description="User assignment mode" type="option">
+			<parameter mandatory="1" name="vcAddress" helpmessage="VC address showed in admin UI" />
+			<parameter mandatory="1" name="composerDomainName" helpmessage="Composer domain name" />
+			<parameter mandatory="1" name="poolId" helpmessage="Unique name used to identify this pool" />
+			<parameter mandatory="0" name="namePrefix" helpmessage="Name prefix, default is 'poolID-'" />
+			<parameter mandatory="1" name="parentVmPath" helpmessage="Path to a virtual machine to be used as the parent VM for this desktop pool." />
+			<parameter mandatory="1" name="parentSnapshotPath" helpmessage="Path to the snapshot that is to be used as the image for this pool, i.e. /clean or /clean/test0" />
+			<parameter mandatory="1" name="vmFolderPath" helpmessage="Specify a location for this new directory as a vCenter folder path." />
+			<parameter mandatory="1" name="resourcePoolPath" helpmessage="Path to a resource pool to be used for this desktop pool." />
+			<parameter mandatory="1" name="datastoreSpecs" helpmessage="List of datastore specs for storage of desktop VMs and data disks, separated by semicolons using the format: '[Overcommit,usage]/path/to/datastore'" />
+			<parameter mandatory="0" name="dataDiskLetter" helpmessage="Data disk letter, default is 'U'" />
+			<parameter mandatory="0" name="dataDiskSize" helpmessage="Data disk size, default is 2048" />
+			<parameter mandatory="0" name="tempDiskSize" helpmessage="Temp disk size, default is 1024" />
+			<parameter mandatory="1" name="min" helpmessage="Minimum number of desktops to be provisioned in this pool" />
+			<parameter mandatory="1" name="max" helpmessage="Maximum number of desktops to be provisioned in this pool" />
+			<parameter mandatory="0" name="poolType" helpmessage="User assignment mode" type="option">
 				<options>
 					<option value="Persistent">Persistent</option>
 					<option value="NonPersistent">NonPersistent</option>
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerAddManualPool" description="Add manual pool" developer="liuj">
+	<command name="brokerAddManualPool" synopsis="Add manual pool" developer="liuj">
 		<script>broker\brokerAddManualPool</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="poolId" description="Unique name used to identify this pool" />
+			<parameter mandatory="1" name="poolId" helpmessage="Unique name used to identify this pool" />
 			&commonVcParam;
-			<parameter optional="0" name="agentVmName" description="Agent virtual machine name in the vCenter inventory" />
-			<parameter optional="0" name="poolType" description="User assignment mode" type="option">
+			<parameter mandatory="1" name="agentVmName" helpmessage="Agent virtual machine name in the vCenter inventory" />
+			<parameter mandatory="1" name="poolType" helpmessage="User assignment mode" type="option">
 				<options>
 					<option value="Persistent">Persistent</option>
 					<option value="NonPersistent">NonPersistent</option>
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerAddSviPool" description="Add SVI pool" developer="liuj">
+	<command name="brokerAddSviPool" synopsis="Add SVI pool" developer="liuj">
 		<script>broker\brokerAddSviPool</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="poolId" description="Unique name used to identify this pool" />
+			<parameter mandatory="1" name="poolId" helpmessage="Unique name used to identify this pool" />
 			&commonVcParam;
-			<parameter optional="0" name="parentVmName" description="Parent virtual machine name in the vCenter inventory" />
-			<parameter optional="0" name="snapshotPath" description="Path to the snapshot that is to be used as the image for this pool, i.e. /clean or /clean/test0" />
-			<parameter optional="0" name="min" description="Minimum number of desktops to be provisioned in this pool" />
-			<parameter optional="0" name="max" description="Maximum number of desktops to be provisioned in this pool" />
-			<parameter optional="0" name="poolType" description="User assignment mode" type="option">
+			<parameter mandatory="1" name="parentVmName" helpmessage="Parent virtual machine name in the vCenter inventory" />
+			<parameter mandatory="1" name="snapshotPath" helpmessage="Path to the snapshot that is to be used as the image for this pool, i.e. /clean or /clean/test0" />
+			<parameter mandatory="1" name="min" helpmessage="Minimum number of desktops to be provisioned in this pool" />
+			<parameter mandatory="1" name="max" helpmessage="Maximum number of desktops to be provisioned in this pool" />
+			<parameter mandatory="1" name="poolType" helpmessage="User assignment mode" type="option">
 				<options>
 					<option value="Persistent">Persistent</option>
 					<option value="NonPersistent">NonPersistent</option>
 				</options>
 			</parameter>
-			<parameter optional="1" name="vmEsxHost" description="The host or cluster on which to run the VMs created for this pool (default is the same one where the parent VM is located)" />
-			<parameter optional="0" name="datastore" description="The storage of desktop VMs and data disks" type="selectText">
+			<parameter mandatory="0" name="vmEsxHost" helpmessage="The host or cluster on which to run the VMs created for this pool (default is the same one where the parent VM is located)" />
+			<parameter mandatory="1" name="datastore" helpmessage="The storage of desktop VMs and data disks" type="selectText">
 				<options />
 			</parameter>
-			<parameter optional="1" name="folder" description="A new folder will be created to store the pool VMs. Specify a location for this folder as a vCenter folder path" />
-			<parameter optional="1" name="resourcePool" description="Path to a resource pool to be used for this desktop pool" />
-			<parameter optional="0" name="datacenter" description="Name of the datacenter where this desktop pool locates" />
+			<parameter mandatory="0" name="folder" helpmessage="A new folder will be created to store the pool VMs. Specify a location for this folder as a vCenter folder path" />
+			<parameter mandatory="0" name="resourcePool" helpmessage="Path to a resource pool to be used for this desktop pool" />
+			<parameter mandatory="1" name="datacenter" helpmessage="Name of the datacenter where this desktop pool locates" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerAddTransferServer" description="Add transfer server" developer="liuj">
+	<command name="brokerAddTransferServer" synopsis="Add transfer server" developer="liuj">
 		<script>broker\brokerAddTransferServer</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 			&commonVcParam;
-			<parameter optional="0" name="tsVmName" description="Transfer server virtual machine name in the vCenter inventory" />
+			<parameter mandatory="1" name="tsVmName" helpmessage="Transfer server virtual machine name in the vCenter inventory" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerAddVc" description="Add VC" developer="liuj">
+	<command name="brokerAddVc" synopsis="Add VC" developer="liuj">
 		<script>broker\brokerAddVc</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 			&commonVcParam;
-			<parameter optional="0" name="useComposer" description="If use composer, true or false" type="option">
+			<parameter mandatory="1" name="useComposer" helpmessage="If use composer, true or false" type="option">
 				&falseOrTrue;
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerEntitlePool" description="Entitle pool" developer="liuj">
+	<command name="brokerEntitlePool" synopsis="Entitle pool" developer="liuj">
 		<script>broker\brokerEntitlePool</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="poolId" description="Pool ID" />
-			<parameter optional="0" name="userName" description="Specifies user name (in domain\user format)" />
+			<parameter mandatory="1" name="poolId" helpmessage="Pool ID" />
+			<parameter mandatory="1" name="userName" helpmessage="Specifies user name (in domain\user format)" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerGetDesktopState" description="Get desktop state" developer="liuj">
+	<command name="brokerGetDesktopState" synopsis="Get desktop state" developer="liuj">
 		<script>broker\brokerGetDesktopState1</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="1" name="poolId" description="Pool ID, default is '*' for all pools" />
+			<parameter mandatory="0" name="poolId" helpmessage="Pool ID, default is '*' for all pools" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerSettingsAction" description="Import / Export Broker Settings" developer="liuj">
+	<command name="brokerSettingsAction" synopsis="Import / Export Broker Settings" developer="liuj">
 		<script>broker\brokerSettings</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="1" name="filePath" description="Path to the broker settings file, default is c:\temp\broker.ldif" />
-			<parameter optional="0" name="action" description="Action on broker Settings" type="option">
+			<parameter mandatory="0" name="filePath" helpmessage="Path to the broker settings file, default is c:\temp\broker.ldif" />
+			<parameter mandatory="1" name="action" helpmessage="Action on broker Settings" type="option">
 				<options>
 					<option value="export">export</option>
 					<option value="import">import</option>
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerRebalanceLinkedClonePool" description="Rebalance linked clone pool" developer="liuj">
+	<command name="brokerRebalanceLinkedClonePool" synopsis="Rebalance linked clone pool" developer="liuj">
 		<script>broker\brokerRebalanceLinkedClonePool</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="poolId" description="Unique name used to identify this pool" />
+			<parameter mandatory="1" name="poolId" helpmessage="Unique name used to identify this pool" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerRecomposeLinkedClonePool" description="Recompose linked clone pool" developer="liuj">
+	<command name="brokerRecomposeLinkedClonePool" synopsis="Recompose linked clone pool" developer="liuj">
 		<script>broker\brokerRecomposeLinkedClonePool</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="poolId" description="Unique name used to identify this pool" />
-			<parameter optional="0" name="parentVmPath" description="Path to a virtual machine to be used as the parent VM for this desktop pool." />
-			<parameter optional="0" name="parentSnapshotPath" description="Path to the snapshot that is to be used as the image for this pool, i.e. /clean or /clean/test0" />
+			<parameter mandatory="1" name="poolId" helpmessage="Unique name used to identify this pool" />
+			<parameter mandatory="1" name="parentVmPath" helpmessage="Path to a virtual machine to be used as the parent VM for this desktop pool." />
+			<parameter mandatory="1" name="parentSnapshotPath" helpmessage="Path to the snapshot that is to be used as the image for this pool, i.e. /clean or /clean/test0" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerRefreshLinkedClonePool" description="Refresh linked clone pool" developer="liuj">
+	<command name="brokerRefreshLinkedClonePool" synopsis="Refresh linked clone pool" developer="liuj">
 		<script>broker\brokerRefreshLinkedClonePool</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="poolId" description="Unique name used to identify this pool" />
+			<parameter mandatory="1" name="poolId" helpmessage="Unique name used to identify this pool" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerRemovePool" description="Remove pool" developer="liuj">
+	<command name="brokerRemovePool" synopsis="Remove pool" developer="liuj">
 		<script>broker\brokerRemovePool</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="poolId" description="Pool ID" />
-			<parameter optional="0" name="rmFromDisk" description="If remove VM from disk, true or false" type="option">
+			<parameter mandatory="1" name="poolId" helpmessage="Pool ID" />
+			<parameter mandatory="1" name="rmFromDisk" helpmessage="If remove VM from disk, true or false" type="option">
 				&falseOrTrue;
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerRemoveTransferServer" description="Remove transfer server" developer="liuj">
+	<command name="brokerRemoveTransferServer" synopsis="Remove transfer server" developer="liuj">
 		<script>broker\brokerRemoveTransferServer</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="tsVmName" description="Transfer server virtual machine name in the vCenter inventory. Input '*' to remove all" />
+			<parameter mandatory="1" name="tsVmName" helpmessage="Transfer server virtual machine name in the vCenter inventory. Input '*' to remove all" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerSendSessionLogoff" description="Send session logoff to pool" developer="liuj">
+	<command name="brokerSendSessionLogoff" synopsis="Send session logoff to pool" developer="liuj">
 		<script>broker\brokerSendSessionLogoff</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="poolId" description="Unique name used to identify this pool" />
+			<parameter mandatory="1" name="poolId" helpmessage="Unique name used to identify this pool" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerSetRecoveryDisabled" description="Set Auto-Recovery" developer="liuj">
+	<command name="brokerSetRecoveryDisabled" synopsis="Set Auto-Recovery" developer="liuj">
 		<script>broker\brokerSetRecoveryDisabled</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="poolId" description="Pool ID" />
-			<parameter optional="0" name="switch" description="Value of pae-RecoveryDisabled, 0 or 1" type="option">
+			<parameter mandatory="1" name="poolId" helpmessage="Pool ID" />
+			<parameter mandatory="1" name="switch" helpmessage="Value of pae-RecoveryDisabled, 0 or 1" type="option">
 				<options>
 					<option value="0">0</option>
 					<option value="1">1</option>
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerSetDirectConnect" description="Set direct connect" developer="liuj">
+	<command name="brokerSetDirectConnect" synopsis="Set direct connect" developer="liuj">
 		<script>broker\brokerSetDirectConnect</script>
-		<annotation>
+		<description>
 			<p>This command is to configure HTTP(S) Secure Tunnel on Broker. The PowerCLI cmdlet used by this command is</p>
 			<p>update-connectionbroker -directconnect [$false | $true]</p>
 			<p>When set to False, "Use Secure Tunnel connection to desktop" is checked in the dialog below.</p>
 			<p>
 				<img id="widthSetter" src="images/brokerEdit.png" />
 			</p>
-		</annotation>
+		</description>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="switch" description="Switch, true or false" type="option">
+			<parameter mandatory="1" name="switch" helpmessage="Switch, true or false" type="option">
 				&falseOrTrue;
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerSetDirectPCoIP" description="Set direct PCoIP" developer="liuj">
+	<command name="brokerSetDirectPCoIP" synopsis="Set direct PCoIP" developer="liuj">
 		<script>broker\brokerSetDirectPCoIP</script>
-		<annotation>
+		<description>
 			<p>This command is to configure PCoIP secure gateway. The PowerCLI cmdlet used by this command is</p>
 			<p>update-connectionbroker -directPCoIP [$false | $true]</p>
 			<p>When set to False, "Use PCoIP Secure Gateway for PCoIP connections to desktop" is checked in the dialog below.</p>
 			<p>
 				<img id="widthSetter" src="images/brokerEdit.png" />
 			</p>
-		</annotation>
+		</description>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="switch" description="Switch, true or false" type="option">
+			<parameter mandatory="1" name="switch" helpmessage="Switch, true or false" type="option">
 				&falseOrTrue;
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerSetEventDatabase" description="Set event database" developer="liuj">
+	<command name="brokerSetEventDatabase" synopsis="Set event database" developer="liuj">
 		<script>broker\brokerSetEventDatabase1</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="dbAddress" description="Database server address" />
-			<parameter optional="1" name="dbType" description="Database server type, default is SQLSERVER" type="option">
+			<parameter mandatory="1" name="dbAddress" helpmessage="Database server address" />
+			<parameter mandatory="0" name="dbType" helpmessage="Database server type, default is SQLSERVER" type="option">
 				<options>
 					<option value="SQLSERVER">SQLSERVER</option>
 					<option value="ORACLE">ORACLE</option>
 				</options>
 			</parameter>
-			<parameter optional="1" name="dbPort" description="Port, default is 1433" />
-			<parameter optional="0" name="dbName" description="Database name" />
-			<parameter optional="1" name="dbUser" description="User name, default is administrator" />
-			<parameter optional="1" name="dbPassword" description="Password, default is VMware standard" type="password" />
-			<parameter optional="0" name="tablePrefix" description="Table prefix" />
+			<parameter mandatory="0" name="dbPort" helpmessage="Port, default is 1433" />
+			<parameter mandatory="1" name="dbName" helpmessage="Database name" />
+			<parameter mandatory="0" name="dbUser" helpmessage="User name, default is administrator" />
+			<parameter mandatory="0" name="dbPassword" helpmessage="Password, default is VMware standard" type="password" />
+			<parameter mandatory="1" name="tablePrefix" helpmessage="Table prefix" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerSetHtmlAccess" description="Set HTML Access" developer="liuj">
+	<command name="brokerSetHtmlAccess" synopsis="Set HTML Access" developer="liuj">
 		<script>broker\brokerSetHtmlAccess</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="poolId" description="Pool ID" />
-			<parameter optional="0" name="switch" description="Switch, true or false" type="option">
+			<parameter mandatory="1" name="poolId" helpmessage="Pool ID" />
+			<parameter mandatory="1" name="switch" helpmessage="Switch, true or false" type="option">
 				&falseOrTrue;
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerSetPairingPassword" description="Set pairing password" developer="liuj">
+	<command name="brokerSetPairingPassword" synopsis="Set pairing password" developer="liuj">
 		<script>broker\brokerSetPairingPassword1</script>
-		<annotation>
+		<description>
 			<p>This command is to specify Security Server Pairing Password in the dialog below. This must run before installing Security Server.</p>
 			<p>The password is hardcoded to 111111, and timeout is 24 hours.</p>
 			<p>
 				<img id="widthSetter" src="images/pairingPassword.png" />
 			</p>
-		</annotation>
+		</description>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerSetPoolName" description="Set pool display name" developer="liuj">
+	<command name="brokerSetPoolName" synopsis="Set pool display name" developer="liuj">
 		<script>broker\brokerSetPoolName</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="poolId" description="Specifies pool ID" />
-			<parameter optional="0" name="poolName" description="Specifies the pool display name" />
+			<parameter mandatory="1" name="poolId" helpmessage="Specifies pool ID" />
+			<parameter mandatory="1" name="poolName" helpmessage="Specifies the pool display name" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerSetPoolId" description="Set pool ID" developer="liuj">
+	<command name="brokerSetPoolId" synopsis="Set pool ID" developer="liuj">
 		<script>broker\brokerSetPoolId</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="poolId" description="Specifies pool ID" />
-			<parameter optional="0" name="newId" description="Specifies the new ID" />
+			<parameter mandatory="1" name="poolId" helpmessage="Specifies pool ID" />
+			<parameter mandatory="1" name="newId" helpmessage="Specifies the new ID" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerSetupSmartcard" description="Setup smartcard" developer="liuj">
+	<command name="brokerSetupSmartcard" synopsis="Setup smartcard" developer="liuj">
 		<script>broker\brokerSetupSmartcard</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="cert" description="CA certificate" type="file" />
+			<parameter mandatory="1" name="cert" helpmessage="CA certificate" type="file" />
 		</parameters>
-		<categories>
-			<category>Broker</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerAddApplication" description="Add application" developer="liuj">
+	<command name="brokerAddApplication" synopsis="Add application" developer="liuj">
 		<script>brokerrds\brokerAddApplication</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="farmName" description="Specifies Farm name" />
-			<parameter optional="0" name="applicationName" description="Specifies application name" />
-			<parameter optional="1" name="applicationId" description="Specifies application ID" />
-			<parameter optional="1" name="displayName" description="Specifies application display name" />
+			<parameter mandatory="1" name="farmName" helpmessage="Specifies Farm name" />
+			<parameter mandatory="1" name="applicationName" helpmessage="Specifies application name" />
+			<parameter mandatory="0" name="applicationId" helpmessage="Specifies application ID" />
+			<parameter mandatory="0" name="displayName" helpmessage="Specifies application display name" />
 		</parameters>
-		<categories>
-			<category>Broker_RDS</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker_RDS</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerAddRdsAppPool" description="Add application pool" developer="liuj">
+	<command name="brokerAddRdsAppPool" synopsis="Add application pool" developer="liuj">
 		<script>brokerrds\brokerAddRdsAppPool</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="farmId" description="Specifies Farm ID" />
-			<parameter optional="0" name="poolId" description="Specifies application pool ID" />
-			<parameter optional="0" name="execPath" description="Specifies application executable path" />
+			<parameter mandatory="1" name="farmId" helpmessage="Specifies Farm ID" />
+			<parameter mandatory="1" name="poolId" helpmessage="Specifies application pool ID" />
+			<parameter mandatory="1" name="execPath" helpmessage="Specifies application executable path" />
 		</parameters>
-		<categories>
-			<category>Broker_RDS</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker_RDS</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerAddRdsDesktopPool" description="Add desktop pool" developer="liuj">
+	<command name="brokerAddRdsDesktopPool" synopsis="Add desktop pool" developer="liuj">
 		<script>brokerrds\brokerAddRdsDesktopPool</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="farmId" description="Specifies farm ID" />
-			<parameter optional="0" name="poolId" description="Specifies desktop pool ID" />
+			<parameter mandatory="1" name="farmId" helpmessage="Specifies farm ID" />
+			<parameter mandatory="1" name="poolId" helpmessage="Specifies desktop pool ID" />
 		</parameters>
-		<categories>
-			<category>Broker_RDS</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker_RDS</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerAddFarm" description="Add farm" developer="liuj">
+	<command name="brokerAddFarm" synopsis="Add farm" developer="liuj">
 		<script>brokerrds\brokerAddFarm</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="farmName" description="Specifies Farm name" />
+			<parameter mandatory="1" name="farmName" helpmessage="Specifies Farm name" />
 		</parameters>
-		<categories>
-			<category>Broker_RDS</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker_RDS</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerAddFarmWithRdsServer" description="Add farm with RDS server" developer="liuj">
+	<command name="brokerAddFarmWithRdsServer" synopsis="Add farm with RDS server" developer="liuj">
 		<script>brokerrds\brokerAddFarmWithRdsServer</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="farmName" description="Specifies Farm name" />
-			<parameter optional="0" name="rdsServerDnsName" description="Specifies RDS server DNS name" />
+			<parameter mandatory="1" name="farmName" helpmessage="Specifies Farm name" />
+			<parameter mandatory="1" name="rdsServerDnsName" helpmessage="Specifies RDS server DNS name" />
 		</parameters>
-		<categories>
-			<category>Broker_RDS</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker_RDS</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerAddRdsServerToFarm" description="Add RDS server to farm" developer="liuj">
+	<command name="brokerAddRdsServerToFarm" synopsis="Add RDS server to farm" developer="liuj">
 		<script>brokerrds\brokerAddRdsServerToFarm</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="farmName" description="Specifies Farm name" />
-			<parameter optional="0" name="rdsServerDnsName" description="Specifies RDS server DNS name" />
+			<parameter mandatory="1" name="farmName" helpmessage="Specifies Farm name" />
+			<parameter mandatory="1" name="rdsServerDnsName" helpmessage="Specifies RDS server DNS name" />
 		</parameters>
-		<categories>
-			<category>Broker_RDS</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker_RDS</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerDeleteApplication" description="Delete application" developer="liuj">
+	<command name="brokerDeleteApplication" synopsis="Delete application" developer="liuj">
 		<script>brokerrds\brokerDeleteApplication</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="applicationId" description="Specifies application ID" />
+			<parameter mandatory="1" name="applicationId" helpmessage="Specifies application ID" />
 		</parameters>
-		<categories>
-			<category>Broker_RDS</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker_RDS</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerDeleteDesktop" description="Delete desktop" developer="liuj">
+	<command name="brokerDeleteDesktop" synopsis="Delete desktop" developer="liuj">
 		<script>brokerrds\brokerDeleteDesktop</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="desktopId" description="Specifies desktop ID" />
+			<parameter mandatory="1" name="desktopId" helpmessage="Specifies desktop ID" />
 		</parameters>
-		<categories>
-			<category>Broker_RDS</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker_RDS</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerDeleteFarm" description="Delete farm" developer="liuj">
+	<command name="brokerDeleteFarm" synopsis="Delete farm" developer="liuj">
 		<script>brokerrds\brokerDeleteFarm</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="farmName" description="Specifies Farm name" />
+			<parameter mandatory="1" name="farmName" helpmessage="Specifies Farm name" />
 		</parameters>
-		<categories>
-			<category>Broker_RDS</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker_RDS</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerEntitleApplication" description="Entitle application" developer="liuj">
+	<command name="brokerEntitleApplication" synopsis="Entitle application" developer="liuj">
 		<script>brokerrds\brokerEntitleApplication</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="applicationId" description="Specifies application ID" />
-			<parameter optional="0" name="userName" description="Specifies user name (in domain\user format)" />
+			<parameter mandatory="1" name="applicationId" helpmessage="Specifies application ID" />
+			<parameter mandatory="1" name="userName" helpmessage="Specifies user name (in domain\user format)" />
 		</parameters>
-		<categories>
-			<category>Broker_RDS</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker_RDS</functionality>
+		</functionalities>
 	</command>
-	<command name="brokerRemoveRdsServerFromFarm" description="Remove RDS server from farm" developer="liuj">
+	<command name="brokerRemoveRdsServerFromFarm" synopsis="Remove RDS server from farm" developer="liuj">
 		<script>brokerrds\brokerRemoveRdsServerFromFarm</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="farmName" description="Specifies Farm name" />
-			<parameter optional="0" name="rdsServerDnsName" description="Specifies RDS server DNS name" />
+			<parameter mandatory="1" name="farmName" helpmessage="Specifies Farm name" />
+			<parameter mandatory="1" name="rdsServerDnsName" helpmessage="Specifies RDS server DNS name" />
 		</parameters>
-		<categories>
-			<category>Broker_RDS</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker_RDS</functionality>
+		</functionalities>
 	</command>
-	<command name="listBuild" description="Search builds with product and branch" developer="liuj">
+	<command name="listBuild" synopsis="Search builds with product and branch" developer="liuj">
 		<script>misc\listBuild</script>
 		<parameters>
-			<parameter optional="0" name="product" description="Name of the product of the build" />
-			<parameter optional="0" name="branch" description="Name of the branch of the build " />
-			<parameter optional="1" name="releaseType" description="Release type" type="selectText">
+			<parameter mandatory="1" name="product" helpmessage="Name of the product of the build" />
+			<parameter mandatory="1" name="branch" helpmessage="Name of the branch of the build " />
+			<parameter mandatory="0" name="releaseType" helpmessage="Release type" type="selectText">
 				<options>
 					<option value="beta">beta</option>
 					<option value="GA">GA</option>
 				</options>
 			</parameter>
-			<parameter optional="1" name="buildType" description="Build type" type="selectText">
+			<parameter mandatory="0" name="buildType" helpmessage="Build type" type="selectText">
 				<options>
 					<option value="beta">beta</option>
 					<option value="release">release</option>
 				</options>
 			</parameter>
-			<parameter optional="1" name="qaResult" description="Filter build by QA Result " />
-			<parameter optional="1" name="latest" description="Number of latest builds to list " />
+			<parameter mandatory="0" name="qaResult" helpmessage="Filter build by QA Result " />
+			<parameter mandatory="0" name="latest" helpmessage="Number of latest builds to list " />
 		</parameters>
-		<categories>
-			<category>Build</category>
-		</categories>
+		<functionalities>
+			<functionality>Build</functionality>
+		</functionalities>
 	</command>
-	<command name="sendEmail" description="Send email notification" developer="liuj">
+	<command name="sendEmail" synopsis="Send email notification" developer="liuj">
 		<script>misc\sendEmail</script>
 		<parameters>
-			<parameter optional="1" name="fromAddress" description="From address, default is doNotReply@vmware.com" />
-			<parameter optional="0" name="toAddress" description="To address" />
-			<parameter optional="1" name="ccAddress" description="CC address" />
-			<parameter optional="1" name="bccAddress" description="BCC address" />
-			<parameter optional="1" name="subject" description="Subject, default is 'webCommander notification'" />
-			<parameter optional="0" name="body" description="Email body" type="textarea" />
+			<parameter mandatory="0" name="fromAddress" helpmessage="From address, default is doNotReply@vmware.com" />
+			<parameter mandatory="1" name="toAddress" helpmessage="To address" />
+			<parameter mandatory="0" name="ccAddress" helpmessage="CC address" />
+			<parameter mandatory="0" name="bccAddress" helpmessage="BCC address" />
+			<parameter mandatory="0" name="subject" helpmessage="Subject, default is 'webCommander notification'" />
+			<parameter mandatory="1" name="body" helpmessage="Email body" type="textarea" />
 		</parameters>
-		<categories>
-			<category>Email</category>
-		</categories>
+		<functionalities>
+			<functionality>Email</functionality>
+		</functionalities>
 	</command>
-	<command name="installComposerSync" description="Composer" developer="liuj">
+	<command name="installComposerSync" synopsis="Composer" developer="liuj">
 		<script>install\vmware\installComposer</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="1" name="ssName" description="Name of the snapshot which to restore before installing Composer" />
-			<parameter optional="0" name="build" description="Number of the build to install" />
-			<parameter optional="0" name="dsnName" description="Name of DSN to connect to VC database" />
-			<parameter optional="1" name="dbUser" description="Name of the database user, default is 'sa'" />
-			<parameter optional="1" name="dbPassword" description="Password of the database user, default is VMware standard" />
-			<parameter optional="1" name="downloadOnly" description="Download build without installing it" type="option">
+			<parameter mandatory="0" name="ssName" helpmessage="Name of the snapshot which to restore before installing Composer" />
+			<parameter mandatory="1" name="build" helpmessage="Number of the build to install" />
+			<parameter mandatory="1" name="dsnName" helpmessage="Name of DSN to connect to VC database" />
+			<parameter mandatory="0" name="dbUser" helpmessage="Name of the database user, default is 'sa'" />
+			<parameter mandatory="0" name="dbPassword" helpmessage="Password of the database user, default is VMware standard" />
+			<parameter mandatory="0" name="downloadOnly" helpmessage="Download build without installing it" type="option">
 				&falseOrTrue;
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Install</category>
-		</categories>
+		<functionalities>
+			<functionality>Install</functionality>
+		</functionalities>
 	</command>
-	<command name="installDotNet" description="DotNet 4.5.2" developer="liuj">
+	<command name="installDotNet" synopsis="DotNet 4.5.2" developer="liuj">
 		<script>install\installDotNet</script>
-		<annotation>
+		<description>
 			<p>
 				<b>Supported Operating System</b>
 			</p>
 			<p>Windows 7 Service Pack 1, Windows 8, Windows 8.1, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2, Windows Server 2012, Windows Server 2012 R2, Windows Vista Service Pack 2</p>
-		</annotation>
+		</description>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 		</parameters>
-		<categories>
-			<category>Install</category>
-		</categories>
+		<functionalities>
+			<functionality>Install</functionality>
+		</functionalities>
 	</command>
-	<command name="installSilently" description="Install silently" developer="liuj">
+	<command name="installSilently" synopsis="Install silently" developer="liuj">
 		<script>install\installSilently</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="1" name="ssName" description="Name of the snapshot which to restore before installing View" />
-			<parameter optional="0" name="installerUrl" description="URL to the installer binary" />
-			<parameter optional="1" name="silentInstallParam" description="Silent install parameters, such as ' /s /v /qn'" />
-			<parameter optional="1" name="downloadOnly" description="Download build without installing it" type="option">
+			<parameter mandatory="0" name="ssName" helpmessage="Name of the snapshot which to restore before installing View" />
+			<parameter mandatory="1" name="installerUrl" helpmessage="URL to the installer binary" />
+			<parameter mandatory="0" name="silentInstallParam" helpmessage="Silent install parameters, such as ' /s /v /qn'" />
+			<parameter mandatory="0" name="downloadOnly" helpmessage="Download build without installing it" type="option">
 				&falseOrTrue;
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Install</category>
-		</categories>
+		<functionalities>
+			<functionality>Install</functionality>
+		</functionalities>
 	</command>
-	<command name="installCis" description="VC 2015" developer="liuj">
+	<command name="installCis" synopsis="VC 2015" developer="liuj">
 		<script>install\vmware\installCis</script>
-		<annotation>
+		<description>
 			<p>The user defined as "guestUser" must have already logged on the target machine, when the install starts. Otherwise the install will fail. 
 				<br />Service <a href="webCmd.php?command=vmSetAutoAdminLogon" target="_blank">vmSetAutoAdminLogon</a> could be used to meet this requirement.
 				<br />Default VC user is 'administrator@vsphere.local'.
 				<br />Default VC password is 'passw0rd'.
 				<br />Refer to this <a href="https://wiki.eng.vmware.com/PIT/Projects/2015/vc_silent_install" target="_blank">wiki</a> for a template setting in JSON </p>
-		</annotation>
+		</description>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="1" name="ssName" description="Name of the snapshot which to restore before installing Virtual Center" />
+			<parameter mandatory="0" name="ssName" helpmessage="Name of the snapshot which to restore before installing Virtual Center" />
 			&commonBuildParam;
-			<parameter optional="1" name="customSettings" description="Custom settings in JSON format" type="textarea" />
-			<parameter optional="1" name="downloadOnly" description="Download build without installing it" type="option">
+			<parameter mandatory="0" name="customSettings" helpmessage="Custom settings in JSON format" type="textarea" />
+			<parameter mandatory="0" name="downloadOnly" helpmessage="Download build without installing it" type="option">
 				&falseOrTrue;
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Install</category>
-		</categories>
+		<functionalities>
+			<functionality>Install</functionality>
+		</functionalities>
 	</command>
-	<command name="installVc" description="VC 5.5 and earlier versions" developer="liuj">
+	<command name="installVc" synopsis="VC 5.5 and earlier versions" developer="liuj">
 		<script>install\vmware\installVc</script>
-		<annotation>
+		<description>
 			<p>The user defined as "guestUser" must have already logged on the target machine, when the install starts. Otherwise the install will fail. 
 				<br />Service <a href="webCmd.php?command=vmSetAutoAdminLogon" target="_blank">vmSetAutoAdminLogon</a> could be used to meet this requirement.
 				<br />Default VC user is 'administrator@vsphere.local'.
 				<br />Default VC password is 'Admin@12345'.</p>
-		</annotation>
+		</description>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="1" name="ssName" description="Name of the snapshot which to restore before installing Virtual Center" />
+			<parameter mandatory="0" name="ssName" helpmessage="Name of the snapshot which to restore before installing Virtual Center" />
 			&commonBuildParam;
-			<parameter optional="1" name="downloadOnly" description="Download build without installing it" type="option">
+			<parameter mandatory="0" name="downloadOnly" helpmessage="Download build without installing it" type="option">
 				&falseOrTrue;
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Install</category>
-		</categories>
+		<functionalities>
+			<functionality>Install</functionality>
+		</functionalities>
 	</command>
-	<command name="installViewSync" description="View" developer="liuj">
+	<command name="installViewSync" synopsis="View" developer="liuj">
 		<script>install\vmware\installView</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="1" name="ssName" description="Name of the snapshot which to restore before installing View" />
-			<parameter optional="0" name="type" description="Type of the View component to install" type="option">
+			<parameter mandatory="0" name="ssName" helpmessage="Name of the snapshot which to restore before installing View" />
+			<parameter mandatory="1" name="type" helpmessage="Type of the View component to install" type="option">
 				<options>
 					<option value="blast">blast (Blast)</option>
 					<option value="agent">agent (View Agent)</option>
@@ -844,43 +844,43 @@ THE SOFTWARE.
 				</options>
 			</parameter>
 			&commonBuildParam;
-			<parameter optional="1" name="stdBrokerIp" description="IP address of standard broker (necessary for installing replica or security broker, and unmanaged agent)" />
-			<parameter optional="1" name="downloadOnly" description="Download build without installing it" type="option">
+			<parameter mandatory="0" name="stdBrokerIp" helpmessage="IP address of standard broker (necessary for installing replica or security broker, and unmanaged agent)" />
+			<parameter mandatory="0" name="downloadOnly" helpmessage="Download build without installing it" type="option">
 				&falseOrTrue;
 			</parameter>
-			<!--parameter optional="1" name="emailTo" description="Email address to which to send notification" />
-			<parameter optional="1" name="uvsId" description="This parameter is used by UVS only. It's not editable to end user." type="uvsid" /-->
+			<!--parameter mandatory="0" name="emailTo" helpmessage="Email address to which to send notification" />
+			<parameter mandatory="0" name="uvsId" helpmessage="This parameter is used by UVS only. It's not editable to end user." type="uvsid" /-->
 		</parameters>
-		<categories>
-			<category>Install</category>
-		</categories>
+		<functionalities>
+			<functionality>Install</functionality>
+		</functionalities>
 	</command>
-	<command name="installWebCommander" description="WebCommander" developer="liuj">
+	<command name="installWebCommander" synopsis="WebCommander" developer="liuj">
 		<script>install\installWebCommander</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="1" name="packageUrl" description="URL of WebCommander package, default is from Fling web site." />
-			<parameter optional="1" name="authentication" description="Type of authentication, default is 'windows'" />
-			<parameter optional="1" name="defaultPassword" description="Default password used by the server to communicate with vSphere and VM, default is VMware standard." type="password" />
+			<parameter mandatory="0" name="packageUrl" helpmessage="URL of WebCommander package, default is from Fling web site." />
+			<parameter mandatory="0" name="authentication" helpmessage="Type of authentication, default is 'windows'" />
+			<parameter mandatory="0" name="defaultPassword" helpmessage="Default password used by the server to communicate with vSphere and VM, default is VMware standard." type="password" />
 		</parameters>
-		<categories>
-			<category>Install</category>
-		</categories>
+		<functionalities>
+			<functionality>Install</functionality>
+		</functionalities>
 	</command>
-	<command name="updateWindowsSync" description="Windows Update" developer="liuj">
+	<command name="updateWindowsSync" synopsis="Windows Update" developer="liuj">
 		<script>windows\updateWindowsSync1</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="1" name="ssName" description="Name of the snapshot which to restore before updating Windows" />
-			<parameter optional="1" name="updateServer" description="Windows update server from which to download updates, default is 'internal'" type="option">
+			<parameter mandatory="0" name="ssName" helpmessage="Name of the snapshot which to restore before updating Windows" />
+			<parameter mandatory="0" name="updateServer" helpmessage="Windows update server from which to download updates, default is 'internal'" type="option">
 				<options>
 					<option value="internal">internal (VMware)</option>
 					<option value="external">external (Microsoft)</option>
 				</options>
 			</parameter>
-			<parameter optional="1" name="severity" description="Severity of the update to install, default is 'Critical'" type="option">
+			<parameter mandatory="0" name="severity" helpmessage="Severity of the update to install, default is 'Critical'" type="option">
 				<options>
 					<option value="Critical">Critical</option>
 					<option value="Important">Importanct (Critical + Important)</option>
@@ -890,23 +890,23 @@ THE SOFTWARE.
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Install</category>
-		</categories>
+		<functionalities>
+			<functionality>Install</functionality>
+		</functionalities>
 	</command>
-	<command name="updateWindows" description="Windows Update (asynchronous)" developer="liuj">
+	<command name="updateWindows" synopsis="Windows Update (asynchronous)" developer="liuj">
 		<script>windows\updateWindows1</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="1" name="ssName" description="Name of the snapshot which to restore before updating Windows" />
-			<parameter optional="1" name="updateServer" description="Windows update server from which to download updates, default is 'internal'" type="option">
+			<parameter mandatory="0" name="ssName" helpmessage="Name of the snapshot which to restore before updating Windows" />
+			<parameter mandatory="0" name="updateServer" helpmessage="Windows update server from which to download updates, default is 'internal'" type="option">
 				<options>
 					<option value="internal">internal (VMware)</option>
 					<option value="external">external (Microsoft)</option>
 				</options>
 			</parameter>
-			<parameter optional="1" name="severity" description="Severity of the update to install, default is 'Critical'" type="option">
+			<parameter mandatory="0" name="severity" helpmessage="Severity of the update to install, default is 'Critical'" type="option">
 				<options>
 					<option value="Critical">Critical</option>
 					<option value="Important">Importanct (Critical + Important)</option>
@@ -915,19 +915,19 @@ THE SOFTWARE.
 					<option value="All">All (Critical + Important + Moderate + Low + Not Defined)</option>
 				</options>
 			</parameter>
-			<parameter optional="1" name="emailTo" description="Email address to which to send notification" />
-			<parameter optional="1" name="uvsId" description="This parameter is used by UVS only. It's not editable to end user." type="uvsid" />
+			<parameter mandatory="0" name="emailTo" helpmessage="Email address to which to send notification" />
+			<parameter mandatory="0" name="uvsId" helpmessage="This parameter is used by UVS only. It's not editable to end user." type="uvsid" />
 		</parameters>
-		<categories>
-			<category>Install</category>
-		</categories>
+		<functionalities>
+			<functionality>Install</functionality>
+		</functionalities>
 	</command>
-	<command name="vmSetViewLogLevel" description="Set View log level" developer="liuj">
+	<command name="vmSetViewLogLevel" synopsis="Set View log level" developer="liuj">
 		<script>windows\vmware\setViewLogLevel</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="logLevel" description="Log levels, 1-3 for Broker, 4-8 for Agent and Client" type="option">
+			<parameter mandatory="1" name="logLevel" helpmessage="Log levels, 1-3 for Broker, 4-8 for Agent and Client" type="option">
 				<options>
 					<option value="0">0 (Default)</option>
 					<option value="1">1 (View Info)</option>
@@ -941,242 +941,242 @@ THE SOFTWARE.
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Log</category>
-		</categories>
+		<functionalities>
+			<functionality>Log</functionality>
+		</functionalities>
 	</command>
-	<command name="deployWindowsVmSync" description="Deploy Windows VM" developer="liuj">
+	<command name="deployWindowsVmSync" synopsis="Deploy Windows VM" developer="liuj">
 		<script>deploy\deployWindowsVmSync</script>
 		<xi:include href="deployWinVm.xml" xmlns:xi="http://www.w3.org/2003/XInclude" />
-		<categories>
-			<category>MakeVM</category>
-		</categories>
+		<functionalities>
+			<functionality>MakeVM</functionality>
+		</functionalities>
 	</command>
-	<command name="deployWindowsVm" description="Deploy Windows VM (asynchronous)" developer="liuj">
+	<command name="deployWindowsVm" synopsis="Deploy Windows VM (asynchronous)" developer="liuj">
 		<script>deploy\deployWindowsVm</script>
 		<xi:include href="deployWinVm.xml" xmlns:xi="http://www.w3.org/2003/XInclude" />
-		<categories>
-			<category>MakeVM</category>
-		</categories>
+		<functionalities>
+			<functionality>MakeVM</functionality>
+		</functionalities>
 	</command>
-	<command name="deployWindowsVmNew" description="Deploy Windows VM (new)" developer="liuj" hidden="1">
+	<command name="deployWindowsVmNew" synopsis="Deploy Windows VM (new)" developer="liuj" hidden="1">
 		<script>deploy\deployWindowsVmNew</script>
 		<xi:include href="deployWinVmNew.xml" xmlns:xi="http://www.w3.org/2003/XInclude" />
-		<categories>
-			<category>MakeVM</category>
-		</categories>
+		<functionalities>
+			<functionality>MakeVM</functionality>
+		</functionalities>
 	</command>
-	<command name="linkedClone" description="Linked clone VM" developer="liuj">
+	<command name="linkedClone" synopsis="Linked clone VM" developer="liuj">
 		<script>deploy\linkedClone</script>
 		<parameters>
 			&commonVcParam;
-			<parameter optional="0" name="parentVmName" description="Parent virtual machine name" />
-			<parameter optional="0" name="parentSnapshotName" description="Parent snapshot name" />
-			<parameter optional="0" name="datastoreName" description="Datastore name" />
-			<parameter optional="0" name="vmHostName" description="VM host name" />
-			<parameter optional="0" name="namePrefix" description="Prefix of the VM name" />
-			<parameter optional="1" name="number" description="Number of VM to clone, default is 1" />
-			<parameter optional="1" name="startNumber" description="Start number, default is 1" />
+			<parameter mandatory="1" name="parentVmName" helpmessage="Parent virtual machine name" />
+			<parameter mandatory="1" name="parentSnapshotName" helpmessage="Parent snapshot name" />
+			<parameter mandatory="1" name="datastoreName" helpmessage="Datastore name" />
+			<parameter mandatory="1" name="vmHostName" helpmessage="VM host name" />
+			<parameter mandatory="1" name="namePrefix" helpmessage="Prefix of the VM name" />
+			<parameter mandatory="0" name="number" helpmessage="Number of VM to clone, default is 1" />
+			<parameter mandatory="0" name="startNumber" helpmessage="Start number, default is 1" />
 		</parameters>
-		<categories>
-			<category>MakeVM</category>
-		</categories>
+		<functionalities>
+			<functionality>MakeVM</functionality>
+		</functionalities>
 	</command>
-	<command name="deployWindowsVm2" description="Post deployment action" developer="liuj" hidden="1">
+	<command name="deployWindowsVm2" synopsis="Post deployment action" developer="liuj" hidden="1">
 		<script>deploy\deployWindowsVm2</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="1" name="emailTo" description="Email address to which to send notification" />
+			<parameter mandatory="0" name="emailTo" helpmessage="Email address to which to send notification" />
 		</parameters>
-		<categories>
-			<category>MakeVM</category>
-		</categories>
+		<functionalities>
+			<functionality>MakeVM</functionality>
+		</functionalities>
 	</command>
-	<command name="deployOva" description="Deploy to ESX" developer="liuj">
+	<command name="deployOva" synopsis="Deploy to ESX" developer="liuj">
 		<script>deploy\deployOva</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter optional="0" name="ovaUrl" description="URL of the OVA" />
-			<parameter optional="0" name="vmName" description="Name of the target VM to be deployed from OVA" />
-			<parameter optional="0" name="datastore" description="Name of the datastore where the target VM is located" type="selectText">
+			<parameter mandatory="1" name="ovaUrl" helpmessage="URL of the OVA" />
+			<parameter mandatory="1" name="vmName" helpmessage="Name of the target VM to be deployed from OVA" />
+			<parameter mandatory="1" name="datastore" helpmessage="Name of the datastore where the target VM is located" type="selectText">
 				<options />
 			</parameter>
-			<parameter optional="0" name="portGroup" description="Name of the virtual port group where the target VM is located" type="selectText">
+			<parameter mandatory="1" name="portGroup" helpmessage="Name of the virtual port group where the target VM is located" type="selectText">
 				<options />
 			</parameter>
 		</parameters>
-		<categories>
-			<category>OVA</category>
-		</categories>
+		<functionalities>
+			<functionality>OVA</functionality>
+		</functionalities>
 	</command>
-	<command name="vmRemoteCosole" description="Access VM remotely" developer="liuj">
+	<command name="vmRemoteCosole" synopsis="Access VM remotely" developer="liuj">
 		<script>vm\vmRemoteConsole</script>
 		<parameters>
 			&commonViServerParam;
 		</parameters>
-		<categories>
-			<category>Remote_Console</category>
-		</categories>
+		<functionalities>
+			<functionality>Remote_Console</functionality>
+		</functionalities>
 	</command>
-	<command name="sshRunScript" description="Run user defined script via SSH" developer="liuj">
+	<command name="sshRunScript" synopsis="Run user defined script via SSH" developer="liuj">
 		<script>misc\sshRunScript</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter optional="0" name="script" description="Script to run in VM" type="textarea" />
+			<parameter mandatory="1" name="script" helpmessage="Script to run in VM" type="textarea" />
 		</parameters>
-		<categories>
-			<category>Script</category>
-		</categories>
+		<functionalities>
+			<functionality>Script</functionality>
+		</functionalities>
 	</command>
-	<command name="vmSqlDbAction" description="Create/drop database" developer="liuj">
+	<command name="vmSqlDbAction" synopsis="Create/drop database" developer="liuj">
 		<script>windows\sqlDbAction</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="dbServerName" description="SQL server name, such as 'MICROSO-N9U1D7A\SQLEXPRESS'" />
-			<parameter optional="0" name="dbName" description="Database name" />
-			<parameter optional="0" name="action" description="Action on database, create | drop" type="option">
+			<parameter mandatory="1" name="dbServerName" helpmessage="SQL server name, such as 'MICROSO-N9U1D7A\SQLEXPRESS'" />
+			<parameter mandatory="1" name="dbName" helpmessage="Database name" />
+			<parameter mandatory="1" name="action" helpmessage="Action on database, create | drop" type="option">
 				<options>
 					<option value="create">create</option>
 					<option value="drop">drop</option>
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>SQL_Server</category>
-		</categories>
+		<functionalities>
+			<functionality>SQL_Server</functionality>
+		</functionalities>
 	</command>
-	<command name="vmSetupStaf" description="Setup Staf" developer="liuj">
+	<command name="vmSetupStaf" synopsis="Setup Staf" developer="liuj">
 		<script>windows\vmware\setupStaf</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="1" name="start" description="How should Staf start, when user logon or as a service" type="option">
+			<parameter mandatory="0" name="start" helpmessage="How should Staf start, when user logon or as a service" type="option">
 				<options>
 					<option value="userLogon">userLogon</option>
 					<option value="asService">asService</option>
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Staf</category>
-		</categories>
+		<functionalities>
+			<functionality>Staf</functionality>
+		</functionalities>
 	</command>
-	<command name="viewApiOperator_addRdsAppPool" description="Add application pool" developer="liuj">
+	<command name="viewApiOperator_addRdsAppPool" synopsis="Add application pool" developer="liuj">
 		<script>brokerrds\viewapi\viewApiOperator_addRdsAppPool</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="farmName" description="Specifies farm name" />
-			<parameter optional="0" name="rdsServerDnsName" description="Specifies RDS server DNS name" />
-			<parameter optional="0" name="appExecPath" description="Specifies application executable path" />
-			<parameter optional="0" name="appName" description="Specifies application name" />
+			<parameter mandatory="1" name="farmName" helpmessage="Specifies farm name" />
+			<parameter mandatory="1" name="rdsServerDnsName" helpmessage="Specifies RDS server DNS name" />
+			<parameter mandatory="1" name="appExecPath" helpmessage="Specifies application executable path" />
+			<parameter mandatory="1" name="appName" helpmessage="Specifies application name" />
 		</parameters>
-		<categories>
-			<category>Broker_RDS</category>
-			<category>View_API</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker_RDS</functionality>
+			<functionality>View_API</functionality>
+		</functionalities>
 	</command>
-	<command name="vmCopyViewLogToUnc" description="Copy View log to a network share folder" developer="liuj">
+	<command name="vmCopyViewLogToUnc" synopsis="Copy View log to a network share folder" developer="liuj">
 		<script>windows\vmware\copyViewLogToUnc</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="unc" description="Network share, such as \\bugs.eng.vmware.com\bugs" />
-			<parameter optional="1" name="uncUser" description="Network share user, default is 'administrator'" />
-			<parameter optional="1" name="uncPassword" description="Network share password, default is VMware standard" type="password" />
-			<parameter optional="1" name="folder" description="Folder on the network share, such as '\files\0\1\2\3\4\5\6\7\update0', default is '\'" />
+			<parameter mandatory="1" name="unc" helpmessage="Network share, such as \\bugs.eng.vmware.com\bugs" />
+			<parameter mandatory="0" name="uncUser" helpmessage="Network share user, default is 'administrator'" />
+			<parameter mandatory="0" name="uncPassword" helpmessage="Network share password, default is VMware standard" type="password" />
+			<parameter mandatory="0" name="folder" helpmessage="Folder on the network share, such as '\files\0\1\2\3\4\5\6\7\update0', default is '\'" />
 		</parameters>
-		<categories>
-			<category>Log</category>
-			<category>Windows</category>
-		</categories>
+		<functionalities>
+			<functionality>Log</functionality>
+			<functionality>Windows</functionality>
+		</functionalities>
 	</command>
-	<command name="vmEnableRdp" description="Enable RDP" developer="liuj">
+	<command name="vmEnableRdp" synopsis="Enable RDP" developer="liuj">
 		<script>windows\enableRDP</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 		</parameters>
-		<categories>
-			<category>Remote_Console</category>
-			<category>Windows</category>
-		</categories>
+		<functionalities>
+			<functionality>Remote_Console</functionality>
+			<functionality>Windows</functionality>
+		</functionalities>
 	</command>
-	<command name="viewApiOperator_getAppExecPathOnRds" description="Get application path on RDS server" developer="liuj">
+	<command name="viewApiOperator_getAppExecPathOnRds" synopsis="Get application path on RDS server" developer="liuj">
 		<script>brokerrds\viewapi\viewApiOperator_getAppExecPathOnRds</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="farmName" description="Specifies farm name" />
-			<parameter optional="0" name="rdsServerDnsName" description="Specifies RDS server DNS name" />
+			<parameter mandatory="1" name="farmName" helpmessage="Specifies farm name" />
+			<parameter mandatory="1" name="rdsServerDnsName" helpmessage="Specifies RDS server DNS name" />
 		</parameters>
-		<categories>
-			<category>Broker_RDS</category>
-			<category>View_API</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker_RDS</functionality>
+			<functionality>View_API</functionality>
+		</functionalities>
 	</command>
-	<command name="viewApiOperator_getRdsSessionCount" description="Get RDS session count" developer="liuj">
+	<command name="viewApiOperator_getRdsSessionCount" synopsis="Get RDS session count" developer="liuj">
 		<script>brokerrds\viewapi\viewApiOperator_getRdsSessionCount</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 			&rdsSessionCounter;
 		</parameters>
-		<categories>
-			<category>Broker_RDS</category>
-			<category>View_API</category>
-		</categories>
+		<functionalities>
+			<functionality>Broker_RDS</functionality>
+			<functionality>View_API</functionality>
+		</functionalities>
 	</command>
-	<command name="vmxGet" description="Get VMX file" developer="liuj">
+	<command name="vmxGet" synopsis="Get VMX file" developer="liuj">
 		<script>vm\vmxGet</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter optional="0" name="vmName" description="Name of the target VM" />
+			<parameter mandatory="1" name="vmName" helpmessage="Name of the target VM" />
 		</parameters>
-		<categories>
-			<category>VMX</category>
-			<category>VM</category>
-		</categories>
+		<functionalities>
+			<functionality>VMX</functionality>
+			<functionality>VM</functionality>
+		</functionalities>
 	</command>
-	<command name="vmInstallPowershell" description="Install Powershell" developer="liuj">
+	<command name="vmInstallPowershell" synopsis="Install Powershell" developer="liuj">
 		<script>vm\vmInstallPowershell</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 		</parameters>
-		<categories>
-			<category>Powershell</category>
-			<category>Install</category>
-			<category>VM</category>
-		</categories>
+		<functionalities>
+			<functionality>Powershell</functionality>
+			<functionality>Install</functionality>
+			<functionality>VM</functionality>
+		</functionalities>
 	</command>
-	<command name="installPowershell4" description="Powershell 4.0" developer="liuj">
+	<command name="installPowershell4" synopsis="Powershell 4.0" developer="liuj">
 		<script>install\installPowershell4</script>
-		<annotation>
+		<description>
 			<p>
 				<b>Supported Operating System</b>
 			</p>
 			<p>Windows 7, Windows Embedded Standard 7, Windows Server 2008 R2, Windows Server 2012</p>
 			<p>Windows Management Framework 4.0 requires Microsoft .NET Framework 4.5. </p>
-		</annotation>
+		</description>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 		</parameters>
-		<categories>
-			<category>Powershell</category>
-			<category>Install</category>
-		</categories>
+		<functionalities>
+			<functionality>Powershell</functionality>
+			<functionality>Install</functionality>
+		</functionalities>
 	</command>
-	<command name="vmRunScript" description="Run user defined script" developer="liuj">
+	<command name="vmRunScript" synopsis="Run user defined script" developer="liuj">
 		<script>windows\runScript</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="script" description="Script to run in VM" type="textarea" />
-			<parameter optional="1" name="type" description="Type of the script to run" type="option">
+			<parameter mandatory="1" name="script" helpmessage="Script to run in VM" type="textarea" />
+			<parameter mandatory="0" name="type" helpmessage="Type of the script to run" type="option">
 				<options>
 					<option value="Bat">Bat (aynchronous, service returns immediately after triggering the batch script)</option>
 					<option value="Powershell">Powershell (synchronous, service returns when Powershell script completes)</option>
@@ -1186,18 +1186,18 @@ THE SOFTWARE.
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Script</category>
-			<category>Windows</category>
-		</categories>
+		<functionalities>
+			<functionality>Script</functionality>
+			<functionality>Windows</functionality>
+		</functionalities>
 	</command>
-	<command name="vmRunScript3" description="Run user defined script v3" developer="liuj" hidden="1">
+	<command name="vmRunScript3" synopsis="Run user defined script v3" developer="liuj" hidden="1">
 		<script>windows\runScript3</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="script" description="Script to run in VM" type="textarea" />
-			<parameter optional="1" name="type" description="Type of the script to run" type="option">
+			<parameter mandatory="1" name="script" helpmessage="Script to run in VM" type="textarea" />
+			<parameter mandatory="0" name="type" helpmessage="Type of the script to run" type="option">
 				<options>
 					<option value="Bat">Bat (asynchronous, service returns immediately after triggering the batch script)</option>
 					<option value="Powershell">Powershell (asynchronous)</option>
@@ -1205,31 +1205,31 @@ THE SOFTWARE.
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Script</category>
-			<category>Windows</category>
-		</categories>
+		<functionalities>
+			<functionality>Script</functionality>
+			<functionality>Windows</functionality>
+		</functionalities>
 	</command>
-	<command name="vmxSet" description="Set VMX file" developer="liuj">
+	<command name="vmxSet" synopsis="Set VMX file" developer="liuj">
 		<script>vm\vmxSet</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter optional="0" name="vmName" description="Name of the target VM" />
-			<parameter optional="0" name="vmxFile" description="VMX file" type="file" />
+			<parameter mandatory="1" name="vmName" helpmessage="Name of the target VM" />
+			<parameter mandatory="1" name="vmxFile" helpmessage="VMX file" type="file" />
 		</parameters>
-		<categories>
-			<category>VMX</category>
-			<category>VM</category>
-		</categories>
+		<functionalities>
+			<functionality>VMX</functionality>
+			<functionality>VM</functionality>
+		</functionalities>
 	</command>
-	<command name="snapshotAction" description="Take / Restore / Remove" developer="liuj">
+	<command name="snapshotAction" synopsis="Take / Restore / Remove" developer="liuj">
 		<script>vm\snapshotAction</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter optional="0" name="vmName" description="Name of the target VM" />
-			<parameter optional="0" name="ssName" description="Name of the snapshot" />
-			<parameter optional="1" name="ssDescription" description="Description of the snapshot" />
-			<parameter optional="0" name="action" description="Action against the snapshot" type="option">
+			<parameter mandatory="1" name="vmName" helpmessage="Name of the target VM" />
+			<parameter mandatory="1" name="ssName" helpmessage="Name of the snapshot" />
+			<parameter mandatory="0" name="ssDescription" helpmessage="Description of the snapshot" />
+			<parameter mandatory="1" name="action" helpmessage="Action against the snapshot" type="option">
 				<options>
 					<option value="take">take</option>
 					<option value="restore">restore</option>
@@ -1237,17 +1237,17 @@ THE SOFTWARE.
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Snapshot</category>
-			<category>VM</category>
-		</categories>
+		<functionalities>
+			<functionality>Snapshot</functionality>
+			<functionality>VM</functionality>
+		</functionalities>
 	</command>
-	<command name="uninstallApp" description="Windows application" developer="liuj">
+	<command name="uninstallApp" synopsis="Windows application" developer="liuj">
 		<script>install\uninstallApp</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="appName" description="Name of the application to uninstall (could be found at Control Panel &gt; Programs &gt; Programs and Features)" type="selectText">
+			<parameter mandatory="1" name="appName" helpmessage="Name of the application to uninstall (could be found at Control Panel &gt; Programs &gt; Programs and Features)" type="selectText">
 				<options>
 					<option value="View Client">View Client</option>
 					<option value="View Agent">View Agent</option>
@@ -1256,91 +1256,91 @@ THE SOFTWARE.
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Uninstall</category>
-		</categories>
+		<functionalities>
+			<functionality>Uninstall</functionality>
+		</functionalities>
 	</command>
-	<command name="configureViewPlanner" description="Configure View Planner" developer="liuj">
+	<command name="configureViewPlanner" synopsis="Configure View Planner" developer="liuj">
 		<script>configureViewPlanner</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter optional="0" name="vmName" description="Name of the VP VM" />
-			<parameter optional="1" name="staticIp" description="Static IP address of the VP VM" />
+			<parameter mandatory="1" name="vmName" helpmessage="Name of the VP VM" />
+			<parameter mandatory="0" name="staticIp" helpmessage="Static IP address of the VP VM" />
 		</parameters>
-		<categories>
-			<category>View_Planner</category>
-		</categories>
+		<functionalities>
+			<functionality>View_Planner</functionality>
+		</functionalities>
 	</command>
-	<command name="deployViewPlanner" description="Deploy and configure View Planner" developer="liuj" hidden="1">
+	<command name="deployViewPlanner" synopsis="Deploy and configure View Planner" developer="liuj" hidden="1">
 		<script>deployViewPlanner</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter optional="1" name="datastore" description="Name of the datastore where VP VM is located" type="selectText">
+			<parameter mandatory="0" name="datastore" helpmessage="Name of the datastore where VP VM is located" type="selectText">
 				<options />
 			</parameter>
-			<parameter optional="1" name="vpName" description="Name of the VP VM (default is 'ViewPlanner')" />
-			<parameter optional="0" name="vpBuild" description="Build of VP" type="option">
+			<parameter mandatory="0" name="vpName" helpmessage="Name of the VP VM (default is 'ViewPlanner')" />
+			<parameter mandatory="1" name="vpBuild" helpmessage="Build of VP" type="option">
 				<options>
 					<option value="1321259">1321259</option>
 				</options>
 			</parameter>
-			<parameter optional="1" name="portGroup" description="Name of the virtual port group where VP VM is located" type="selectText">
+			<parameter mandatory="0" name="portGroup" helpmessage="Name of the virtual port group where VP VM is located" type="selectText">
 				<options />
 			</parameter>
-			<parameter optional="1" name="staticIp" description="Static IP address of the VP VM" />
+			<parameter mandatory="0" name="staticIp" helpmessage="Static IP address of the VP VM" />
 		</parameters>
-		<categories>
-			<category>View_Planner</category>
-		</categories>
+		<functionalities>
+			<functionality>View_Planner</functionality>
+		</functionalities>
 	</command>
-	<command name="answerVmQuestion" description="Answer VM question" developer="liuj">
+	<command name="answerVmQuestion" synopsis="Answer VM question" developer="liuj">
 		<script>vm\answerVmQuestion</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter optional="0" name="vmName" description="Name of the target VM" />
-			<parameter optional="1" name="answer" description="Answer to the question, default is 'Cancel'" />
+			<parameter mandatory="1" name="vmName" helpmessage="Name of the target VM" />
+			<parameter mandatory="0" name="answer" helpmessage="Answer to the question, default is 'Cancel'" />
 		</parameters>
-		<categories>
-			<category>VM</category>
-		</categories>
+		<functionalities>
+			<functionality>VM</functionality>
+		</functionalities>
 	</command>
-	<command name="deleteVm" description="Delete VM" developer="liuj">
+	<command name="deleteVm" synopsis="Delete VM" developer="liuj">
 		<script>vm\deleteVm</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter optional="0" name="vmName" description="Name of the target VM" />
+			<parameter mandatory="1" name="vmName" helpmessage="Name of the target VM" />
 		</parameters>
-		<categories>
-			<category>VM</category>
-		</categories>
+		<functionalities>
+			<functionality>VM</functionality>
+		</functionalities>
 	</command>
-	<command name="listVmAndSnapshot" description="List VMs and snapshots" developer="liuj">
+	<command name="listVmAndSnapshot" synopsis="List VMs and snapshots" developer="liuj">
 		<script>vm\listVmAndSnapshot</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter optional="1" name="vmName" description="Name of the target VM. Default is '*' to list all VMs" />
+			<parameter mandatory="0" name="vmName" helpmessage="Name of the target VM. Default is '*' to list all VMs" />
 		</parameters>
-		<categories>
-			<category>VM</category>
-		</categories>
+		<functionalities>
+			<functionality>VM</functionality>
+		</functionalities>
 	</command>
-	<command name="vmPowerOn" description="Power on" developer="liuj">
+	<command name="vmPowerOn" synopsis="Power on" developer="liuj">
 		<script>vm\vmPowerOn</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 		</parameters>
-		<categories>
-			<category>VM</category>
-		</categories>
+		<functionalities>
+			<functionality>VM</functionality>
+		</functionalities>
 	</command>
-	<command name="vmRunScript2" description="Run user defined script v2" developer="liuj" hidden="1">
+	<command name="vmRunScript2" synopsis="Run user defined script v2" developer="liuj" hidden="1">
 		<script>vmRunScript2</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="script" description="Script to run in VM" type="textarea" />
-			<parameter optional="1" name="type" description="Type of the script to run" type="option">
+			<parameter mandatory="1" name="script" helpmessage="Script to run in VM" type="textarea" />
+			<parameter mandatory="0" name="type" helpmessage="Type of the script to run" type="option">
 				<options>
 					<option value="Bat">Bat (aynchronous, service returns immediately after triggering the batch script)</option>
 					<option value="Powershell">Powershell (synchronous, service returns when Powershell script completes)</option>
@@ -1348,297 +1348,309 @@ THE SOFTWARE.
 					<option value="Bash">Bash (synchronous)</option>
 				</options>
 			</parameter>
-			<parameter optional="1" name="method" description="How to trigger scripts in VM" type="option">
+			<parameter mandatory="0" name="method" helpmessage="How to trigger scripts in VM" type="option">
 				<options>
 					<option value="PSSession">PSSession (Powershell remote session)</option>
 					<option value="VMwareTools">VMwareTools (Invoke-VMScript through VMware Tools)</option>
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>VM</category>
-		</categories>
+		<functionalities>
+			<functionality>VM</functionality>
+		</functionalities>
 	</command>
-	<command name="vmSetMemory" description="Set memory size" developer="liuj">
+	<command name="vmSetMemory" synopsis="Set memory size" developer="liuj">
 		<script>vm\vmSetMemory</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter optional="0" name="vmName" description="Name of the target VM" />
-			<parameter optional="0" name="memoryGb" description="Specifies the memory size in gigabytes (GB)." />
+			<parameter mandatory="1" name="vmName" helpmessage="Name of the target VM" />
+			<parameter mandatory="1" name="memoryGb" helpmessage="Specifies the memory size in gigabytes (GB)." />
 		</parameters>
-		<categories>
-			<category>VM</category>
-		</categories>
+		<functionalities>
+			<functionality>VM</functionality>
+		</functionalities>
 	</command>
-	<command name="vmSetPortGroup" description="Set network port group" developer="liuj">
+	<command name="vmSetPortGroup" synopsis="Set network port group" developer="liuj">
 		<script>vm\vmSetPortGroup</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter optional="0" name="vmName" description="Name of the target VM" />
-			<parameter optional="0" name="portGroup" description="Name of the port group" type="selectText">
+			<parameter mandatory="1" name="vmName" helpmessage="Name of the target VM" />
+			<parameter mandatory="1" name="portGroup" helpmessage="Name of the port group" type="selectText">
 				<options />
 			</parameter>
 		</parameters>
-		<categories>
-			<category>VM</category>
-		</categories>
+		<functionalities>
+			<functionality>VM</functionality>
+		</functionalities>
 	</command>
-	<command name="vmSuspend" description="Suspend" developer="liuj">
+	<command name="vmSuspend" synopsis="Suspend" developer="liuj">
 		<script>vm\vmSuspend</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 		</parameters>
-		<categories>
-			<category>VM</category>
-		</categories>
+		<functionalities>
+			<functionality>VM</functionality>
+		</functionalities>
 	</command>
-	<command name="vmUpdateTools" description="Update VMware Tools" developer="liuj">
+	<command name="vmUpdateTools" synopsis="Update VMware Tools" developer="liuj">
 		<script>vm\vmUpdateTools</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 		</parameters>
-		<categories>
-			<category>VM</category>
-		</categories>
+		<functionalities>
+			<functionality>VM</functionality>
+		</functionalities>
 	</command>
-	<command name="addDsNic" description="Add DS NIC" developer="liuj">
+	<command name="addDsNic" synopsis="Add DS NIC" developer="liuj">
 		<script>vsphere\addDsNic</script>
 		<parameters>
 			&commonVcParam;
-			<parameter optional="1" name="esxAddress" description="FQDN or IP of ESX, default is '*'" />
-			<parameter optional="0" name="dsName" description="Name of distributed switch" />
-			<parameter optional="0" name="nicName" description="Name of network adapter" />
+			<parameter mandatory="0" name="esxAddress" helpmessage="FQDN or IP of ESX, default is '*'" />
+			<parameter mandatory="1" name="dsName" helpmessage="Name of distributed switch" />
+			<parameter mandatory="1" name="nicName" helpmessage="Name of network adapter" />
 		</parameters>
-		<categories>
-			<category>vSphere</category>
-		</categories>
+		<functionalities>
+			<functionality>vSphere</functionality>
+		</functionalities>
 	</command>
-	<command name="addVsanAdapter" description="Add VSAN network adapter" developer="liuj">
+	<command name="addVsanAdapter" synopsis="Add VSAN network adapter" developer="liuj">
 		<script>vsphere\addVsanAdapter</script>
 		<parameters>
 			&commonVcParam;
-			<parameter optional="1" name="esxAddress" description="FQDN or IP of ESX, default is '*'" />
-			<parameter optional="0" name="portGroup" description="Name of virtual port group" type="selectText">
+			<parameter mandatory="0" name="esxAddress" helpmessage="FQDN or IP of ESX, default is '*'" />
+			<parameter mandatory="1" name="portGroup" helpmessage="Name of virtual port group" type="selectText">
 				<options />
 			</parameter>
 		</parameters>
-		<categories>
-			<category>vSphere</category>
-		</categories>
+		<functionalities>
+			<functionality>vSphere</functionality>
+		</functionalities>
 	</command>
-	<command name="listDatastore" description="List datastores" developer="liuj">
+	<command name="setPageSharing" synopsis="Set inter-VM transparent page sharing" developer="liuj">
+		<script>vsphere\setPageSharing</script>
+		<parameters>
+			&commonViServerParam;
+			<parameter mandatory="1" name="switch" helpmessage="Switch, true or false" type="option">
+				&falseOrTrue;
+			</parameter>
+		</parameters>
+		<functionalities>
+			<functionality>vSphere</functionality>
+		</functionalities>
+	</command>
+	<command name="listDatastore" synopsis="List datastores" developer="liuj">
 		<script>vsphere\listDatastore</script>
 		<parameters>
 			&commonViServerParam;
 		</parameters>
-		<categories>
-			<category>vSphere</category>
-		</categories>
+		<functionalities>
+			<functionality>vSphere</functionality>
+		</functionalities>
 	</command>
-	<command name="listPortGroup" description="List port groups" developer="liuj">
+	<command name="listPortGroup" synopsis="List port groups" developer="liuj">
 		<script>vsphere\listPortGroup</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter option="1" name="format" description="Output format, JSON | XML (default)" type="option">
+			<parameter option="1" name="format" helpmessage="Output format, JSON | XML (default)" type="option">
 				<options>
 					<option value="XML">XML</option>
 					<option value="JSON">JSON</option>
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>vSphere</category>
-		</categories>
+		<functionalities>
+			<functionality>vSphere</functionality>
+		</functionalities>
 	</command>
-	<command name="listResourcePool" description="List resource pools" developer="liuj">
+	<command name="listResourcePool" synopsis="List resource pools" developer="liuj">
 		<script>vsphere\listResourcePool</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter optional="1" name="resourcePoolName" description="Name of the target resource pool. Default is '*' to list all resource pools" />
+			<parameter mandatory="0" name="resourcePoolName" helpmessage="Name of the target resource pool. Default is '*' to list all resource pools" />
 		</parameters>
-		<categories>
-			<category>vSphere</category>
-		</categories>
+		<functionalities>
+			<functionality>vSphere</functionality>
+		</functionalities>
 	</command>
-	<command name="listVmHost" description="List VM hosts" developer="liuj">
+	<command name="listVmHost" synopsis="List VM hosts" developer="liuj">
 		<script>vsphere\listVmHost</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter option="1" name="format" description="Output format, JSON | XML (default)" type="option">
+			<parameter option="1" name="format" helpmessage="Output format, JSON | XML (default)" type="option">
 				<options>
 					<option value="XML">XML</option>
 					<option value="JSON">JSON</option>
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>vSphere</category>
-		</categories>
+		<functionalities>
+			<functionality>vSphere</functionality>
+		</functionalities>
 	</command>
-	<command name="vSphereSyncTime" description="Sync time for ESX and VM" developer="liuj">
+	<command name="vSphereSyncTime" synopsis="Sync time for ESX and VM" developer="liuj">
 		<script>vsphere\vSphereSyncTime</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter optional="1" name="ntpServerAddress" description="NTP server address. Default is '10.132.71.1'" />
+			<parameter mandatory="0" name="ntpServerAddress" helpmessage="NTP server address. Default is '10.132.71.1'" />
 		</parameters>
-		<categories>
-			<category>vSphere</category>
-		</categories>
+		<functionalities>
+			<functionality>vSphere</functionality>
+		</functionalities>
 	</command>
-	<command name="updateFirmware" description="Update DRAC firmware" developer="liuj">
+	<command name="updateFirmware" synopsis="Update DRAC firmware" developer="liuj">
 		<script>vsphere\updateFirmware</script>
 		<parameters>
-			<parameter optional="0" name="address" description="IP address of the iDRAC card" />
-			<parameter optional="1" name="user" description="User name (default is 'root')" />
-			<parameter optional="1" name="password" description="Password (default is VMware standard)" type="password" />
-			<parameter optional="1" name="type" description="Card type (default is 'iDrac')" type="option">
+			<parameter mandatory="1" name="address" helpmessage="IP address of the iDRAC card" />
+			<parameter mandatory="0" name="user" helpmessage="User name (default is 'root')" />
+			<parameter mandatory="0" name="password" helpmessage="Password (default is VMware standard)" type="password" />
+			<parameter mandatory="0" name="type" helpmessage="Card type (default is 'iDrac')" type="option">
 				<options>
 					<option value="idrac">iDRAC</option>
 				</options>
 			</parameter>
 		</parameters>
-		<categories>
-			<category>vSphere</category>
-		</categories>
+		<functionalities>
+			<functionality>vSphere</functionality>
+		</functionalities>
 	</command>
-	<command name="upgradeEsx" description="Upgrade ESX server" developer="liuj">
+	<command name="upgradeEsx" synopsis="Upgrade ESX server" developer="liuj">
 		<script>vsphere\upgradeEsx</script>
 		<parameters>
 			&commonViServerParam;
 			&commonBuildParam;
 		</parameters>
-		<categories>
-			<category>vSphere</category>
-		</categories>
+		<functionalities>
+			<functionality>vSphere</functionality>
+		</functionalities>
 	</command>
-	<command name="vmChangeName" description="Change hostname" developer="liuj">
+	<command name="vmChangeName" synopsis="Change hostname" developer="liuj">
 		<script>windows\changeName</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="1" name="newGuestName" description="New name of the guest OS" />
+			<parameter mandatory="0" name="newGuestName" helpmessage="New name of the guest OS" />
 		</parameters>
-		<categories>
-			<category>Windows</category>
-		</categories>
+		<functionalities>
+			<functionality>Windows</functionality>
+		</functionalities>
 	</command>
-	<command name="vmGetInstalledApp" description="Get all installed applications" developer="liuj">
+	<command name="vmGetInstalledApp" synopsis="Get all installed applications" developer="liuj">
 		<script>windows\getInstalledApp</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 		</parameters>
-		<categories>
-			<category>Windows</category>
-		</categories>
+		<functionalities>
+			<functionality>Windows</functionality>
+		</functionalities>
 	</command>
-	<command name="vmReadFile" description="Read file in Windows" developer="liuj">
+	<command name="vmReadFile" synopsis="Read file in Windows" developer="liuj">
 		<script>windows\readFile</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="filePath" description="File path in VM" />
-			<parameter optional="1" name="numberOfLine" description="Number of lines to read. Count from top if positive; Count from bottom if negative. Read all if not defined." />
+			<parameter mandatory="1" name="filePath" helpmessage="File path in VM" />
+			<parameter mandatory="0" name="numberOfLine" helpmessage="Number of lines to read. Count from top if positive; Count from bottom if negative. Read all if not defined." />
 		</parameters>
-		<categories>
-			<category>Windows</category>
-		</categories>
+		<functionalities>
+			<functionality>Windows</functionality>
+		</functionalities>
 	</command>
-	<command name="vmRestart" description="Restart" developer="liuj">
+	<command name="vmRestart" synopsis="Restart" developer="liuj">
 		<script>windows\restart</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 		</parameters>
-		<categories>
-			<category>Windows</category>
-		</categories>
+		<functionalities>
+			<functionality>Windows</functionality>
+		</functionalities>
 	</command>
-	<command name="vmSetAutoAdminLogon" description="Set auto logon" developer="liuj">
+	<command name="vmSetAutoAdminLogon" synopsis="Set auto logon" developer="liuj">
 		<script>windows\setAutoAdminLogon</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="switch" description="Auto logon switch, true | false." type="option">
+			<parameter mandatory="1" name="switch" helpmessage="Auto logon switch, true | false." type="option">
 				&falseOrTrue;
 			</parameter>
 		</parameters>
-		<categories>
-			<category>Windows</category>
-		</categories>
+		<functionalities>
+			<functionality>Windows</functionality>
+		</functionalities>
 	</command>
-	<command name="vmShutdown" description="Shutdown" developer="liuj">
+	<command name="vmShutdown" synopsis="Shutdown" developer="liuj">
 		<script>windows\shutDown</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 		</parameters>
-		<categories>
-			<category>Windows</category>
-		</categories>
+		<functionalities>
+			<functionality>Windows</functionality>
+		</functionalities>
 	</command>
-	<command name="vmTrustVMwareSignature" description="Trust VMware Signed Drivers" developer="liuj">
+	<command name="vmTrustVMwareSignature" synopsis="Trust VMware Signed Drivers" developer="liuj">
 		<script>windows\vmware\trustVMwareSignature</script>
-		<annotation>
+		<description>
 			<p>This command is to add VMware certificates (vmware_2013.cer and vmware_2016.cer) into Windows enterprise certificate store, so that VMware is considered a trusted publisher'.</p>
 			<p>When the target machine is Windows XP, it simply sets the value of "HKLM:\SOFTWARE\Microsoft\Driver Signing\Policy" to 0.</p>
-		</annotation>
+		</description>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 		</parameters>
-		<categories>
-			<category>Windows</category>
-		</categories>
+		<functionalities>
+			<functionality>Windows</functionality>
+		</functionalities>
 	</command>
-	<command name="vmUploadFileToRacetrack" description="Upload a file to Racetrack" developer="liuj">
+	<command name="vmUploadFileToRacetrack" synopsis="Upload a file to Racetrack" developer="liuj">
 		<script>windows\vmware\uploadFileToRacetrack</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="0" name="resultId" description="Result ID on Racetrack" />
-			<parameter optional="0" name="description" description="Description of the file to upload" />
-			<parameter optional="1" name="filePath" description="File path, default is vmmsi log in the temp folder of the user" />
+			<parameter mandatory="1" name="resultId" helpmessage="Result ID on Racetrack" />
+			<parameter mandatory="1" name="description" helpmessage="Description of the file to upload" />
+			<parameter mandatory="0" name="filePath" helpmessage="File path, default is vmmsi log in the temp folder of the user" />
 		</parameters>
-		<categories>
-			<category>Windows</category>
-		</categories>
+		<functionalities>
+			<functionality>Windows</functionality>
+		</functionalities>
 	</command>
-	<command name="vmFileUpload" description="Upload a file to Windows machine" developer="liuj">
+	<command name="vmFileUpload" synopsis="Upload a file to Windows machine" developer="liuj">
 		<script>fileUpload</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter optional="1" name="file" description="File to upload to VM" type="file" />
-			<parameter optional="0" name="destination" description="Destination path, such as c:\temp\ or /home/temp/" />
+			<parameter mandatory="0" name="file" helpmessage="File to upload to VM" type="file" />
+			<parameter mandatory="1" name="destination" helpmessage="Destination path, such as c:\temp\ or /home/temp/" />
 		</parameters>
-		<categories>
-			<category>Windows</category>
-		</categories>
+		<functionalities>
+			<functionality>Windows</functionality>
+		</functionalities>
 	</command>
-	<command name="runWorkflow" description="Run as a command" developer="liuj">
+	<command name="runWorkflow" synopsis="Run as a command" developer="liuj">
 		<script>runWorkflow</script>
 		<parameters>
-			<parameter optional="0" name="name" description="Name of the workflow" />
-			<parameter optional="1" name="emailTo" description="Email address to send notification" />
-			<parameter optional="1" name="type" description="Run type, serial | parallel, default is serial" type="option">
+			<parameter mandatory="1" name="name" helpmessage="Name of the workflow" />
+			<parameter mandatory="0" name="emailTo" helpmessage="Email address to send notification" />
+			<parameter mandatory="0" name="type" helpmessage="Run type, serial | parallel, default is serial" type="option">
 				<options>
 					<option value="serial">serial</option>
 					<option value="parallel">parallel</option>
 				</options>
 			</parameter>
-			<parameter optional="0" name="errorAction" description="Action on error, stop | continue, only meaningful for serial run" type="option">
+			<parameter mandatory="1" name="errorAction" helpmessage="Action on error, stop | continue, only meaningful for serial run" type="option">
 				<options>
 					<option value="stop">stop</option>
 					<option value="continue">continue</option>
 				</options>
 			</parameter>
-			<parameter optional="0" name="workflow" description="Workflow to run, in format of JSON" type="textarea" />
+			<parameter mandatory="1" name="workflow" helpmessage="Workflow to run, in format of JSON" type="textarea" />
 		</parameters>
-		<categories>
-			<category>Workflow</category>
-		</categories>
+		<functionalities>
+			<functionality>Workflow</functionality>
+		</functionalities>
 	</command>
 </webcommander>
