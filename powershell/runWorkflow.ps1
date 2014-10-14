@@ -55,15 +55,23 @@ foreach ($cmd in $json) {
 		$value = $cmd.($k.name)
 		$queryString += $k.name + "=" + $value + "&" 
 	}
-	$urlList += "http://10.136.240.188/webcmd.php?" + $queryString
+	$urlList += "http://127.0.0.1/webcmd.php?" + $queryString
 }
 
 $result = "Success"
 $i = 1
 if ($type -eq "parallel") {
 	foreach ($url in $urlList) {
-		start-job -scriptBlock {invoke-webRequest -timeoutsec 86400 -uri $args[0]} -argumentList $url -name "command $i"
-		$i++
+		if ($url -notmatch "command=sleep&") {
+			start-job -scriptBlock {invoke-webRequest -timeoutsec 86400 -uri $args[0]} -argumentList $url -name "command $i"
+			$i++
+		} else {
+			$second = [int](($url -split 'second=')[-1] -split '&')[0]
+			if ($second -lt 1){$second = 1}
+			elseif ($second -gt 3600) {$second = 3600}
+			start-sleep $second
+			writeCustomizedMsg ("Info - wait $second seconds")
+		}
 	}
 	get-job | wait-job
 	for ($j=1; $j -lt $i; $j++) {
@@ -84,21 +92,29 @@ if ($type -eq "parallel") {
 	}
 } else {
 	foreach($url in $urlList) {
-		[xml]$s = Invoke-WebRequest -timeoutsec 86400 -uri $url
-		if ($s.webcommander.returnCode -ne '4488') { 
-			$cmdResult = "Fail"
+		if ($url -notmatch "command=sleep") {
+			[xml]$s = Invoke-WebRequest -timeoutsec 86400 -uri $url
+			if ($s.webcommander.returnCode -ne '4488') { 
+				$cmdResult = "Fail"
+			} else {
+				$cmdResult = "Success"
+			}
+			writeCustomizedMsg ("$cmdResult - command $i")
+			$msg.body += "`n===================`n"
+			$msg.body += "$cmdResult - command $i"
+			$msg.body += "`n===================`n"
+			$msg.body += $s.innerXml
+			if (($cmdResult -eq "Fail") -and ($errorAction -eq "stop")) {
+				$result = "Fail"
+				break
+			} else { $i++ }
 		} else {
-			$cmdResult = "Success"
+			$second = [int](($url -split 'second=')[-1] -split '&')[0]
+			if ($second -lt 1){$second = 1}
+			elseif ($second -gt 3600) {$second = 3600}
+			start-sleep $second
+			writeCustomizedMsg ("Info - wait $second seconds")
 		}
-		writeCustomizedMsg ("$cmdResult - command $i")
-		$msg.body += "`n===================`n"
-		$msg.body += "$cmdResult - command $i"
-		$msg.body += "`n===================`n"
-		$msg.body += $s.innerXml
-		if (($cmdResult -eq "Fail") -and ($errorAction -eq "stop")) {
-			$result = "Fail"
-			break
-		} else {$i++}
 	}
 }
 writeCustomizedMsg ("$result - run workflow $name in $type")
