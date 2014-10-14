@@ -109,6 +109,31 @@ function addWorkflow(jsonString){
 	return false;
 }
 
+function loadXMLDoc(filename){
+	if (window.ActiveXObject){
+		xhttp = new ActiveXObject("Msxml2.XMLHTTP");
+	} else {
+		xhttp = new XMLHttpRequest();
+	}
+	xhttp.open("GET", filename, false);
+	try {xhttp.responseType = "msxml-document"} catch(err) {} // Helping IE11
+	xhttp.send("");
+	return xhttp.responseXML;
+}
+
+function transformXml(xml) {
+	xsl = loadXMLDoc("workflow.xsl");
+	if (window.ActiveXObject || xhttp.responseType == "msxml-document"){
+		html = xml.transformNode(xsl);
+	}
+	else if (document.implementation && document.implementation.createDocument){
+		xsltProcessor = new XSLTProcessor();
+		xsltProcessor.importStylesheet(xsl);
+		html = xsltProcessor.transformToFragment(xml, document);
+	}
+	return html;
+}
+
 function renderResult(returnCode,executionTime,xml,status,detail){
 	var output = '';
 	if (returnCode=='4488'){output = '<font color="Green">PASS (4488) ' + executionTime + '</font>';}
@@ -116,161 +141,8 @@ function renderResult(returnCode,executionTime,xml,status,detail){
 	status.html(output);
 	
 	var log = '<table width="100%" class="parameter"><tr><th>Result</th></tr><tr><td>';
-	
-	var co = $(xml).find('customizedOutput');
-	if (co.length != 0) {
-		log += '<ul>';
-		co.each(function() {
-			log += '<li>' + $(this).text() + '</li>';
-		});
-		log += '</ul>';
-	}
-	
-	var err = $(xml).find('stderr');
-	if (err.length != 0) {
-		log += '<center>';
-		log += '<table class="exceptionTable">';
-		log += '<tr><th colspan="2">Exception occurred</th></tr>';
-		log += '<tr><td>Exception Type</td><td>' + err.find('exceptionType').text() + '</td></tr>';
-		log += '<tr><td>Fully Qualified Error ID</td><td>' + err.find('fullyQualifiedErrorId').text() + '</td></tr>';
-		log += '<tr><td>Error Message</td><td>' + err.find('errMessage').text() + '</td></tr>';
-		log += '<tr><td>Script Name</td><td>' + err.find('scriptName').text() + '</td></tr>';
-		log += '<tr><td>Scripte Line Number</td><td>' + err.find('scriptLineNumber').text() + '</td></tr>';
-		log += '</table>';
-		log += '</center>';
-	}
-	
-	var so = $(xml).find('stdOutput');
-	if (so.length != 0) {
-		log += '<ul>';
-		so.each(function() {
-			log += '<pre>' + $(this).text() + '</pre>';
-		});
-		log += '</ul>';
-	}
-	
-	var app = $(xml).find('Property[Name="name"]');
-	if (app.length != 0) {
-		log += '<center>';
-		log += '<table class="exceptionTable">';
-		log += '<tr><th>Application</th><th>Vendor</th><th>Version</th></tr>';
-		app.each(function() {
-			log += '<tr><td>' + $(this).text() + '</td>';
-			log += '<td>' + $(this).siblings('Property[Name="vendor"]').text() + '</td>';
-			log += '<td>' + $(this).siblings('Property[Name="version"]').text() + '</td></tr>';
-		})
-		log += '</table>';
-		log += '</center>';
-	}
-	
-	var vmhost = $(xml).find('VmHost');
-	if (vmhost.length != 0) {
-		vmhost.each(function() {
-			var host = $(this);
-			log += '<center>';
-			log += '<table class="exceptionTable" width="50%">';
-			log += '<tr><th width="20%">Property</th><th width="80%">Value</th></tr>';
-			host.find('Property').each(function(){
-				log += '<tr><td>' + $(this).attr("Name") + '</td>';
-				log += '<td>' + $(this).text() + '</td></tr>';
-			});
-			log += "</table></center>";
-		});
-	}
-	
-	var vm = $(xml).find('vm');
-	if (vm.length != 0) {
-		log += '<center><table class="exceptionTable">';
-		log += '<tr><th>VM</th><th>Remote control via VMRC ( download <a href="download/vmrc.zip">here</a> )</th><th>Remote control via MSTSC</th></tr>';
-		vm.each(function() {			
-			log += '<tr><td>' + $(this).find("name").text() + '</td>';
-			log += '<td>c:\\vmrc\\vmware-vmrc.exe -h ' + $(this).find("hostaddr").text() + ' -d "' + $(this).find("vmdkpath").text() + '" -u root -p ' + $(this).find("hostpassword").text() + '</td>';
-			log += '<td>mstsc /v:' + $(this).find("ip").text() + '</td></tr>';
-		});
-		log += '</table></center>';	
-	}
-	
-	var rp = $(xml).find('resourcepool');
-	if (rp.length != 0) {
-		log += '<center><table class="exceptionTable" width="60%">';
-		log += '<tr><th>Name</th><th>ID</th><th>Path</th></tr>';
-		rp.each(function() {			
-			log += '<tr><td>' + $(this).find("name").text() + '</td>';
-			log += '<td>' + $(this).find("id").text() + '</td>';
-			log += '<td>' + $(this).find("path").text() + '</td></tr>';
-		});
-		log += '</table></center>';	
-	}
-	
-	var desktop = $(xml).find('desktop');
-	if (desktop.length != 0) {
-		log += '<center><table class="exceptionTable" width="60%">';
-		log += '<tr><th>Pool ID</th><th>Desktop Name</th><th>Assigned User (for dedicated pool)</th><th>State</th></tr>';
-		desktop.each(function() {			
-			log += '<tr><td>' + $(this).find("poolid").text() + '</td>';
-			log += '<td>' + $(this).find("desktopname").text() + '</td>';
-			log += '<td>' + $(this).find("assigneduser").text() + '</td>';
-			log += '<td>' + $(this).find("state").text() + '</td></tr>';
-		});
-		log += '</table></center>';	
-	}
-	
-	var vm = $(xml).find('virtualmachine');
-	if (vm.length != 0) {
-		log += '<center><table class="exceptionTable" width="60%">';
-		log += '<tr><th>VM Name</th><th>IP</th><th>Snapshots</th></tr>';
-		vm.each(function() {
-			var vm = $(this);
-			log += '<tr><td>' + vm.find("name").text() + '</td>';
-			log += '<td>' + vm.find("ip").text() + '</td>';
-			log += '<td>';
-			vm.find('snapshot').each(function() {
-				log += $(this).text() + " | ";
-			})
-			log += '</td></tr>';
-		});
-		log += '</table></center>';	
-	}
-	
-	var pg = $(xml).find('portGroup');
-	if (pg.length != 0) {
-		log += '<center><table class="exceptionTable" width="60%">';
-		log += '<tr><th>Name</th><th>VLAN ID</th><th>Virtual Switch</th></tr>';
-		pg.each(function() {
-			log += '<tr><td>' + $(this).find("name").text() + '</td>';
-			log += '<td>' + $(this).find("vlanId").text() + '</td>';
-			log += '<td>' + $(this).find("virtualSwtichName").text() + '</td></tr>';
-		});
-		log += '</table></center>';	
-	}
-	
-	var build = $(xml).find('build');
-	if (build.length != 0) {
-		log += '<center><table class="exceptionTable">';
-		log += '<tr><th>ID</th><th>Changeset</th><th>Release Type</th><th>Build Type</th><th>Start Time</th><th>End Time</th><th>BAT Result</th></tr>';
-		build.each(function() {
-			log += '<tr><td>' + $(this).find("id").text() + '</td>';
-			log += '<td>' + $(this).find("changeset").text() + '</td>';
-			log += '<td>' + $(this).find("releasetype").text() + '</td>';
-			log += '<td>' + $(this).find("buildtype").text() + '</td>';
-			log += '<td>' + $(this).find("starttime").text() + '</td>';
-			log += '<td>' + $(this).find("endtime").text() + '</td>';
-			log += '<td>' + $(this).find("qaresult").text() + '</td></tr>';
-		});
-		log += '</table></center>';	
-	}
-	
-	var ds = $(xml).find('datastore');
-	if (ds.length != 0) {
-		log += '<center><table class="exceptionTable" width="60%">';
-		log += '<tr><th>Name</th><th>Free Space GB</th><th>Capacity GB</th></tr>';
-		ds.each(function() {
-			log += '<tr><td>' + $(this).find("name").text() + '</td>';
-			log += '<td>' + $(this).find("freespace").text() + '</td>';
-			log += '<td>' + $(this).find("capacity").text() + '</td></tr>';
-		});
-		log += '</table></center>';	
-	}
+	var result = transformXml(xml);
+	log += result.querySelector('#result').innerHTML;
 	log += '</td></tr></table>';
 	detail.html(log);
 }
@@ -548,24 +420,35 @@ $(function() {
 				};
 				var start = $.now();
 				status.html('<font color="Gold">Running...</font>');
-				$.ajax({
-					url: 'webcmd.php?command=' + form.attr('name'),
-					data: form.serialize()
-				})
-				.success(function(xml){
-					var returnCode = $(xml).find('returnCode').text();
-					//var executionTime = $(xml).find('executiontime').text();
-					var executionTime = ($.now() - start) / 1000 + " seconds";
-					renderResult(returnCode,executionTime,xml,status,detail);
-					if (returnCode=='4488'){
-						if (key && tag) {
-							var value = $(xml).find(tag).text();
-							eval("wf_" + key + " = '" + value + "'");
-						}
+				if (form.attr('name')=='sleep'){
+					var second = form.find('input[name="second"]').val();
+					setTimeout(function(){
+						var executionTime = second + " seconds";
+						var xml = '<webcommander><result><customizedOutput>Info - sleep ' + second + ' seconds</customizedOutput></result></webcommander>';
+						xml = $.parseXML(xml);
+						renderResult('4488',executionTime,xml,status,detail);
 						$(document).dequeue("ajaxRequests");
-					}
-					else {return false;}
-				});
+					}, second * 1000);
+				} else {
+					$.ajax({
+						url: 'webcmd.php?command=' + form.attr('name'),
+						data: form.serialize()
+					})
+					.success(function(xml){
+						var returnCode = $(xml).find('returnCode').text();
+						//var executionTime = $(xml).find('executiontime').text();
+						var executionTime = ($.now() - start) / 1000 + " seconds";
+						renderResult(returnCode,executionTime,xml,status,detail);
+						if (returnCode=='4488'){
+							if (key && tag) {
+								var value = $(xml).find(tag).text();
+								eval("wf_" + key + " = '" + value + "'");
+							}
+							$(document).dequeue("ajaxRequests");
+						}
+						else {return false;}
+					});
+				}
 			});
 		});
 		$(document).dequeue("ajaxRequests");
@@ -579,16 +462,26 @@ $(function() {
 			detail.empty();
 			var start = $.now();
 			status.html('<font color="Gold">Running...</font>');
-			$.ajax({
-				url: 'webcmd.php?command=' + form.attr('name'),
-				data: form.serialize()
-			})
-			.success(function(xml){
-				var returnCode = $(xml).find('returnCode').text();
-				//var executionTime = $(xml).find('executiontime').text();
-				var executionTime = ($.now() - start) / 1000 + " seconds";
-				renderResult(returnCode,executionTime,xml,status,detail);
-			});
+			if (form.attr('name')=='sleep'){
+				var second = form.find('input[name="second"]').val();
+				setTimeout(function(){
+					var executionTime = second + " seconds";
+					var xml = '<webcommander><result><customizedOutput>Info - sleep ' + second + ' seconds</customizedOutput></result></webcommander>';
+					xml = $.parseXML(xml);
+					renderResult('4488',executionTime,xml,status,detail);
+				}, second * 1000);
+			} else {
+				$.ajax({
+					url: 'webcmd.php?command=' + form.attr('name'),
+					data: form.serialize()
+				})
+				.success(function(xml){
+					var returnCode = $(xml).find('returnCode').text();
+					//var executionTime = $(xml).find('executiontime').text();
+					var executionTime = ($.now() - start) / 1000 + " seconds";
+					renderResult(returnCode,executionTime,xml,status,detail);
+				});
+			}
 		});
 	});
 	
@@ -632,7 +525,18 @@ $(function() {
 		});
 
 		select_cmd = '<select class="cmdlist"><option selected disabled>Select a command to run</option>';
-		var cmd_list = $(webcmd).find('command[hidden!="1"]');
+		var cmd_list = $(webcmd)
+			.find('webcommander')
+			.append('<command name="sleep" synopsis="sleep">\
+						<parameters>\
+							<parameter name="second" helpmessage="number of second to sleep" mandatory="1" />\
+						</parameters>\
+						<functionalities>\
+							<functionality>Workflow</functionality>\
+						</functionalities>\
+					</command>')
+			.find('command[hidden!="1"]');
+
 		cmd_list = $(cmd_list)
 			.sort(function(a, b){
 				var x = $(a).find('functionality').first().text() + $(a).attr('synopsis');
@@ -749,10 +653,12 @@ $(function() {
 				};
 				table += '</td><td>'  + param.attr('helpmessage') + '</td></tr>';
 			});
-			table += '<tr><td>Define workflow variable</td><td>';
-			table += '<input type="text" size="20" name="wf_key" placeholder="variable name"></input> = ';
-			table += '<input type="text" size="20" name="wf_tag" placeholder="xml tag from the result"></input></td>';
-			table += '<td>Define a variable with the command output to be used by other commands in the workflow</td></tr>';
+			if (xml.attr('name')!='sleep') {
+				table += '<tr><td>Define workflow variable</td><td>';
+				table += '<input type="text" size="20" name="wf_key" placeholder="variable name"></input> = ';
+				table += '<input type="text" size="20" name="wf_tag" placeholder="xml tag from the result"></input></td>';
+				table += '<td>Define a variable with the command output to be used by other commands in the workflow</td></tr>';
+			}
 			table += '</table></form>';
 			var $table = $(table);
 			var content = $(this).parents("div.command").find(".content");

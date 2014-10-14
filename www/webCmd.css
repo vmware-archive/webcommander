@@ -238,8 +238,8 @@ h1 {
     margin: 0 0 10px 0
 }
 
-#paraTable, .exceptionTable {
-	margin:30px;
+#paraTable, .pvTable {
+	margin:15px;
 	border-collapse:collapse;
 	border:1px solid black;
 	width:80%;
@@ -258,7 +258,7 @@ h1 {
 	text-align:right;
 }
 
-.exceptionTable  td{
+.pvTable  td{
 	text-align:left;
 	padding:5px;
 	color: black;
@@ -283,7 +283,7 @@ h1 {
 	color:#959595;
 }
 
-.exceptionTable  th{
+.pvTable  th{
 	background:#323235;
 	color:gold;
 	padding:5px;
@@ -357,6 +357,10 @@ ul, ol {
 
 .sidebar-root div.sidebar-container{
     position: absolute;
+}
+
+input#btnJson,input#btnUrl {
+	margin-left:10px;
 }
 
 div.sidebar-container {

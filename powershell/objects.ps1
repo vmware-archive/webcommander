@@ -143,11 +143,21 @@ function newUnc {
 function newSshServer { ##Server supports SSH access
 	Param($address, $user, $password)
 	
-	'y' | ..\postinstall\plink.exe -l $user -pw $password $address exit
-	$r =  ..\postinstall\plink.exe -l $user -pw $password $address exit
-	
-	if ($r) {
+	try {
+		import-module posh-ssh -ea stop
+	} catch {
+		writeCustomizedMsg "Fail - import POSH-SSH module"
+		writeCustomizedMsg "Info - need to install POSH-SSH on webcommander server https://github.com/darkoperator/Posh-SSH"
+		writeStderr
+		[Environment]::exit("0")
+	}
+	$cred = new-object -typeName System.management.automation.pscredential -argumentList $user, (ConvertTo-SecureString $password -asPlainText -Force)
+	try {
+		$sshSession = new-sshsession -computername $address -credential $cred -AcceptKey $true
+		$sftpSession = new-sftpsession -computername $address -credential $cred -AcceptKey $true
+	} catch {
 		writeCustomizedMsg "Fail - connect to SSH server $address"
+		writeStderr
 		[Environment]::exit("0")
 	}
 
@@ -155,12 +165,20 @@ function newSshServer { ##Server supports SSH access
 		address = $address
 		user = $user
 		password = $password
+		sshSession = $sshSession
+		sftpSession = $sftpSession
 	}
 	
 	$sshServer | add-member -MemberType ScriptMethod -value {
         param($cmd)
-		$r = ..\postinstall\plink.exe -batch -l $this.user -pw $this.password $this.address $cmd 2>&1
-		return $r
+		$cmd = $cmd -replace "`r`n","`n"
+		$result = invoke-sshcommand -command $cmd -sshSession $this.sshSession
+		if ($result.exitStatus -eq 0) {
+			writeCustomizedMsg "Success - run SSH script"
+		} else {
+			writeCustomizedMsg "Fail - run SSH script"
+		}
+		writeStdout ($result.output)
 	} -name runCommand
 	
 	return $sshServer
@@ -1646,6 +1664,7 @@ function newRemoteWin {
 		if (invoke-command {(get-wmiobject -class win32_operatingsystem).version -gt 6.0} -session $this.session) {
 			$this.sendFile("..\postinstall\vmware_2013.cer","c:\temp\")
 			$this.sendFile("..\postinstall\vmware_2016.cer","c:\temp\")
+			$this.sendFile("..\postinstall\fabula_2015.cer","c:\temp\")
 		} else {
 			# $this.sendFile("..\postinstall\certutil.exe","c:\windows\system32\")
 			# $this.sendFile("..\postinstall\certadm.dll","c:\windows\system32\")
@@ -1657,7 +1676,8 @@ function newRemoteWin {
 			if (test-path c:\Windows\system32\CertUtil.exe) {
 				c:\Windows\System32\CertUtil.exe -Enterprise -addstore 'TrustedPublisher' c:\temp\vmware_2013.cer | out-null
 				c:\Windows\System32\CertUtil.exe -Enterprise -addstore 'TrustedPublisher' c:\temp\vmware_2016.cer | out-null
-				remove-item c:\temp\vmware_201*.cer -force
+				c:\Windows\System32\CertUtil.exe -Enterprise -addstore 'TrustedPublisher' c:\temp\fabula_2015.cer | out-null
+				remove-item c:\temp\*.cer -force
 			} else {
 				# $regPath = 'HKLM:\SOFTWARE\Microsoft\Driver Signing'
 				# set-itemproperty -force -path $regPath -name Policy -value 0

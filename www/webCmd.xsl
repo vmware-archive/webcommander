@@ -143,38 +143,15 @@ THE SOFTWARE.
 								<td colspan="3" style="text-align:right">
 									<img id="imgWait" src="images/progress-bar.gif" style="vertical-align:middle; margin-right:20px; visibility:hidden;" />
 									<input id="btnSubmit" type="button" value="Submit" />
+									<input id="btnJson" type="button" value="JSON" />
+									<input id="btnUrl" type="button" value="URL" />
 								</td>
 							</tr>
 						</table>
 					</form>
 				</xsl:if>
-				<xsl:if test="returnCode = '4488'">
-					<h2>This command could also be called with the URL below</h2>
-					<textarea cols="100"><xsl:value-of select="url"/></textarea>
-				</xsl:if>
 			</center>
 		</div>	
-		<script>
-					$(function(){
-						var effects=["blind","bounce","clip","drop","explode","fold","highlight","puff","pulsate","scale","shake","size","slide","transfer"];
-						var randomnumber=Math.floor(Math.random()*15);
-						var options = {};
-						if ( effects[randomnumber] === "scale" ) {
-							options = { percent: 0 };
-						} else if ( effects[randomnumber] === "transfer" ) {
-							options = { to: "#logo", className: "ui-effects-transfer" };
-						} else if ( effects[randomnumber] === "size" ) {
-							options = { to: { width: 200, height: 60 } };
-						}
-						$("#table").effect( effects[randomnumber], options, 500, callback );
-				 
-						function callback() {
-							setTimeout(function() {
-								$( "#table" ).removeAttr( "style" ).hide().fadeIn();
-							}, 1000 );
-						};
-					});
-		</script>
 	</xsl:template>
 	
 	<xsl:template name="parameter">	
@@ -265,178 +242,62 @@ THE SOFTWARE.
 			</xsl:if>
 			<xsl:if test="not(contains(result, 'Missing parameters'))">
 				<ul>
-					<xsl:for-each select="result/customizedOutput">
-						<li><xsl:value-of select="text()" /></li>
-					</xsl:for-each>
+				<xsl:for-each select="result/*">
+					<xsl:choose>
+						<xsl:when test="name() = 'customizedOutput'">
+							<li><xsl:value-of select="text()"/></li>
+						</xsl:when> 
+						<xsl:when test="name() = 'stdOutput'">
+							<pre><xsl:value-of select="text()" /></pre>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:call-template name="pvTable"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:for-each>
 				</ul>
-				<pre><xsl:value-of select="result/stdOutput" /></pre>
-				<xsl:for-each select="result/stderr">
-					<center>
-					<table class="exceptionTable">
-					<tr><th colspan="2">Exception occurred</th></tr>
-					<tr><td>Exception Type</td><td><xsl:value-of select="exceptionType" /></td></tr>
-					<tr><td>Fully Qualified Error ID</td><td><xsl:value-of select="fullyQualifiedErrorId" /></td></tr>
-					<tr><td>Error Message</td><td><xsl:value-of select="errMessage" /></td></tr>
-					<tr><td>Script Name</td><td><xsl:value-of select="scriptName" /></td></tr>
-					<tr><td>Scripte Line Number</td><td><xsl:value-of select="scriptLineNumber" /></td></tr>
-					</table>
-					</center>
-				</xsl:for-each>
-				
-				<xsl:for-each select="result/Objects/Object">
-					<center>
-					<table class="exceptionTable">
-					<tr><th>Application</th><th>Vendor</th><th>Version</th></tr>
-					<xsl:for-each select="./Property">
-						<tr>
-							<td><xsl:value-of select="./Property[1]"/></td>
-							<td><xsl:value-of select="./Property[2]"/></td>
-							<td><xsl:value-of select="./Property[3]"/></td>
-						</tr>
-					</xsl:for-each>
-					</table>
-					</center>
-				</xsl:for-each>
-				
-				<xsl:for-each select="result/VmHosts/VmHost">
-					<center>
-					<table class="exceptionTable" width="50%">
-					<tr><th width="20%">Property</th><th width="80%">Value</th></tr>
-					<xsl:for-each select="./Property">
-						<xsl:sort select="@Name"/>
-						<tr>
-							<td><xsl:value-of select="@Name"/></td>
-							<td><xsl:value-of select="."/></td>
-						</tr>
-					</xsl:for-each>
-					</table>
-					</center>
-				</xsl:for-each>
-				
-				<xsl:if test="result/vm">
-					<center>
-						<table class="exceptionTable">
-							<tr><th>VM</th><th>Remote control via VMRC ( download <a href="download/vmrc.zip">here</a> )</th><th>Remote control via MSTSC</th></tr>
-							<xsl:for-each select="result/vm">
-								<tr>
-									<td><xsl:value-of select="name" /></td>
-									<td>c:\vmrc\vmware-vmrc.exe -h <xsl:value-of select="hostaddr"/> -d "<xsl:value-of select="vmdkpath"/>" -u root -p <xsl:value-of select="hostpassword"/></td>
-									<td>mstsc /v:<xsl:value-of select="ip"/></td>
-								</tr>
-							</xsl:for-each>
-						</table>
-					</center>
-				</xsl:if>
-				
-				<xsl:if test="result/datastore">
-					<center>
-						<table class="exceptionTable" width="60%">
-							<tr><th>Name</th><th>Free Space GB</th><th>Capacity GB</th></tr>
-							<xsl:for-each select="result/datastore">
-								<tr>
-									<td><xsl:value-of select="name" /></td>
-									<td><xsl:value-of select="freespace"/></td>
-									<td><xsl:value-of select="capacity"/></td>
-								</tr>
-							</xsl:for-each>
-						</table>
-					</center>
-				</xsl:if>
-				
-				<xsl:if test="result/portGroup">
-					<center>
-						<table class="exceptionTable" width="60%">
-							<tr><th>Name</th><th>VLAN ID</th><th>Virtual Switch</th></tr>
-							<xsl:for-each select="result/portGroup">
-								<tr>
-									<td><xsl:value-of select="name" /></td>
-									<td><xsl:value-of select="vlanId"/></td>
-									<td><xsl:value-of select="virtualSwitchName"/></td>
-								</tr>
-							</xsl:for-each>
-						</table>
-					</center>
-				</xsl:if>
-				
-				<xsl:if test="result/build">
-					<center>
-						<table class="exceptionTable">
-							<tr><th>ID</th><th>Changeset</th><th>Release Type</th><th>Build Type</th><th>Start Time</th><th>End Time</th><th>BAT Result</th></tr>
-							<xsl:for-each select="result/build">
-								<tr>
-									<td><xsl:value-of select="id" /></td>
-									<td><xsl:value-of select="changeset"/></td>
-									<td><xsl:value-of select="releasetype"/></td>
-									<td><xsl:value-of select="buildtype"/></td>
-									<td><xsl:value-of select="starttime"/></td>
-									<td><xsl:value-of select="endtime"/></td>
-									<td><xsl:value-of select="qaresult"/></td>
-								</tr>
-							</xsl:for-each>
-						</table>
-					</center>
-				</xsl:if>
-				
-				<xsl:if test="result/resourcepool">
-					<center>
-						<table class="exceptionTable" width="60%">
-							<tr><th>Name</th><th>ID</th><th>Path</th></tr>
-							<xsl:for-each select="result/resourcepool">
-								<tr>
-									<td><xsl:value-of select="name" /></td>
-									<td><xsl:value-of select="id"/></td>
-									<td><xsl:value-of select="path"/></td>
-								</tr>
-							</xsl:for-each>
-						</table>
-					</center>
-				</xsl:if>
-				
-				<xsl:if test="result/desktop">
-					<center>
-						<table class="exceptionTable" width="60%">
-							<tr><th>Pool ID</th><th>Desktop Name</th><th>Assigned User (for dedicated pool)</th><th>State</th></tr>
-							<xsl:for-each select="result/desktop">
-								<xsl:sort select="poolid"/>
-								<tr>
-									<td><xsl:value-of select="poolid" /></td>
-									<td><xsl:value-of select="desktopname" /></td>
-									<td><xsl:value-of select="assigneduser" /></td>
-									<td><xsl:value-of select="state" /></td>
-								</tr>
-							</xsl:for-each>
-						</table>
-					</center>
-				</xsl:if>
-				
-				<xsl:if test="result/virtualmachine">
-					<center>
-						<table class="exceptionTable" width="60%">
-							<tr><th>VM Name</th><th>Power State</th><th>IP</th><th>Snapshots</th></tr>
-							<xsl:for-each select="result/virtualmachine">
-								<tr>
-									<td><xsl:value-of select="name" /></td>
-									<td><xsl:value-of select="power" /></td>
-									<td><xsl:value-of select="ip" /></td>
-									<td>	
-										<xsl:for-each select="snapshot">
-											<xsl:value-of select="text()" />
-											<xsl:if test="position() != last()"> | </xsl:if>
-										</xsl:for-each>
-									</td>
-								</tr>
-							</xsl:for-each>
-						</table>
-					</center>
-				</xsl:if>
-				
 				<h2>Execution Time</h2>
 				<ul>
 					<li><xsl:value-of select="executiontime"/></li>
 				</ul>
-			</xsl:if>
+			</xsl:if>	
 		</div>
 		</div>
+	</xsl:template>
+	
+	<xsl:template name='pvTable'>
+		<center>
+		<table class="pvTable">
+			<tr>
+				<th>Property</th>
+				<th>Value</th>
+			</tr>
+			<xsl:for-each select="*">
+				<tr>
+					<td>
+						<xsl:choose>
+							<xsl:when test="@Name">
+								<xsl:value-of select="@Name" />
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="name()"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</td>
+					<td>
+						<xsl:choose>
+							<xsl:when test="not(*)">
+								<xsl:value-of select="text()" />
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:call-template name="pvTable" />
+							</xsl:otherwise>
+						</xsl:choose>
+					</td>
+				</tr>
+			</xsl:for-each>
+		</table>
+		</center>
 	</xsl:template>
 	
 </xsl:stylesheet>

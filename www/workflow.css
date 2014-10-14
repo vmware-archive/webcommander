@@ -126,18 +126,19 @@ ul, ol {
 li{
 	font:normal 18px 'Roboto Condensed';
 }
-.exceptionTable {
-	margin:0px 0 30px 0;
+.pvTable {
+	margin:15px;
 	border-collapse:collapse;
 	border:1px solid black;
+	width:80%;
 }
-.exceptionTable  td{
+.pvTable  td{
 	text-align:left;
 	padding:10px;
 	border:1px solid black;
 	font:normal 14px 'Roboto Condensed';
 }
-.exceptionTable  th{
+.pvTable  th{
 	background-color: #323235;
 }
 a.logo, a.logo:hover {
