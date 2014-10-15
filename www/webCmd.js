@@ -22,6 +22,23 @@ THE SOFTWARE.
 
 // Author: Jerry Liu, liuj@vmware.com
 
+$.fn.serializeObject = function(){
+    var o = {};
+	o["command"] = this.attr('action').replace("webcmd.php?command=", "");;
+    var a = this.serializeArray();
+    $.each(a, function() {
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+};
+
 $(document).ready(function() {
 	
 	$('.catchk').change(function() {
@@ -322,6 +339,30 @@ $(document).ready(function() {
 		$('#returnCode').css({"visibility":"hidden"});
 		$('#result').html('<center><h3>webCommander is handling your request. Please wait.</h3></center>');
 		$('#form1').submit();
+    });
+	
+	$('#btnJson').click(function() {	
+		$("#dialogExport").remove();
+		var dialog = '<div id="dialogExport" title="Export command to JSON"><center><textarea style="width:760px;height:500px" id="jsonExport" class="json">[';
+		var workflow = '';
+		$('form').each(function(){
+			workflow += JSON.stringify($(this).serializeObject(), null, '\t');
+			workflow += ',\n';
+		});	
+		dialog += workflow.slice(0, -2);
+		dialog += ']</textarea></center></div>';
+		$('#btnJson').after(dialog);
+		$( "#dialogExport" ).dialog({width:800});
+    });
+	
+	$('#btnUrl').click(function() {	
+		$("#dialogExport").remove();
+		var dialog = '<div id="dialogExport" title="Export command to URL"><center><textarea style="width:760px;height:300px" id="jsonExport" class="json">';
+		dialog += window.location.protocol + "//" + window.location.host + "/" + $('form').attr("action") + "&";
+		dialog += $('form').serialize();
+		dialog += '</textarea></center></div>';
+		$('#btnUrl').after(dialog);
+		$( "#dialogExport" ).dialog({width:800});
     });
 });
 /*
