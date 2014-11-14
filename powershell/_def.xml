@@ -77,6 +77,10 @@ THE SOFTWARE.
 ]>
 <webcommander>
 	<command name="adNewDomain" synopsis="Create a child domain" developer="liuj">
+		<description>This command creates a child domain in AD.
+		This command generates _def.xml.
+		It parses all powershell scripts to get information from comment
+		based help and parameter attributes.</description>
 		<script>ad\adNewDomain1</script>
 		<parameters>
 			&commonViServerParam;
@@ -1020,13 +1024,13 @@ THE SOFTWARE.
 		</functionalities>
 	</command>
 	<command name="sshRunScript" synopsis="Run user defined script via SSH" developer="liuj">
-		<script>misc\sshRunScript</script>
+		<script>ssh\sshRunScript</script>
 		<parameters>
 			&commonViServerParam;
 			<parameter mandatory="1" name="script" helpmessage="Script to run in VM" type="textarea" />
 		</parameters>
 		<functionalities>
-			<functionality>Script</functionality>
+			<functionality>SSH</functionality>
 		</functionalities>
 	</command>
 	<command name="vmSqlDbAction" synopsis="Create/drop database" developer="liuj">
@@ -1335,7 +1339,7 @@ THE SOFTWARE.
 		</functionalities>
 	</command>
 	<command name="vmRunScript2" synopsis="Run user defined script v2" developer="liuj" hidden="1">
-		<script>vmRunScript2</script>
+		<script>windows\runScript2</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
@@ -1619,15 +1623,26 @@ THE SOFTWARE.
 		</functionalities>
 	</command>
 	<command name="vmFileUpload" synopsis="Upload a file to Windows machine" developer="liuj">
-		<script>fileUpload</script>
+		<script>windows\fileUpload</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter mandatory="0" name="file" helpmessage="File to upload to VM" type="file" />
+			<parameter mandatory="1" name="file" helpmessage="File to upload to VM" type="file" />
 			<parameter mandatory="1" name="destination" helpmessage="Destination path, such as c:\temp\ or /home/temp/" />
 		</parameters>
 		<functionalities>
 			<functionality>Windows</functionality>
+		</functionalities>
+	</command>
+	<command name="sftpCopyFile" synopsis="Copy a file to SFTP server" developer="liuj">
+		<script>ssh\sftpCopyFile</script>
+		<parameters>
+			&commonViServerParam;
+			<parameter mandatory="1" name="file" helpmessage="File to copy" type="file" />
+			<parameter mandatory="1" name="destination" helpmessage="Destination path, such as /home/temp/" />
+		</parameters>
+		<functionalities>
+			<functionality>SSH</functionality>
 		</functionalities>
 	</command>
 	<command name="runWorkflow" synopsis="Run as a command" developer="liuj">
