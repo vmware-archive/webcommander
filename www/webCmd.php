@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /*
 Copyright (c) 2012-2014 VMware, Inc.
 
@@ -22,7 +22,6 @@ THE SOFTWARE.
 */
 
 /* Author: Jerry Liu, liuj@vmware.com */
-
 $codeArray = array(
 	"4000" => "Missing parameters",
 	"4001" => "Fail - connect to server",
@@ -198,10 +197,12 @@ if ( $command == ""){
 		$target = $target[0];
 		header("Content-type:text/xml");
 		//include("include/functionLib.php");
-		$xmloutput .= '<?xml version="1.0" encoding="utf-8" ?>';
+		$xmloutput .= '<?xml version="1.0" encoding="UTF-8" ?>';
 		$xmloutput .= '<?xml-stylesheet type="text/xsl" href="webCmd.xsl"?>';
 		$scriptName = (string)$target->script;
 		$xmloutput .= '<webcommander cmd="' . $command . '" developer="' . $target["developer"] . '" script="' . $scriptName . '">';
+		$annotation = $target->xpath("annotation");
+		if ( $annotation ){$xmloutput .= $annotation[0]->asXML();}
 		$description = $target->xpath("description");
 		if ( $description ){$xmloutput .= $description[0]->asXML();}
 		$xmloutput .= '<parameters>';
