@@ -181,6 +181,30 @@ function newSshServer { ##Server supports SSH access
 		writeStdout ($result.output)
 	} -name runCommand
 	
+	$sshServer | add-member -MemberType ScriptMethod -value {
+        param($localFile, $remotePath)
+		try {
+			set-sftpfile -sftpsession $this.sftpsession -localfile $localFile -remotePath $remotePath
+		} catch {
+			writeCustomizedMsg "Fail - copy file via SFTP"
+			writeStderr
+			[Environment]::exit("0")
+		}
+		writeCustomizedMsg "Success - copy file via SFTP"
+	} -name copyFileSftp
+	
+	$sshServer | add-member -MemberType ScriptMethod -value {
+        param($localFile, $remoteFile)
+		try {
+			"y" | set-scpfile -computername $this.address -credential $cred -localfile $localFile -remotePath $remoteFile
+		} catch {
+			writeCustomizedMsg "Fail - copy file via SCP"
+			writeStderr
+			[Environment]::exit("0")
+		}
+		writeCustomizedMsg "Success - copy file via SCP"
+	} -name copyFileScp
+	
 	return $sshServer
 }
 
@@ -1738,7 +1762,7 @@ function newRemoteWin {
 
 function writeStdout {
 	Param($output)
-
+	$output = [System.Web.HttpUtility]::HtmlEncode($output)
 	Write-Output "<stdOutput><![CDATA["
 	Write-Output $output
 	Write-Output "]]></stdOutput>"
@@ -1758,6 +1782,7 @@ function writeStderr {
 
 function writeCustomizedMsg {
 	Param($message)
+	$message = [System.Web.HttpUtility]::HtmlEncode($message)
 	$logtime = get-date -format "[yyyy-MM-dd HH:mm:ss] "
 	Write-Host "<customizedOutput>$logtime$message</customizedOutput>"
 }
