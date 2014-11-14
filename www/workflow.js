@@ -430,9 +430,19 @@ $(function() {
 						$(document).dequeue("ajaxRequests");
 					}, second * 1000);
 				} else {
+					//$.ajax({
+					//	url: 'webcmd.php?command=' + form.attr('name'),
+					//	data: form.serialize()
+					//})
+					var formData = new FormData(form[0]);
 					$.ajax({
 						url: 'webcmd.php?command=' + form.attr('name'),
-						data: form.serialize()
+						type: 'POST',
+						data: formData,
+						async: true,
+						cache: false,
+						contentType: false,
+						processData: false
 					})
 					.success(function(xml){
 						var returnCode = $(xml).find('returnCode').text();
@@ -471,9 +481,15 @@ $(function() {
 					renderResult('4488',executionTime,xml,status,detail);
 				}, second * 1000);
 			} else {
+				var formData = new FormData(form[0]);
 				$.ajax({
 					url: 'webcmd.php?command=' + form.attr('name'),
-					data: form.serialize()
+					type: 'POST',
+					data: formData,
+					async: true,
+					cache: false,
+					contentType: false,
+					processData: false
 				})
 				.success(function(xml){
 					var returnCode = $(xml).find('returnCode').text();
