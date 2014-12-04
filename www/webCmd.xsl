@@ -172,7 +172,7 @@ THE SOFTWARE.
 						<xsl:value-of select="@value"/>
 					</xsl:when>
 					<xsl:when test="@type = 'textarea'">
-						<textarea id="{@name}" name="{@name}" cols="80" rows="20"><xsl:value-of select="@value"/></textarea>
+						<textarea id="{@name}" name="{@name}"><xsl:value-of select="@value"/></textarea>
 					</xsl:when>
 					<xsl:when test="@type = 'file'">
 						<input type="file" id="{@name}" name="{@name}" size="60" />
