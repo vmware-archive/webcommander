@@ -415,6 +415,10 @@ div#category-header {
 	font:bold 17px 'Roboto Condensed';
 	margin-bottom:20px;
 }
+textarea {
+	width:90%;
+	height:100px;
+}
 input,textarea,select{
 	font:normal 14px/1.8em 'Roboto Condensed';
 }

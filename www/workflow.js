@@ -615,7 +615,7 @@ $(function() {
             });
 			var table = '<form name="'; 
 			table += cmd; 
-			table += '"><table width="100%" class="parameter"><tr><th width="20%">Name</th><th width="30%">Value</th><th width="50%">Help Message</th></tr>';
+			table += '"><table width="100%" class="parameter"><tr class="header"><th width="20%">Name</th><th width="30%">Value</th><th width="50%">Help Message</th></tr>';
 			$(xml).find('parameter').each(function(){
 				var param = $(this);
 				var name = param.attr('name');
@@ -625,7 +625,7 @@ $(function() {
 				var type = param.attr('type');
 				switch (type){
 					case 'textarea':
-						table += '<textarea type="textarea" cols="80" rows="20" name="' + name + '"></textarea>';
+						table += '<textarea type="textarea" name="' + name + '"></textarea>';
 						break;
 					case 'file':
 						table += '<input type="file" size="60" name="' + name + '"></input>';
@@ -670,11 +670,14 @@ $(function() {
 				table += '</td><td>'  + param.attr('helpmessage') + '</td></tr>';
 			});
 			if (xml.attr('name')!='sleep') {
-				table += '<tr><td>Define workflow variable</td><td>';
+				table += '<tr class="wf"><td>Define workflow variable</td><td>';
 				table += '<input type="text" size="20" name="wf_key" placeholder="variable name"></input> = ';
 				table += '<input type="text" size="20" name="wf_tag" placeholder="xml tag from the result"></input></td>';
 				table += '<td>Define a variable with the command output to be used by other commands in the workflow</td></tr>';
 			}
+			table += '<tr class="wf"><td>Command description</td><td>';
+			table += '<textarea type="textarea" name="wf_des"></textarea></td>';
+			table += '<td>Write down a desciption here so that you will not forget what it does</td></tr>';
 			table += '</table></form>';
 			var $table = $(table);
 			var content = $(this).parents("div.command").find(".content");

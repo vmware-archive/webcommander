@@ -141,6 +141,9 @@ li{
 .pvTable  th{
 	background-color: #323235;
 }
+tr.wf {
+	color: #1697D1;
+}
 a.logo, a.logo:hover {
 	text-decoration:none;
 	color:white;
@@ -155,6 +158,10 @@ select.cmdlist{
    border-radius: 0;
    height: 34px;
    -webkit-appearance: none;
+}
+textarea {
+	width:100%;
+	height:40px;
 }
 textarea.json
 {
