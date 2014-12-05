@@ -22,11 +22,11 @@ THE SOFTWARE.
 
 <#
 	.SYNOPSIS
-        Add license
+        Import / export broker settings
 
 	.DESCRIPTION
-        This command adds license to brokers.
-		This command could execute on multiple brokers.
+        This command enables or disables auto-recovery of pools.
+		This command could execute on multiple brokers and pools.
 		
 	.FUNCTIONALITY
 		Broker
@@ -36,7 +36,7 @@ THE SOFTWARE.
 
 Param (
 	[parameter(
-		HelpMessage="IP or FQDN of the ESX or VC server where broker VMs are located"
+		HelpMessage="IP or FQDN of the ESX or VC server where the broker VM is located"
 	)]
 	[string]
 		$serverAddress, 
@@ -71,13 +71,24 @@ Param (
 	)]
 	[string]	
 		$guestPassword=$env:defaultPassword,
+		
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Pool ID. Support multiple values seperated by comma."
+	)]
+	[string]
+		$poolId,
 	
 	[parameter(
 		Mandatory=$true,
-		HelpMessage="License key"
+		HelpMessage="Action on pool auto-recovery setting"
+	)]
+	[ValidateSet(
+		"enable",
+		"disable"
 	)]
 	[string]
-		$license
+		$action
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -88,14 +99,19 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-function addLicense {
-	param($ip, $guestUser, $guestPassword, $license)
+function setAutoRecovery {
+	param ($ip, $guestUser, $guestPassword, $poolIdList, $action)
 	$remoteWinBroker = newRemoteWinBroker $ip $guestUser $guestPassword
 	$remoteWinBroker.initialize()
-	$remoteWinBroker.addLicense($license)
-}
+	foreach ($poolId in $poolIdList) {
+		$remoteWinBroker.setPoolAutoRecovery($poolId, $action)
+	}
+	$remoteWinBroker.setPoolAutoRecovery($poolId, $action)	
+}	
+
+$poolIdList = $poolId.split(",") | %{$_.trim()}
 
 $ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
 $ipList | % {
-	addLicense $_ $guestUser $guestPassword $license
+	setAutoRecovery $_ $guestUser $guestPassword $poolIdList $action
 }

@@ -20,30 +20,161 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
+<#
+	.SYNOPSIS
+        Add linked clone pool
+
+	.DESCRIPTION
+        This command adds a linked clone pool on a broker.
+		
+	.FUNCTIONALITY
+		Broker
+#>
+
 ## Author: Jerry Liu, liuj@vmware.com
 
 Param (
-	$serverAddress,
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword, 
-	$vcAddress, 
-	$composerDomainName, 
-	$poolId, 
-	$namePrefix, 
-	$parentVmPath, 
-	$parentSnapshotPath, 
-	$vmFolderPath, 
-	$resourcePoolPath, 
-	$datastoreSpecs,
-	$dataDiskLetter="U", 
-	$dataDiskSize=2048, 
-	$tempDiskSize=1024,
-	$min, 
-	$max, 
-	$poolType="Persistent"
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where the broker VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of broker VM or IP / FQDN of broker machine"
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of broker (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword,
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP / FQDN of VC server"
+	)]
+	[string]
+		$vcAddress,  
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Composer domain name"
+	)]
+	[string]
+		$composerDomainName, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Pool ID"
+	)]
+	[string]
+		$poolId, 
+	
+	[parameter(
+		HelpMessage="Name prefix, default is 'poolID-'"
+	)]
+	[string]	
+		$namePrefix, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Path to a virtual machine to be used as the parent VM for this desktop pool."
+	)]
+	[string]
+		$parentVmPath, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Path to the snapshot that is to be used as the image for this pool, i.e. /clean or /clean/test0"
+	)]
+	[string]
+		$parentSnapshotPath, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Specify a location for this new directory as a vCenter folder path."
+	)]
+	[string]
+		$vmFolderPath, 
+		
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Path to a resource pool to be used for this desktop pool."
+	)]
+	[string]
+		$resourcePoolPath, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="List of datastore specs for storage of desktop VMs and data disks, separated by semicolons using the format: '[Overcommit,usage]/path/to/datastore'"
+	)]
+	[string]
+		$datastoreSpecs,
+	
+	[parameter(
+		HelpMessage="Data disk letter, default is 'U'"
+	)]
+	[string]
+		$dataDiskLetter="U", 
+	
+	[parameter(
+		HelpMessage="Data disk size, default is 2048"
+	)]
+	[string]
+		$dataDiskSize=2048, 
+	
+	[parameter(
+		HelpMessage="Temp disk size, default is 1024"
+	)]
+	[string]
+		$tempDiskSize=1024,
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Minimum number of desktops to be provisioned in this pool."
+	)]
+	[string]
+		$min, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Maximum number of desktops to be provisioned in this pool."
+	)]
+	[string]
+		$max, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Pool type"
+	)]
+	[ValidateSet(
+		"Persistent",
+		"NonPersistent"
+	)]
+	[string]
+		$poolType="Persistent"
 )
 
 foreach ($paramKey in $psboundparameters.keys) {

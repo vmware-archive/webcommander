@@ -20,19 +20,85 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
+<#
+	.SYNOPSIS
+        Add composer
+
+	.DESCRIPTION
+        This command adds VC servers on a broker.
+		
+	.FUNCTIONALITY
+		Broker
+#>
+
 ## Author: Jerry Liu, liuj@vmware.com
 
 Param (
-	$serverAddress,
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword,  
-	$vcAddress, 
-	$vcUser="administrator", 
-	$vcPassword=$env:defaultPassword, 
-	$useComposer
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where the broker VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of broker VM or IP / FQDN of broker machine"
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of broker (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword,
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP / FQDN of VC server. Support multiple values seperated by comma"
+	)]
+	[string]
+		$vcAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to VC server (default is administrator)"
+	)]
+	[string]	
+		$vcUser="administrator", 
+	
+	[parameter(
+		HelpMessage="Password of vcUser"
+	)]
+	[string]	
+		$vcPassword=$env:defaultPassword,  
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Whether to use compopser if installed on VC"
+	)]
+	[ValidateSet(
+		"false",
+		"true"
+	)]
+		$useComposer
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -42,6 +108,8 @@ foreach ($paramKey in $psboundparameters.keys) {
 }
 
 . .\objects.ps1
+
+$vcAddressList = $vcAddress.split(",") | %{$_.trim()}
 
 if (verifyIp($vmName)) {
 	$ip = $vmName
@@ -56,4 +124,6 @@ if (verifyIp($vmName)) {
 $remoteWinBroker = newRemoteWinBroker $ip $guestUser $guestPassword
 $remoteWinBroker.initialize()
 $useComposer = [System.Convert]::ToBoolean("$useComposer")
-$remoteWinBroker.addVc($vcAddress, $vcUser, $vcPassword, $useComposer)
+foreach ($vc in $vcAddressList) {
+	$remoteWinBroker.addVc($vc, $vcUser, $vcPassword, $useComposer)
+}

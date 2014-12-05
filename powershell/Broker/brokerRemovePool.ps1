@@ -20,17 +20,73 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
+<#
+	.SYNOPSIS
+        Remove pool
+
+	.DESCRIPTION
+        This command removes pools on brokers.
+		This command could execute on multiple brokers and pools.
+		
+	.FUNCTIONALITY
+		Broker
+#>
+
 ## Author: Jerry Liu, liuj@vmware.com
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword, 
-	$poolId, 
-	$rmFromDisk
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where the broker VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of broker VM or IP / FQDN of broker machine. Support multiple values seperated by comma. VM name and IP could be mixed."
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of broker (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword,
+		
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Pool ID. Support multiple values seperated by comma."
+	)]
+	[string]
+		$poolId,
+		
+	[parameter(
+		HelpMessage="Whether to remove VM from disk. Default is false"
+	)]
+	[ValidateSet(
+		"false",
+		"true"
+	)]
+		$rmFromDisk="false"
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -41,17 +97,17 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-if (verifyIp($vmName)) {
-	$ip = $vmName
-} else {
-	$server = newServer $serverAddress $serverUser $serverPassword
-	$vm = newVmWin $server $vmName $guestUser $guestPassword
-	$vm.waitfortools()
-	$ip = $vm.getIPv4()
-	$vm.enablePsRemote()
+function removePool {
+	param ($ip, $guestUser, $guestPassword, $poolIdList, $rmFromDisk)
+	$remoteWinBroker = newRemoteWinBroker $ip $guestUser $guestPassword
+	$remoteWinBroker.initialize()
+	$poolIdList | % {
+		$remoteWinBroker.removePool($_, $rmFromDisk)
+	}
 }
-
-$remoteWinBroker = newRemoteWinBroker $ip $guestUser $guestPassword
-$remoteWinBroker.initialize()
 $rmFromDisk = [System.Convert]::ToBoolean("$rmFromDisk")
-$remoteWinBroker.removePool($poolId, $rmFromDisk)
+$poolIdList = $poolId.split(",") | %{$_.trim()}
+$ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
+$ipList | % {
+	removePool $_ $guestUser $guestPassword $poolIdList $rmFromDisk
+}

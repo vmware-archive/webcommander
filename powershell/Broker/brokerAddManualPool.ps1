@@ -20,21 +20,100 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
+<#
+	.SYNOPSIS
+        Add manual pool
+
+	.DESCRIPTION
+        This command adds a manual pool on a broker.
+		
+	.FUNCTIONALITY
+		Broker
+#>
+
 ## Author: Jerry Liu, liuj@vmware.com
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword, 
-	$poolId, 
-	$vcAddress, 
-	$vcUser="administrator", 
-	$vcPassword=$env:defaultPassword, 
-	$agentVmName, 
-	$poolType
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where the broker VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of broker VM or IP / FQDN of broker machine"
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of broker (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword,
+		
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Pool ID"
+	)]
+	[string]
+		$poolId,
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP / FQDN of VC server"
+	)]
+	[string]
+		$vcAddress,
+	 
+	[parameter(
+		HelpMessage="User name to connect to VC server (default is administrator)"
+	)]
+	[string]	
+		$vcUser="administrator", 
+	
+	[parameter(
+		HelpMessage="Password of vcUser"
+	)]
+	[string]	
+		$vcPassword=$env:defaultPassword, 
+		
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Agent virtual machine name in the vCenter inventory. Support multiple values seperated by comma."
+	)]
+	[string]
+		$agentVmName, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Pool type"
+	)]
+	[ValidateSet(
+		"Persistent",
+		"NonPersistent"
+	)]
+	[string]
+		$poolType="Persistent"
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -45,6 +124,7 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
+$agentVmNameList = $agentVmName.split(",") | %{$_.trim()}
 $vc = newServer $vcAddress $vcUser $vcPassword
 
 if (verifyIp($vmName)) {
@@ -59,7 +139,4 @@ if (verifyIp($vmName)) {
 
 $remoteWinBroker = newRemoteWinBroker $ip $guestUser $guestPassword
 $remoteWinBroker.initialize()
-$remoteWinBroker.addManualPool($vc, $agentVmName, $poolId, $poolType)
-
-disconnect-VIServer -Server * -Force -Confirm:$false
-get-pssession | remove-pssession -Confirm:$false
+$remoteWinBroker.addManualPool($vc, $agentVmNameList, $poolId, $poolType)

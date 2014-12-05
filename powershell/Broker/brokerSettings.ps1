@@ -20,17 +20,74 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
+<#
+	.SYNOPSIS
+        Import / export broker settings
+
+	.DESCRIPTION
+        This command utilizes vdmimport and vdmexport utilities to import or export broker settings.
+		This command could execute on multiple brokers.
+		
+	.FUNCTIONALITY
+		Broker
+#>
+
 ## Author: Jerry Liu, liuj@vmware.com
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword, 
-	$action,
-	$filePath="c:\temp\broker.ldif"
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where the broker VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of broker VM or IP / FQDN of broker machine. Support multiple values seperated by comma. VM name and IP could be mixed."
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of broker (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword,
+
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Action on broker settings"
+	)]
+	[ValidateSet(
+		"export",
+		"import"
+	)]
+	[string]	
+		$action,
+		
+	[parameter(
+		HelpMessage="Path to the broker settings file, default is c:\temp\broker.ldif"
+	)]
+	[string]
+		$filePath="c:\temp\broker.ldif"
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -41,23 +98,17 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-if (verifyIp($vmName)) {
-	$ip = $vmName
-} else {
-	$server = newServer $serverAddress $serverUser $serverPassword
-	$vm = newVmWin $server $vmName $guestUser $guestPassword
-	$vm.waitfortools()
-	$ip = $vm.getIPv4()
-	$vm.enablePsRemote()
-}
-
-$remoteWinBroker = newRemoteWinBroker $ip $guestUser $guestPassword	
-
-if ($action -eq "import") {
+function settingAction {
+	param ($ip, $guestUser, $guestPassword, $action, $filePath)
+	$remoteWinBroker = newRemoteWin $ip $guestUser $guestPassword
+	if ($action -eq "import") {
 	$remoteWinBroker.importSettings($filePath)
-} else {
-	$remoteWinBroker.exportSettings($filePath) 
+	} else {
+		$remoteWinBroker.exportSettings($filePath) 
+	}	
 }
 
-disconnect-VIServer -Server * -Force -Confirm:$false
-get-pssession | remove-pssession -Confirm:$false
+$ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
+$ipList | % {
+	settingAction $_ $guestUser $guestPassword $action $filePath
+}

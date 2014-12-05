@@ -20,16 +20,64 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
+<#
+	.SYNOPSIS
+        Setup smartcard environment
+
+	.DESCRIPTION
+        This command setup and configure smartcard environment on brokers.
+		This command could execute on multiple brokers.
+		
+	.FUNCTIONALITY
+		Broker
+#>
+
 ## Author: Jerry Liu, liuj@vmware.com
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword, 
-	$cert
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where the broker VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of the VM or IP / FQDN of broker machine. Support multiple values seperated by comma. VM name and IP could be mixed."
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of broker (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword, 
+		
+	[parameter(
+		Mandatory=$true
+		HelpMessage="CA certificate"
+	)]
+	[string]	
+		$certFile
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -40,66 +88,36 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-if (verifyIp($vmName)) {
-	$ip = $vmName
-} else {
-	$server = newServer $serverAddress $serverUser $serverPassword
-	$vm = newVmWin $server $vmName $guestUser $guestPassword
-	$vm.waitfortools()
-	$ip = $vm.getIPv4()
-	$vm.enablePsRemote()
-}
-
-$remoteWinBroker = newRemoteWin $ip $guestUser $guestPassword
-
-$remoteWinBroker.sendFile("$cert", "C:\temp\certnew.cer")
-$script = {
-	remove-item c:\temp\trust.key -ea silentlyContinue
-	& "C:\Program Files\VMware\VMware View\Server\jre\bin\keytool.exe" -import -alias alias -file C:\temp\certnew.cer -keystore c:\temp\trust.key -storepass 111111 -noprompt 2>null
-	copy-item c:\temp\trust.key "C:\Program Files\VMware\VMware View\Server\sslgateway\conf\" 
-	$content = @"
+function setupSmartCard {
+	param ($ip, $guestUser, $guestPassword, $certFile)
+	$remoteWinBroker = newRemoteWin $ip $guestUser $guestPassword
+	$remoteWinBroker.sendFile("$certFile", "C:\temp\certnew.cer")
+	$script = {
+		remove-item c:\temp\trust.key -ea silentlyContinue
+		& "C:\Program Files\VMware\VMware View\Server\jre\bin\keytool.exe" -import -alias alias -file C:\temp\certnew.cer -keystore c:\temp\trust.key -storepass 111111 -noprompt 2>null
+		copy-item c:\temp\trust.key "C:\Program Files\VMware\VMware View\Server\sslgateway\conf\" 
+		$content = @"
 trustKeyfile=trust.key
 trustStoretype=JKS
 useCertAuth=true
 "@
-	#$content | out-file "c:\Program Files\VMware\VMware View\Server\sslgateway\conf\locked.properties" -encoding UTF8
-	$Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding($False)
-	[System.IO.File]::WriteAllLines("c:\Program Files\VMware\VMware View\Server\sslgateway\conf\locked.properties", $content, $Utf8NoBomEncoding)
-	restart-service wsbroker
+		$Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding($False)
+		[System.IO.File]::WriteAllLines("c:\Program Files\VMware\VMware View\Server\sslgateway\conf\locked.properties", $content, $Utf8NoBomEncoding)
+		restart-service wsbroker
+	}
+
+	try {
+		$result = invoke-command -scriptBlock $script -session $remoteWinBroker.session -EA stop
+	} catch {
+		writeCustomizedMsg "Fail - setup smartcard"
+		writeStderr
+		[Environment]::exit("0")
+	}
+	writeStdout($result)
+	writeCustomizedMsg "Success - setup smartcard"	
+}	
+
+$ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
+$ipList | % {
+	setupSmartCard $_ $guestUser $guestPassword $certFile
 }
-
-try {
-	$result = invoke-command -scriptBlock $script -session $remoteWinBroker.session -EA stop
-} catch {
-	writeCustomizedMsg "Fail - setup smartcard"
-	writeStderr
-	[Environment]::exit("0")
-}
-
-# $remoteWinBroker.sendFile("..\www\download\smartcard.zip", "C:\temp\")
-# $script = {
-	# remove-item -path "c:\temp\smartcard" -recurse -force -confirm:$false -ea silentlyContinue
-	# $shell = new-object -com shell.application
-	# $zip = $shell.namespace("c:\temp\smartcard.zip") 
-	# $destination = $shell.namespace("c:\temp") 
-	# $destination.Copyhere($zip.items(),20) 
-	# $cmd = "c:\temp\smartcard\ActivClient_x64_6.2.msi"
-	# $installprocess = [System.Diagnostics.Process]::Start($cmd, " /quiet")
-	# $installprocess.WaitForExit()
-	# $cmd = "rundll32.exe"
-	# $cmdPara = " advpack.dll,LaunchINFSectionEx C:\temp\smartcard\gemalto\Gemalto.MiniDriver.NET.inf,,,256"
-	# $installprocess = [System.Diagnostics.Process]::Start($cmd, $cmdPara)
-	# $installprocess.WaitForExit()
-# }
-# try {
-	# $result = invoke-command -scriptBlock $script -session $remoteWinBroker.session -EA stop
-# } catch {
-	# writeCustomizedMsg "Fail - configure smartcard drivers"
-	# writeStderr
-	# [Environment]::exit("0")
-# }
-
-#$result = $remoteWinBroker.runInteractivePs1($script)
-writeStdout($result)
-writeCustomizedMsg "Success - setup smartcard"
-# $remoteWinBroker.restart()

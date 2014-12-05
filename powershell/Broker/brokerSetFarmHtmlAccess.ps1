@@ -22,11 +22,11 @@ THE SOFTWARE.
 
 <#
 	.SYNOPSIS
-        Add license
+        Set farm HTML access
 
 	.DESCRIPTION
-        This command adds license to brokers.
-		This command could execute on multiple brokers.
+        This command enables or disables HTML access of farms.
+		This command could execute on multiple brokers and farms.
 		
 	.FUNCTIONALITY
 		Broker
@@ -36,7 +36,7 @@ THE SOFTWARE.
 
 Param (
 	[parameter(
-		HelpMessage="IP or FQDN of the ESX or VC server where broker VMs are located"
+		HelpMessage="IP or FQDN of the ESX or VC server where the broker VM is located"
 	)]
 	[string]
 		$serverAddress, 
@@ -71,13 +71,23 @@ Param (
 	)]
 	[string]	
 		$guestPassword=$env:defaultPassword,
-	
+		
 	[parameter(
 		Mandatory=$true,
-		HelpMessage="License key"
+		HelpMessage="Farm ID. Support multiple values seperated by comma."
 	)]
 	[string]
-		$license
+		$farmId,
+	
+	[parameter(
+		HelpMessage="Switch, select true to enable or false to disable. Default is false"
+	)]
+	[ValidateSet(
+		"false",
+		"true"
+	)]
+	[string]
+		$switch="false"
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -88,14 +98,17 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-function addLicense {
-	param($ip, $guestUser, $guestPassword, $license)
+function setFarmHtmlAccess {
+	param ($ip, $guestUser, $guestPassword, $farmIdList, $switch)
 	$remoteWinBroker = newRemoteWinBroker $ip $guestUser $guestPassword
 	$remoteWinBroker.initialize()
-	$remoteWinBroker.addLicense($license)
+	$farmIdList | % {
+		$remoteWinBroker.setFarmHtmlAccess($_, $switch)
+	}
 }
 
+$farmIdList = $farmId.split(",") | %{$_.trim()}
 $ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
 $ipList | % {
-	addLicense $_ $guestUser $guestPassword $license
+	setFarmHtmlAccess $_ $guestUser $guestPassword $farmIdList $switch
 }
