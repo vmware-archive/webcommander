@@ -20,6 +20,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
+<#
+	.SYNOPSIS
+		This file defines common objects and functions used by other scripts.
+		
+	.FUNCTIONALITY
+		noshow
+#>
+
 ## Author: Jerry Liu, liuj@vmware.com
 
 #$errorActionPreference = "SilentlyContinue"
@@ -33,14 +41,18 @@ $host.ui.rawui.windowsize = $current
 function verifyIp {
 	param($ipAddress)
 	try {
-		$ipObj = [System.Net.IPAddress]::parse($ipAddress)
-		$isValidIP = [System.Net.IPAddress]::tryparse([string]$ipAddress, [ref]$ipObj)
-	} catch {}
-	if ($isValidIP) {
-	   return $true
-	} else {
-	   return $false
+		#$ipObj = [System.Net.IPAddress]::parse($ipAddress)
+		#$isValidIP = [System.Net.IPAddress]::tryparse([string]$ipAddress, [ref]$ipObj)
+		$ip = ([System.Net.Dns]::GetHostAddresses($ipaddress)).IPAddressToString
+	} catch {
+		return $false
 	}
+	return $ip
+	# if ($isValidIP) {
+	   # return $true
+	# } else {
+	   # return $false
+	# }
 }
 
 function getUniqueString {
@@ -142,7 +154,6 @@ function newUnc {
 
 function newSshServer { ##Server supports SSH access
 	Param($address, $user, $password)
-	
 	try {
 		import-module posh-ssh -ea stop
 	} catch {
@@ -153,6 +164,7 @@ function newSshServer { ##Server supports SSH access
 	}
 	$cred = new-object -typeName System.management.automation.pscredential -argumentList $user, (ConvertTo-SecureString $password -asPlainText -Force)
 	try {
+		get-sshtrustedhost | remove-sshtrustedhost
 		$sshSession = new-sshsession -computername $address -credential $cred -AcceptKey $true
 		$sftpSession = new-sftpsession -computername $address -credential $cred -AcceptKey $true
 	} catch {
@@ -471,7 +483,7 @@ function newVm {
 		writeCustomizedMsg "Warning - VM $($this.name) is killed forcely"
 	} -Name stop
 	
-	$vm | Add-Member -MemberType ScriptMethod -Value { ##stop
+	$vm | Add-Member -MemberType ScriptMethod -Value { ##suspend
 		$this.vivm = get-vm $this.name -server $this.server.viserver
 		try {
 			$null = Suspend-VM -vm $this.vivm -confirm:$false -EA stop
@@ -854,58 +866,21 @@ function newRemoteWinBroker {
 	} -name addComposerDomain
 	
 	$broker | Add-Member -MemberType ScriptMethod -Value { ##addManualPool
-		Param($vc,$vmName,$pooId,$type)
+		Param($vc,$vmNameList,$pooId,$type)
 		$msg = "add pool to broker"
-		$vmId = (get-vm -name $vmName -server $vc.viserver).id
+		$vmId = @()
+		foreach ($vmName in $vmNameList) {
+			$vmId += (get-vm -name $vmName -server $vc.viserver).id
+		}
+		$vmIdList = $vmId -join ";"
 		$vcId = $this.getVcId($vc.address)
-		$argList = @($poolId,$vcId,$vmId,$type)
+		$argList = @($poolId,$vcId,$vmIdList,$type)
 		$cmd = {
 			Add-PSSnapin vm*
 			Add-manualpool -pool_id $args[0] -vc_id $args[1] -vm_id_list $args[2] -Persistence $args[3] -ea Stop
 		}
 		$this.executePsRemote($cmd, $argList, $msg)
 	} -Name addManualPool
-	
-	$broker | Add-Member -MemberType ScriptMethod -Value { ##addSviPool	
-		Param($vc,$vm,$poolId,$snapshotPath,$datastore,$min,$max,$type,$folder,$resourcePool,$datacenter,$vmEsxHost)
-		$msg = "add pool to broker"
-		if ($folder -ne "") {
-			$vmFolderPath = $folder
-		} else {
-			$vmFolderPath = "/" + $datacenter + "/vm"
-		}
-		if (!$vmEsxHost) {
-			$vmEsxHost = $vm.getVmHost()
-		} 
-		if ($resourcePool -ne "") {
-			$resourcePoolPath = $resourcePool
-		} else {
-			$resourcePoolPath = "/" + $datacenter + "/host/" + $vmEsxHost + "/Resources"
-		}
-		$parentVmPath = $vc.getVmPath($vm.name)
-		$parentSnapshotPath = $snapshotPath
-		$datastoreSpecs = "/" + $datacenter + "/host/" + $vmEsxHost + "/" + $datastore
-		if ($poolId.length -lt 13) {
-			$namePrefix = $poolId + "-"
-		} else {
-			$namePrefix = $poolId.substring(0,12) + "-"
-		}
-		$vcId = $this.getVcId($vc.address)
-		
-		$argList = @($poolId, $vcId, $vmFolderPath, $resourcePoolPath, $parentVmPath, $parentSnapshotPath, $datastoreSpecs, $namePrefix, $min, $max, $type)
-		$cmd = {
-			Add-PSSnapin vm*
-			$domain = get-composerdomain
-			if ($domain.count){$domain = $domain[0]}
-			add-automaticLinkedClonePool -pool_id $args[0] -vc_id $args[1] -vmFolderPath $args[2] -resourcePoolPath $args[3] `
-				-parentVmPath $args[4] -parentSnapshotPath $args[5] -datastoreSpecs $args[6] `
-				-composer_ad_id $domain.composer_ad_id -namePrefix $args[7] -useUserDataDisk $false -useTempDisk $false `
-				-powerPolicy 'AlwaysOn' -minimumCount $args[8] -maximumCount $args[9] -persistence $args[10] -ea Stop
-			Update-AutomaticLinkedClonePool -pool_id $args[0] -suspendProvisioningOnError $false -ea stop
-		}
-		
-		$this.executePsRemote($cmd, $argList, $msg)
-	} -Name addSviPool
 	
 	$broker | Add-Member -MemberType ScriptMethod -Value { ##addLinkedClonePool	
 		Param($vcAddress, $composerDomainName, $poolId, $namePrefix, $parentVmPath, $parentSnapshotPath, $vmFolderPath, 
@@ -1070,17 +1045,38 @@ function newRemoteWinBroker {
 		$this.executePsRemote($cmd, $argList, $msg)
 	} -Name setHtmlAccess
 	
+	$broker | Add-Member -MemberType ScriptMethod -Value { ##setFarmHtmlAccess
+		Param($farmId,$switch)
+		$msg = "set HTML Access"
+		$argList = @($farmId,$switch)
+		$cmd = {
+			$serverObject = [ADSI]("LDAP://localhost:389/cn=" + $args[0] + ",ou=Server Groups,dc=vdi,dc=vmware,dc=int")
+			if ($args[1] -eq "true") {
+				$spl = @("BLAST","PCOIP","RDP")
+			} else {
+				$spl = @("PCOIP","RDP")
+			}
+			$serverObject.putex(2,"pae-ServerProtocolLevel",$spl)
+			$serverObject.setinfo()
+		}
+		$this.executePsRemote($cmd, $argList, $msg)
+	} -Name setFarmHtmlAccess
+	
 	$broker | Add-Member -MemberType ScriptMethod -Value { ##setHtmlAccess
-		Param($poolId,$switch)
-		$msg = "set pae-RecoveryDisabled value"
+		Param($poolId,$action)
+		$msg = "set pool auto-recovery $action"
 		$argList = @($poolId,$switch)
 		$cmd = {
 			$pool = [ADSI]("LDAP://localhost:389/cn=" + $args[0] + ",ou=Server Groups,dc=vdi,dc=vmware,dc=int")
-			$pool.put("pae-RecoveryDisabled", $args[1])
+			if ($args[1] -eq "enable") {
+				$pool.put("pae-RecoveryDisabled", "0")
+			} else {
+				$pool.put("pae-RecoveryDisabled", "1")
+			}
 			$pool.setinfo()
 		}
 		$this.executePsRemote($cmd, $argList, $msg)
-	} -Name setRecoveryDisabled
+	} -Name setPoolAutoRecovery
 	
 	$broker | Add-Member -MemberType ScriptMethod -Value { ##addRdsDesktopPool
 		Param($farmId,$poolId)
@@ -1244,6 +1240,28 @@ function newRemoteWinBroker {
 		}
 		$this.executePsRemote($cmd, $argList, $msg)
 	} -Name entitleRdsAppPool
+	
+	$broker | Add-Member -MemberType ScriptMethod -Value { ##setPairingPassword
+		Param($pairingPassword, $timeout)
+		$msg = "set pairing password"
+		$argList = @($pairingPassword, $timeout)
+		$cmd = {
+			$serverOu = [ADSI]"LDAP://localhost:389/ou=server,ou=properties,dc=vdi,dc=vmware,dc=int"
+			$searcher = new-object System.DirectoryServices.DirectorySearcher($serverOu)
+			$searcher.filter= ("(cn=" + $(hostname) + ")")
+			$res = $searcher.findall()
+			if ($res.count -ge 1) {
+				$db = [ADSI] ($res[0].path)
+				$db.put("pae-SecurityServerPairingPassword", $args[0])
+				$db.put("pae-SecurityServerPairingPasswordTimeout", $args[1])
+				$db.put("pae-SecurityServerPairingPasswordLastChangedTime", (get-date))
+				$db.setinfo()
+			} else {
+				throw ("ERROR: Server " + $(hostname) + " not found")
+			}
+		}
+		$this.executePsRemote($cmd, $argList, $msg)
+	} -Name setPairingPassword
 	
 	$broker | Add-Member -MemberType ScriptMethod -Value { ##addTransferServer
 		Param($vcAddress,$tsVmPath)
@@ -1806,4 +1824,34 @@ function getWebCommanderJobResult {
 		$result.webcommander.result.outerxml
 	}
 	get-job | remove-job
+}
+
+function getVmIpList {
+	param($vmName, $serverAddress, $serverUser, $serverPassword)
+	$ipList = @()
+	$vmNameList = $vmName.split(",") | %{$_.trim()}	
+	foreach ($vmName in $vmNameList) {
+		$ip = verifyIp($vmName)
+		if ($ip) {
+			$ipList += $ip
+		} else {
+			if (!$server) {
+				$server = newServer $serverAddress $serverUser $serverPassword
+			}
+			$vmList = get-vm -name "$vmName" -server $server.viserver -EA SilentlyContinue
+			if (!$vmList) {
+				writeCustomizedMsg "Fail - get VM $vmName"
+				[Environment]::exit("0")
+			}
+			$vmList | % { 
+				$vm = newVmWin $server $_.name $guestUser $guestPassword
+				$vm.waitfortools()
+				$ip = $vm.getIPv4()
+				$vm.enablePsRemote()
+				$ipList += $ip
+			}	
+		}	
+	}
+	$ipList = $ipList | select -uniq
+	return $ipList
 }

@@ -75,13 +75,13 @@ THE SOFTWARE.
 </parameter>
 '>
 ]>
-<webcommander>
+<webcommander xmlns:xi="http://www.w3.org/2003/XInclude">
 	<command name="adNewDomain" synopsis="Create a child domain" developer="liuj">
 		<description>This command creates a child domain in AD.
 		This command generates _def.xml.
 		It parses all powershell scripts to get information from comment
 		based help and parameter attributes.</description>
-		<script>ad\adNewDomain1</script>
+		<script>ad\adNewDomain</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
@@ -105,7 +105,7 @@ THE SOFTWARE.
 		</functionalities>
 	</command>
 	<command name="adNewForest" synopsis="Create a forest" developer="liuj">
-		<script>ad\adNewForest1</script>
+		<script>ad\adNewForest</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
@@ -126,7 +126,7 @@ THE SOFTWARE.
 		</functionalities>
 	</command>
 	<command name="adNewUserAndGroup" synopsis="Create new users and groups" developer="liuj">
-		<script>ad\adNewUserAndGroup1</script>
+		<script>ad\adNewUserAndGroup</script>
 		<description>
 			<p>Users will be averagely added into each group.</p>
 			<p>For instance, when there are 100 users and 10 groups:</p>
@@ -314,7 +314,7 @@ THE SOFTWARE.
 		</functionalities>
 	</command>
 	<command name="brokerGetDesktopState" synopsis="Get desktop state" developer="liuj">
-		<script>broker\brokerGetDesktopState1</script>
+		<script>broker\brokerGetDesktopState</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
@@ -413,15 +413,15 @@ THE SOFTWARE.
 		</functionalities>
 	</command>
 	<command name="brokerSetRecoveryDisabled" synopsis="Set Auto-Recovery" developer="liuj">
-		<script>broker\brokerSetRecoveryDisabled</script>
+		<script>broker\brokerSetPoolAutoRecovery</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
 			<parameter mandatory="1" name="poolId" helpmessage="Pool ID" />
-			<parameter mandatory="1" name="switch" helpmessage="Value of pae-RecoveryDisabled, 0 or 1" type="option">
+			<parameter mandatory="1" name="action" helpmessage="Action on the auto-recovery setting, disable or enable" type="option">
 				<options>
-					<option value="0">0</option>
-					<option value="1">1</option>
+					<option value="disable">Disable</option>
+					<option value="enable">Enable</option>
 				</options>
 			</parameter>
 		</parameters>
@@ -472,7 +472,7 @@ THE SOFTWARE.
 		</functionalities>
 	</command>
 	<command name="brokerSetEventDatabase" synopsis="Set event database" developer="liuj">
-		<script>broker\brokerSetEventDatabase1</script>
+		<script>broker\brokerSetEventDatabase</script>
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
@@ -493,7 +493,7 @@ THE SOFTWARE.
 			<functionality>Broker</functionality>
 		</functionalities>
 	</command>
-	<command name="brokerSetHtmlAccess" synopsis="Set HTML Access" developer="liuj">
+	<command name="brokerSetHtmlAccess" synopsis="Set HTML Access for Pool" developer="liuj">
 		<script>broker\brokerSetHtmlAccess</script>
 		<parameters>
 			&commonViServerParam;
@@ -507,8 +507,22 @@ THE SOFTWARE.
 			<functionality>Broker</functionality>
 		</functionalities>
 	</command>
+	<command name="brokerSetFarmHtmlAccess" synopsis="Set HTML Access for Farm" developer="liuj">
+		<script>broker\brokerSetFarmHtmlAccess</script>
+		<parameters>
+			&commonViServerParam;
+			&vmParam;
+			<parameter mandatory="1" name="farmId" helpmessage="Farm ID" />
+			<parameter mandatory="1" name="switch" helpmessage="Switch, true or false" type="option">
+				&falseOrTrue;
+			</parameter>
+		</parameters>
+		<functionalities>
+			<functionality>Broker_RDS</functionality>
+		</functionalities>
+	</command>
 	<command name="brokerSetPairingPassword" synopsis="Set pairing password" developer="liuj">
-		<script>broker\brokerSetPairingPassword1</script>
+		<script>broker\brokerSetPairingPassword</script>
 		<description>
 			<p>This command is to specify Security Server Pairing Password in the dialog below. This must run before installing Security Server.</p>
 			<p>The password is hardcoded to 111111, and timeout is 24 hours.</p>
@@ -768,7 +782,7 @@ THE SOFTWARE.
 			&commonViServerParam;
 			&vmParam;
 			<parameter mandatory="0" name="ssName" helpmessage="Name of the snapshot which to restore before installing View" />
-			<parameter mandatory="1" name="installerUrl" helpmessage="URL to the installer binary" />
+			<parameter mandatory="1" name="installerUrl" helpmessage="URL to the installer binary" type="textarea" />
 			<parameter mandatory="0" name="silentInstallParam" helpmessage="Silent install parameters, such as ' /s /v /qn'" />
 			<parameter mandatory="0" name="downloadOnly" helpmessage="Download build without installing it" type="option">
 				&falseOrTrue;
@@ -852,8 +866,8 @@ THE SOFTWARE.
 			<parameter mandatory="0" name="downloadOnly" helpmessage="Download build without installing it" type="option">
 				&falseOrTrue;
 			</parameter>
-			<!--parameter mandatory="0" name="emailTo" helpmessage="Email address to which to send notification" />
-			<parameter mandatory="0" name="uvsId" helpmessage="This parameter is used by UVS only. It's not editable to end user." type="uvsid" /-->
+			<parameter mandatory="0" name="silentInstallParam" helpmessage="Silent install parameters" type="textarea" />
+			<!--parameter mandatory="0" name="uvsId" helpmessage="This parameter is used by UVS only. It's not editable to end user." type="uvsid" /-->
 		</parameters>
 		<functionalities>
 			<functionality>Install</functionality>
@@ -864,7 +878,7 @@ THE SOFTWARE.
 		<parameters>
 			&commonViServerParam;
 			&vmParam;
-			<parameter mandatory="0" name="packageUrl" helpmessage="URL of WebCommander package, default is from Fling web site." />
+			<parameter mandatory="0" name="packageUrl" helpmessage="URL of WebCommander package, default is from Fling web site." type="textarea" />
 			<parameter mandatory="0" name="authentication" helpmessage="Type of authentication, default is 'windows'" />
 			<parameter mandatory="0" name="defaultPassword" helpmessage="Default password used by the server to communicate with vSphere and VM, default is VMware standard." type="password" />
 		</parameters>
@@ -956,7 +970,7 @@ THE SOFTWARE.
 			<functionality>MakeVM</functionality>
 		</functionalities>
 	</command>
-	<command name="deployWindowsVm" synopsis="Deploy Windows VM (asynchronous)" developer="liuj">
+	<!--command name="deployWindowsVm" synopsis="Deploy Windows VM (asynchronous)" developer="liuj">
 		<script>deploy\deployWindowsVm</script>
 		<xi:include href="deployWinVm.xml" xmlns:xi="http://www.w3.org/2003/XInclude" />
 		<functionalities>
@@ -969,7 +983,8 @@ THE SOFTWARE.
 		<functionalities>
 			<functionality>MakeVM</functionality>
 		</functionalities>
-	</command>
+	</command-->
+	<xi:include href="Deploy/deployWindowsVm.xml" xpointer="xpointer(//command)" parse="xml" />
 	<command name="linkedClone" synopsis="Linked clone VM" developer="liuj">
 		<script>deploy\linkedClone</script>
 		<parameters>
@@ -998,17 +1013,53 @@ THE SOFTWARE.
 		</functionalities>
 	</command>
 	<command name="deployOva" synopsis="Deploy to ESX" developer="liuj">
-		<script>deploy\deployOva</script>
+		<script>ova\deployOva</script>
 		<parameters>
 			&commonViServerParam;
-			<parameter mandatory="1" name="ovaUrl" helpmessage="URL of the OVA" />
+			<parameter mandatory="1" name="ovaUrl" helpmessage="URL of the OVA" type="textarea" />
 			<parameter mandatory="1" name="vmName" helpmessage="Name of the target VM to be deployed from OVA" />
 			<parameter mandatory="1" name="datastore" helpmessage="Name of the datastore where the target VM is located" type="selectText">
 				<options />
 			</parameter>
+			<parameter mandatory="0" name="storageFormat" helpmessage="Storage format of the disks of the virtual machine" type="option">
+				<options>
+					<option value="Thin">Thin</option>
+					<option value="Thick">Thick</option>
+					<option value="EagerZeroedThick">EagarZeroedThick</option>
+				</options>
+			</parameter>
 			<parameter mandatory="1" name="portGroup" helpmessage="Name of the virtual port group where the target VM is located" type="selectText">
 				<options />
 			</parameter>
+			<parameter mandatory="0" name="advancedProperty" helpmessage="Advanced properties, such --prop:vami.hostname=myvmname" type="textarea" />
+		</parameters>
+		<functionalities>
+			<functionality>OVA</functionality>
+		</functionalities>
+	</command>
+	<command name="deployOvaToVc" synopsis="Deploy to VC" developer="liuj">
+		<script>ova\deployOvaToVc</script>
+		<parameters>
+			&commonVcParam;
+			<parameter mandatory="1" name="ovaUrl" helpmessage="URL of the OVA" type="textarea" />
+			<parameter mandatory="1" name="vmName" helpmessage="Name of the target VM to be deployed from OVA" />
+			<parameter mandatory="1" name="datacenter" helpmessage="Name of datacenter" />
+			<parameter mandatory="0" name="cluster" helpmessage="Name of cluster" />
+			<parameter mandatory="1" name="esxHost" helpmessage="Name of ESX host" />
+			<parameter mandatory="1" name="datastore" helpmessage="Name of the datastore where the target VM is located" type="selectText">
+				<options />
+			</parameter>
+			<parameter mandatory="0" name="storageFormat" helpmessage="Storage format of the disks of the virtual machine" type="option">
+				<options>
+					<option value="Thin">Thin</option>
+					<option value="Thick">Thick</option>
+					<option value="EagerZeroedThick">EagarZeroedThick</option>
+				</options>
+			</parameter>
+			<parameter mandatory="1" name="portGroup" helpmessage="Name of the virtual port group where the target VM is located" type="selectText">
+				<options />
+			</parameter>
+			<parameter mandatory="0" name="advancedProperty" helpmessage="Advanced properties, such --prop:vami.hostname=myvmname" type="textarea" />
 		</parameters>
 		<functionalities>
 			<functionality>OVA</functionality>
@@ -1374,6 +1425,32 @@ THE SOFTWARE.
 			<functionality>VM</functionality>
 		</functionalities>
 	</command>
+	<command name="vmAddDisk" synopsis="Add hard disks" developer="liuj">
+		<script>vm\vmAddDisk</script>
+		<parameters>
+			&commonViServerParam;
+			<parameter mandatory="1" name="vmName" helpmessage="Name of the target VM" />
+			<parameter mandatory="1" name="capacityGb" helpmessage="Specifies the disk size in gigabytes (GB)." />
+			<parameter mandatory="0" name="diskNumber" helpmessage="Specifies number of disks to add, default is 1." />
+			<parameter mandatory="0" name="storageFormat" helpmessage="Storage format of the disks" type="option">
+				<options>
+					<option value="Thin">Thin</option>
+					<option value="Thick">Thick</option>
+					<option value="EagerZeroedThick">EagarZeroedThick</option>
+				</options>
+			</parameter>
+			<parameter mandatory="0" name="Persistence" helpmessage="Persistence mode, default is IndependentPersistent" type="option">
+				<options>
+					<option value="IndependentPersistent">IndependentPersistent</option>
+					<option value="IndependentNonPersistent">IndependentNonPersistent</option>
+					<option value="Persistent">Persistent</option>
+				</options>
+			</parameter>
+		</parameters>
+		<functionalities>
+			<functionality>VM</functionality>
+		</functionalities>
+	</command>
 	<command name="vmSetPortGroup" synopsis="Set network port group" developer="liuj">
 		<script>vm\vmSetPortGroup</script>
 		<parameters>
@@ -1667,5 +1744,12 @@ THE SOFTWARE.
 		<functionalities>
 			<functionality>Workflow</functionality>
 		</functionalities>
+	</command>
+	<command name="checkAvamarInstall" synopsis="Check Avamar installation status" developer="liuj" hidden="1">
+		<script>dps\check</script>
+		<parameters>
+			<parameter mandatory="1" name="serverAddress" helpmessage="Avamar Server IP" />
+			<parameter mandatory="1" name="avamarRootPassword" helpmessage="Avamar Root user password" />
+		</parameters>
 	</command>
 </webcommander>
