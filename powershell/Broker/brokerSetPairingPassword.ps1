@@ -22,11 +22,12 @@ THE SOFTWARE.
 
 <#
 	.SYNOPSIS
-        Add license
+        Set pairing password
 
 	.DESCRIPTION
-        This command adds license to brokers.
+        This command specifies Security Server Pairing Password on brokers.
 		This command could execute on multiple brokers.
+		This must be run before installing Security Server.
 		
 	.FUNCTIONALITY
 		Broker
@@ -36,7 +37,7 @@ THE SOFTWARE.
 
 Param (
 	[parameter(
-		HelpMessage="IP or FQDN of the ESX or VC server where broker VMs are located"
+		HelpMessage="IP or FQDN of the ESX or VC server where the broker VM is located"
 	)]
 	[string]
 		$serverAddress, 
@@ -71,13 +72,18 @@ Param (
 	)]
 	[string]	
 		$guestPassword=$env:defaultPassword,
-	
+		
 	[parameter(
-		Mandatory=$true,
-		HelpMessage="License key"
+		HelpMessage="Pairing password, default is 111111"
 	)]
-	[string]
-		$license
+	[string]	
+		$pairingPassword="111111",
+		
+	[parameter(
+		HelpMessage="Pairing password timeout in term of seconds, default is 86400"
+	)]
+	[int]	
+		$timeout=86400
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -88,14 +94,13 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-function addLicense {
-	param($ip, $guestUser, $guestPassword, $license)
-	$remoteWinBroker = newRemoteWinBroker $ip $guestUser $guestPassword
-	$remoteWinBroker.initialize()
-	$remoteWinBroker.addLicense($license)
-}
+function setPairingPassword {
+	param ($ip, $guestUser, $guestPassword, $pairingPassword, $timeout)
+	$remoteWinBroker = newRemoteWin $ip $guestUser $guestPassword
+	$remoteWinBroker.setPairingPassword($pairingPassword, $timeout)
+}	
 
 $ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
 $ipList | % {
-	addLicense $_ $guestUser $guestPassword $license
+	setPairingPassword $_ $guestUser $guestPassword $pairingPassword $timeout
 }

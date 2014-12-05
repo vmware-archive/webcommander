@@ -20,17 +20,74 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
+<#
+	.SYNOPSIS
+        Set pool HTML access
+
+	.DESCRIPTION
+        This command enables or disables HTML access of pools.
+		This command could execute on multiple brokers and pools.
+		
+	.FUNCTIONALITY
+		Broker
+#>
+
 ## Author: Jerry Liu, liuj@vmware.com
 
 Param (
-	$serverAddress,
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword, 
-	$poolId,
-	$switch
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where the broker VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of broker VM or IP / FQDN of broker machine. Support multiple values seperated by comma. VM name and IP could be mixed."
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of broker (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword,
+		
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Pool ID. Support multiple values seperated by comma."
+	)]
+	[string]
+		$PoolId,
+	
+	[parameter(
+		HelpMessage="Switch, select true to enable or false to disable. Default is false"
+	)]
+	[ValidateSet(
+		"false",
+		"true"
+	)]
+	[string]
+		$switch="false"
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -41,16 +98,17 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-if (verifyIp($vmName)) {
-	$ip = $vmName
-} else {
-	$server = newServer $serverAddress $serverUser $serverPassword
-	$vm = newVmWin $server $vmName $guestUser $guestPassword
-	$vm.waitfortools()
-	$ip = $vm.getIPv4()
-	$vm.enablePsRemote()
+function setPoolHtmlAccess {
+	param ($ip, $guestUser, $guestPassword, $farmIdList, $switch)
+	$remoteWinBroker = newRemoteWinBroker $ip $guestUser $guestPassword
+	$remoteWinBroker.initialize()
+	$poolIdList | % {
+		$remoteWinBroker.setHtmlAccess($_, $switch)
+	}
 }
 
-$remoteWinBroker = newRemoteWinBroker $ip $guestUser $guestPassword
-$remoteWinBroker.initialize()
-$remoteWinBroker.setHtmlAccess($poolId,$switch)
+$poolIdList = $poolId.split(",") | %{$_.trim()}
+$ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
+$ipList | % {
+	setPoolHtmlAccess $_ $guestUser $guestPassword $poolIdList $switch
+}

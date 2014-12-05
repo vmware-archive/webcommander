@@ -20,16 +20,67 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
+<#
+	.SYNOPSIS
+        Set direct connection
+
+	.DESCRIPTION
+        This command enables or disables direct connection to desktop on brokers.
+		This command could execute on multiple brokers.
+		
+	.FUNCTIONALITY
+		Broker
+#>
+
 ## Author: Jerry Liu, liuj@vmware.com
 
 Param (
-	$serverAddress,
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword,  
-	$switch
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where the broker VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of broker VM or IP / FQDN of broker machine. Support multiple values seperated by comma. VM name and IP could be mixed."
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of broker (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Switch, select false to use Secure Tunnel connection to desktop"
+	)]
+	[ValidateSet(
+		"false",
+		"true"
+	)]
+		$switch
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -40,17 +91,10 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-if (verifyIp($vmName)) {
-	$ip = $vmName
-} else {
-	$server = newServer $serverAddress $serverUser $serverPassword
-	$vm = newVmWin $server $vmName $guestUser $guestPassword
-	$vm.waitfortools()
-	$ip = $vm.getIPv4()
-	$vm.enablePsRemote()
-}
-
-$remoteWinBroker = newRemoteWinBroker $ip $guestUser $guestPassword
-$remoteWinBroker.initialize()
 $switch = [System.Convert]::ToBoolean("$switch")
-$remoteWinBroker.setDirectConnect($switch)
+$ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
+$ipList | % {
+	$remoteWinBroker = newRemoteWinBroker $_ $guestUser $guestPassword
+	$remoteWinBroker.initialize()
+	$remoteWinBroker.setDirectConnect($switch)
+}

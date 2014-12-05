@@ -20,19 +20,81 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
+<#
+	.SYNOPSIS
+        Join domain
+
+	.DESCRIPTION
+        This command join Windows machines to a domain.
+		
+	.FUNCTIONALITY
+		AD
+#>
+
+
 ## Author: Jerry Liu, liuj@vmware.com
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword,
-	$domainName,
-	$domainUser="administrator",
-	$domainPassword=$env:defaultPassword,
-	$dnsIp
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where the target VM is located"
+	)]
+	[string]$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root",
+		
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword,
+		
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of the VM or IP / FQDN of remote Windows machine. Support multiple values seperated by comma. VM name and IP could be mixed."
+	)]
+	[string]
+		$vmName,
+	
+	[parameter(
+		HelpMessage="User of Windows machine (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword,
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of the domain to join"
+	)]
+	[string]
+		$domainName,
+		
+	[parameter(
+		HelpMessage="User of the domain (default is administrator)"
+	)]
+	[string]
+		$domainUser="administrator",
+	
+	[parameter(
+		HelpMessage="Password of the domain user"
+	)]
+	[string]
+		$domainPassword=$env:defaultPassword,
+		
+	[parameter(
+		HelpMessage="IP address of DNS server"
+	)]
+	[string]
+		$dnsIp
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -63,29 +125,7 @@ function joinDomain {
 	$remoteWin.restart()
 }		
 
-$vmNameList = $vmName.split(",") | %{$_.trim()}	
-foreach ($vmName in $vmNameList) {
-	if (verifyIp($vmName)) {
-		$ip = $vmName
-		writeCustomizedMsg "Info - remote machine is $ip"
-		joinDomain $ip $guestUser $guestPassword $domainName $domainUser $domainPassword $dnsIp
-	} else {
-		if (!$server) {
-			$server = newServer $serverAddress $serverUser $serverPassword
-		}
-		$vmList = get-vm -name "$vmName" -server $server.viserver -EA SilentlyContinue
-		if (!$vmList) {
-			writeCustomizedMsg "Fail - get VM $vmName"
-			[Environment]::exit("0")
-		}
-		$vmList | % { 
-			$vm = newVmWin $server $_.name $guestUser $guestPassword
-			$vm.waitfortools()
-			$ip = $vm.getIPv4()
-			$vm.enablePsRemote()
-			writeCustomizedMsg "Info - VM name is $($vm.name)"
-			joinDomain $ip $guestUser $guestPassword $domainName $domainUser $domainPassword $dnsIp
-			writeSeperator
-		}	
-	}	
+$ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
+$ipList | % {
+	joinDomain $_ $guestUser $guestPassword $domainName $domainUser $domainPassword $dnsIp
 }
