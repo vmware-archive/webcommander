@@ -269,8 +269,8 @@ THE SOFTWARE.
 		<center>
 		<table class="pvTable">
 			<tr>
-				<th>Property</th>
-				<th>Value</th>
+				<th width="30%">Property</th>
+				<th width="70%">Value</th>
 			</tr>
 			<xsl:for-each select="*">
 				<tr>
