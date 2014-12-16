@@ -40,8 +40,8 @@ $.fn.serializeObject = function(){
 };
 
 function addCommand(currentCommand){
-	var $cmd = $('<div class="command"><p class="heading">\
-		' + select_cmd + '<span class="status"></span><span class="right"> \
+	var $cmd = $('<div class="command"><p class="heading"><span class="orderNumber"></span>\
+		' + select_cmd + '<span class="description"></span><span class="status"></span><span class="right"> \
 		<input class="add" type="image" title="Add a new command" src="images/button-add-icon.png" /> \
 		<input class="delete" type="image" title="Delete this command" src="images/button-delete-icon.png" /> \
 		<input class="toggle" type="image" title="Toggle display" src="images/button-switch-icon.png" /> \
@@ -63,7 +63,8 @@ function populate(frm, data) {
 			case "hidden":  
 			case "password":
 			case "textarea":  
-				$ctrl.val(value);   
+				$ctrl.val(value); 
+				$ctrl.trigger("change");
 				break;   
 			case "radio" : 
 			case "checkbox":   
@@ -75,6 +76,15 @@ function populate(frm, data) {
 				break;
 		}  
     });  
+}
+
+function updateOrder(){
+	$('div.command').each(function() {
+		var cmd = $(this);
+		var on = cmd.find('.orderNumber');
+		on.empty();
+		on.html(cmd.index() + 1);
+	});
 }
 
 function addWorkflow(jsonString){
@@ -106,6 +116,7 @@ function addWorkflow(jsonString){
 		var form = $('div.command:last').find('form:first');
 		populate(form,command);
 	});
+	updateOrder();
 	return false;
 }
 
@@ -372,6 +383,12 @@ $(function() {
 		});
     });
 	
+	$('#sortable').on('change', 'textarea[name*="wf_des"]', function() {	
+		var des = $(this).parents('div.command').find('span.description');
+		var text = $(this).val().split('\n')[0];
+		des.html(text);
+    });
+	
 	$('#onOffAll').click(function(){ 
 		$('#onOffAll').toggleClass('offAll');
 		//if ($('#onOffAll').attr('class') == 'execute offAll') 
@@ -396,6 +413,7 @@ $(function() {
 	});	
 
 	$('#serial').click(function(){
+		globalVariable={};
 		$(document).clearQueue("ajaxRequests");
 		$('form').not('.off').each(function(){
 			var form = $(this);
@@ -407,12 +425,6 @@ $(function() {
 			var tag = form.find('input[name="wf_tag"]').val();
 	
 			$(document).queue("ajaxRequests", function(){
-				form.find('input[name!="wf_key"]').each(function(){
-					var input = $(this);
-					if (typeof window["wf_" + input.val()] != "undefined"){
-						input.val(window["wf_" + input.val()]);
-					}
-				});
 				if (form.hasClass('off')) {
 					//status.html('<font color="Gray">Skipped</font>');
 					$(document).dequeue("ajaxRequests");
@@ -429,12 +441,47 @@ $(function() {
 						renderResult('4488',executionTime,xml,status,detail);
 						$(document).dequeue("ajaxRequests");
 					}, second * 1000);
+				} else if (form.attr('name')=='defineVariable'){
+					var kvList = form.find('textarea[name="variableList"]').val();
+					var lines = kvList.split("\n");
+					for (var i in lines) {
+						line = lines[i];	
+						var variable = line.split("=");
+						if (variable != ''){
+							globalVariable[variable[0].trim()]=variable[1].trim(); 
+						}			
+					}
+					setTimeout(function(){
+						var executionTime = "1 second";
+						var xml = '<webcommander><result><stdOutput>' + JSON.stringify(globalVariable) + '</stdOutput></result></webcommander>';
+						xml = $.parseXML(xml);
+						renderResult('4488',executionTime,xml,status,detail);
+						$(document).dequeue("ajaxRequests");
+					}, 1000);
 				} else {
-					//$.ajax({
-					//	url: 'webcmd.php?command=' + form.attr('name'),
-					//	data: form.serialize()
-					//})
-					var formData = new FormData(form[0]);
+					var formData = new FormData();
+					$.each(form[0], function(){
+						var fieldName = $(this).attr('name');
+						if ($(this).attr('type') != 'file') {
+							var fieldValue = $(this).val();
+							if (fieldValue != "") {
+								$.each(globalVariable, function(key, value){ 
+									var regex = new RegExp(key, 'g');
+									fieldValue = fieldValue.replace(regex, value); 
+								});
+							} else {
+								if (globalVariable[fieldName]) {
+									fieldValue = globalVariable[fieldName];
+								}
+							}
+							formData.append(fieldName,fieldValue);
+						} else {
+							var fileToUpload = $(this)[0].files[0];
+							if (fileToUpload) {
+								formData.append(fieldName,fileToUpload);
+							}
+						}
+					});
 					$.ajax({
 						url: 'webcmd.php?command=' + form.attr('name'),
 						type: 'POST',
@@ -452,7 +499,7 @@ $(function() {
 						if (returnCode=='4488'){
 							if (key && tag) {
 								var value = $(xml).find(tag).text();
-								eval("wf_" + key + " = '" + value + "'");
+								globalVariable[key]=value;
 							}
 							$(document).dequeue("ajaxRequests");
 						}
@@ -534,7 +581,11 @@ $(function() {
 	});
 	
 	$.get('webcmd.php',function(webcmd){
-		$( "#sortable" ).sortable();
+		$("#sortable").sortable({
+			update: function() {
+				updateOrder();
+			}
+		});
 		//$(".content").hide();
 		$("#sortable").on('click', '.toggle', function(){
 			$(this).parents('p').next('div.body:first').slideToggle(500);
@@ -543,9 +594,17 @@ $(function() {
 		select_cmd = '<select class="cmdlist"><option selected disabled>Select a command to run</option>';
 		var cmd_list = $(webcmd)
 			.find('webcommander')
-			.append('<command name="sleep" synopsis="sleep">\
+			.append('<command name="sleep" synopsis="Sleep">\
 						<parameters>\
 							<parameter name="second" helpmessage="number of second to sleep" mandatory="1" />\
+						</parameters>\
+						<functionalities>\
+							<functionality>Workflow</functionality>\
+						</functionalities>\
+					</command>\
+					<command name="defineVariable" synopsis="Define variables">\
+						<parameters>\
+							<parameter name="variableList" helpmessage="Define variables in key=value pairs" mandatory="1" type="textarea" />\
 						</parameters>\
 						<functionalities>\
 							<functionality>Workflow</functionality>\
@@ -563,7 +622,7 @@ $(function() {
 				select_cmd += '<option value="' + $(this).attr('name') + '">' + $(this).find('functionality').first().text() + " > " + $(this).attr('synopsis') + '</option>';
 			}); 
 		select_cmd += '</select>';
-		$('.status').before(select_cmd);
+		$('.description').before(select_cmd);
 		
 		$("#sortable").on('click', '.status', function(){ 
 			var content = $(this).parents('div.command').find('.content');
@@ -581,12 +640,16 @@ $(function() {
 		$("#sortable").on('click', '.add', function(){ 
 			var currentCommand = $(this).parents('div:first');
 			addCommand(currentCommand);
+			updateOrder();
 		});
 			
 		$("#sortable").on('click', '.delete', function(){ 
 			//$(this).parents("div:first").remove();
-			var cmd = $(this).parents("div:first");
-			cmd.hide('slow', function(){ cmd.remove(); });
+			var cmd = $(this).parents("div.command:first");
+			cmd.hide('slow', function(){ 
+				cmd.remove(); 
+				updateOrder();
+			});
 		});	
 
 		$("#sortable").on('click', '.onoff', function(){ 
@@ -607,7 +670,7 @@ $(function() {
 		
 		$("#sortable").on('change', '.cmdlist', function(){ 
 			$(this).parents("div.command").find(".content:first").empty();
-			var status = $(this).parents('div.command').find('.status');
+			var status = $(this).parents('div.command').find('.status, .description');
 			status.empty();
 			var cmd = $(this).val();
 			var xml = $(webcmd).find('command').filter(function() {
@@ -669,7 +732,7 @@ $(function() {
 				};
 				table += '</td><td>'  + param.attr('helpmessage') + '</td></tr>';
 			});
-			if (xml.attr('name')!='sleep') {
+			if (0 > $.inArray(xml.attr('name'),['sleep','defineVariable'])) {
 				table += '<tr class="wf"><td>Define workflow variable</td><td>';
 				table += '<input type="text" size="20" name="wf_key" placeholder="variable name"></input> = ';
 				table += '<input type="text" size="20" name="wf_tag" placeholder="xml tag from the result"></input></td>';

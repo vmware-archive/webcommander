@@ -89,9 +89,19 @@ body {
 	vertical-align:middle;
 	/*background-image: linear-gradient(to right, white 35%, #1697d1 100%);*/
 }
-
+.orderNumber {
+	display:inline-block;
+	width:30px;
+	text-align:right;
+	color:black;
+}
 .right {float: right;}
-.status {margin-left: 200px;}
+.description {
+	width:500px; text-align:left; display:inline-block; margin-left:30px; margin-right:30px;
+}.status {
+	margin-right:30px;
+}
+
 .content, .detail {
 	margin: 0 105px 0 105px;
 }
