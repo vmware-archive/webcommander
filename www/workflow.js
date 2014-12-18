@@ -415,6 +415,15 @@ $(function() {
 	$('#serial').click(function(){
 		globalVariable={};
 		$(document).clearQueue("ajaxRequests");
+		var itrNumber = $('#iteration').val();
+		if (itrNumber.indexOf(" of ") >= 0) {
+			currentItr = parseInt(itrNumber.split(" of ")[0]) + 1;
+			totalItr = itrNumber.split(" of ")[1];
+		} else {
+			currentItr = 1;
+			totalItr = parseInt(itrNumber) ? itrNumber : 1;
+		}
+		$('#iteration').val(currentItr + " of " + totalItr);
 		$('form').not('.off').each(function(){
 			var form = $(this);
 			var status = form.parents('div.command').find('.status');
@@ -423,7 +432,6 @@ $(function() {
 			detail.empty();
 			var key = form.find('input[name="wf_key"]').val();
 			var tag = form.find('input[name="wf_tag"]').val();
-	
 			$(document).queue("ajaxRequests", function(){
 				if (form.hasClass('off')) {
 					//status.html('<font color="Gray">Skipped</font>');
@@ -507,6 +515,9 @@ $(function() {
 					});
 				}
 			});
+		});
+		$(document).queue("ajaxRequests", function() {
+			if (currentItr < totalItr) {$('#serial').trigger("click");}
 		});
 		$(document).dequeue("ajaxRequests");
 	});
