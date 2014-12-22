@@ -63,23 +63,6 @@ function getUniqueString {
 	return $string
 }
 
-function checkBuild {
-	param($build, $regex)
-	$wc = new-object system.net.webclient
-	$page = $wc.downloadstring("http://buildweb.eng.vmware.com/ob/api/legacy/build_info/?build=$build")	
-	$page += $wc.downloadstring("http://buildweb.eng.vmware.com/sb/api/legacy/build_info/?build=$build")
-	$url = $regex.matches($page) | Select-Object -Property value	
-	$url = $url.value.trimend('"')
-
-	# if ($url -eq $null) {
-		# writeCustomizedMsg "Fail - find installer at http://buildweb.eng.vmware.com/ob/api/legacy/build_info/?build=$build"
-		# [Environment]::exit("0")
-	# }
-
-	$wc = $null
-	return $url
-}
-
 function listVmAndSnapshot {
 	param([parameter(valueFromPipeLine=$true)]$vivm)
 	process {	
@@ -1780,7 +1763,7 @@ function newRemoteWin {
 
 function writeStdout {
 	Param($output)
-	$output = [System.Web.HttpUtility]::HtmlEncode($output)
+	#$output = [System.Web.HttpUtility]::HtmlEncode($output)
 	Write-Output "<stdOutput><![CDATA["
 	Write-Output $output
 	Write-Output "]]></stdOutput>"
@@ -1854,4 +1837,21 @@ function getVmIpList {
 	}
 	$ipList = $ipList | select -uniq
 	return $ipList
+}
+
+function restoreSnapshot {
+	param($ssName, $vmName, $serverAddress, $serverUser, $serverPassword)
+	$server = newServer $serverAddress $serverUser $serverPassword
+	$vmNameList = $vmName.split(",") | %{$_.trim()}
+	$vmList = get-vm -name $vmNameList -server $server.viserver -EA SilentlyContinue
+	if (!$vmList) {
+		writeCustomizedMsg "Fail - get VM $vmName"
+		[Environment]::exit("0")
+	}
+	$vmList | % { 
+		$vm = newVmWin $server $_.name $guestUser $guestPassword
+		$vm.restoreSnapshot($ssName)
+		$vm.start()
+		$vm.waitfortools()
+	}	
 }
