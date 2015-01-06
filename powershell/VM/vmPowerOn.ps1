@@ -20,15 +20,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Power on VM
+
+	.DESCRIPTION
+		This command could power on multiple virtual machines.
+		
+	.FUNCTIONALITY
+		VM
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName,
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM. Support multiple values seperated by comma and also wildcard."
+	)]
+	[string]
+		$vmName
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -39,29 +71,17 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-add-pssnapin vmware.vimautomation.core -ea silentlycontinue
-
-try {
-	connect-VIServer $serverAddress -user $serverUser -password $serverPassword -wa 0 -EA stop
-} catch {
-	writeCustomizedMsg "Fail - connect to server $address"
-	writeStderr
-	[Environment]::exit("0")
-}
-
-$vmNameList = $vmName.split(",") | %{$_.trim()}	
-foreach ($vmName in $vmNameList) {
-	try {
-		#Get-VM -name $vmName | Get-VMQuestion | Set-VMQuestion -Option "Cancel" -confirm:$false
-		#get-vm -name $vmName | remove-vm -deletePermanently -confirm:$false
-		get-vm -name $vmName -ea stop | ?{$_.PowerState -ne "PoweredOn"} | %{
-			Start-VM -vm $_ -confirm:$false -runAsync:$true -ea stop
+$vivmList = getVivmList $vmName $serverAddress $serverUser $serverPassword
+$vivmList | % { 
+	if ($_.PowerState -ne "PoweredOn") {
+		try {
+			Start-VM -vm $_ -confirm:$false -runAsync:$false -ea stop
 			writeCustomizedMsg "Success - start VM $($_.name)"
+		} catch {
+			writeCustomizedMsg "Fail - start VM $($_.name)"
+			writeStderr
 		}
-	} catch {
-		writeCustomizedMsg "Fail - start VM"
-		writeStderr
-		[Environment]::exit("0")
+	} else {
+		writeCustomizedMsg "Info - VM $($_.name) is already powered on"
 	}
 }
-disconnect-VIServer -Server * -Force -Confirm:$false

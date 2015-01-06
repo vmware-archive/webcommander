@@ -20,13 +20,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Delete VM
+
+	.DESCRIPTION
+		This command could delete multiple virtual machines.
+		
+	.FUNCTIONALITY
+		VM
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress,
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword,
-	$vmName
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM. Support multiple values seperated by comma and also wildcard."
+	)]
+	[string]
+		$vmName
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -37,32 +71,13 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-add-pssnapin vmware.vimautomation.core -ea silentlycontinue
-
-try {
-	connect-VIServer $serverAddress -user $serverUser -password $serverPassword -wa 0 -EA stop
-} catch {
-	writeCustomizedMsg "Fail - connect to server $address"
-	writeStderr
-	[Environment]::exit("0")
-}
-
-$vmNameList = $vmName.split(",") | %{$_.trim()}	
-foreach ($vmName in $vmNameList) {
+$vivmList = getVivmList $vmName $serverAddress $serverUser $serverPassword
+$vivmList | % {
 	try {
-		#Get-VM -name $vmName | Get-VMQuestion | Set-VMQuestion -Option "Cancel" -confirm:$false
-		#start-sleep 10
-		#get-vm -name $vmName | Stop-VM -Kill -confirm:$false -runasync:$false
-		#start-sleep 30
-		#get-vm -name $vmName | remove-vm -deletePermanently -confirm:$false
-		get-vm -name $vmName -ea stop | % {
-			remove-vm -vm $_ -deletePermanently -confirm:$false -EA Stop
-			writeCustomizedMsg "Success - delete VM $($_.name)"
-		}
+		remove-vm -vm $_ -deletePermanently -confirm:$false -EA Stop
+		writeCustomizedMsg "Success - delete VM $($_.name)"
 	} catch {
 		writeCustomizedMsg "Fail - delete VM $($_.name)"
 		writeStderr
-		[Environment]::exit("0")
 	}
 }
-disconnect-VIServer -Server * -Force -Confirm:$false

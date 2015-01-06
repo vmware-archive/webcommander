@@ -20,15 +20,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Suspend VM 
+
+	.DESCRIPTION
+		This command could suspend multiple virtual machines.
+		
+	.FUNCTIONALITY
+		VM
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM. Support multiple values seperated by comma and also wildcard."
+	)]
+	[string]
+		$vmName
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -39,6 +71,13 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-$server = newServer $serverAddress $serverUser $serverPassword
-$vm = newVmWin $server $vmName $guestUser $guestPassword
-$vm.suspend()
+$vivmList = getVivmList $vmName $serverAddress $serverUser $serverPassword
+$vivmList | % {
+	try {	
+		Suspend-VM -vm $_ -confirm:$false -EA stop
+		writeCustomizedMsg "Success - suspend VM $($_.name)"
+	} catch {
+		writeCustomizedMsg "Fail - suspend VM $($_.name)"
+		writeStderr
+	}
+}

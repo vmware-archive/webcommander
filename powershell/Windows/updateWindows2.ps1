@@ -20,22 +20,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.DESCRIPTION
+		This command is triggered by updateWindows1.
+		This command should not show on webcommander UI.
+		
+	.FUNCTIONALITY
+		noshow
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param ($updateServer,$severity,$emailTo,$uvsId)
-
-#$regKey = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate"
-#Set-ItemProperty -path $regKey -name WUServer -value http://10.117.0.25:8530
-#Set-ItemProperty -path $regKey -name WUStatusServer -value http://10.117.0.25:8530
-
-function notifyUvs {
-	param ($id, $result)
-	#$ie = new-object -com "InternetExplorer.Application"
-	#$ie.visible = $true
-	#$ie.navigate("http://racetrack.eng.vmware.com/uvsjobnotify.php?id=$id&result=$result")
-	$wc = new-object system.net.webclient
-	$wc.downloadstring("http://racetrack.eng.vmware.com/uvsjobnotify.php?id=$id&result=$result")	
-}
 
 function sendMail {
 	param ($receiver, $content, $attachment)
@@ -99,12 +97,8 @@ if($objCollection.count -eq 0){
 	Write-Host "Windows is up-to-date!"
 	& "reg" "add" "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon" "/v" "AutoAdminLogon" "/d" "0" "/t" "REG_SZ" "/F"
 	& "reg" "delete" "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "/v" "WinUpdate" "/f"
-	
-	#Remove-Item "c:\temp\updateWindows.bat" -force -Confirm:$false
-	
 	$message = "Succeed to install Windows Updates in remote machine $hostName."
 	if ($emailTo) { sendMail $emailTo $message }
-	if ($uvsId) {notifyUvs $uvsId "1"}
 	exit
 }
 
@@ -118,12 +112,6 @@ foreach($Update in $objCollection){
 	if($InstallResult.ResultCode -eq 2){
 		Write-Host $Update.Title " has been installed successfully."
 	}
-	
-	#if($InstallResult.RebootRequired){
-	#	Write-Host "Need to reboot the system to continue Windows update."
-	#	& "shutdown" "/r" "/t" "0"
-	#}
 }
 
-#Restart-Computer -Confirm:$false
 & "shutdown" "/r" "/t" "0"

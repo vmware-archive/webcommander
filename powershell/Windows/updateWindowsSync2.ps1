@@ -20,7 +20,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.DESCRIPTION
+		This command is triggered by updateWindowsSync1.
+		This command should not show on webcommander UI.
+		
+	.FUNCTIONALITY
+		noshow
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param ($updateServer="external",$severity="all")
 

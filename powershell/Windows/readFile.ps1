@@ -20,17 +20,72 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Read file content 
+
+	.DESCRIPTION
+		This command reads a file content on Windows machine.
+		This command could execute on multiple machines.
+		
+	.FUNCTIONALITY
+		Windows
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword,
-	$filePath,
-	$numberOfLine
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM or IP / FQDN of target machine. Support multiple values seperated by comma. VM name and IP could be mixed."
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of target machine (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword,
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="File path"
+	)]
+	[string]
+		$filePath,
+	
+	[parameter(
+		HelpMessage="Number of lines to read. Count from top if positive; Count from bottom if negative. Read all if not defined."
+	)]
+	[string]
+		$numberOfLine
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -41,31 +96,9 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-function readFile{
-	param ($ip)
-	$remoteWin = newRemoteWin $ip $guestUser $guestPassword
+$ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
+$ipList | % {
+	$remoteWin = newRemoteWin $_ $guestUser $guestPassword
 	$content = $remoteWin.readFile($filePath,$numberOfLine)
 	writeStdout $content
-}	
-
-$vmNameList = $vmName.split(",") | %{$_.trim()}	
-foreach ($vmName in $vmNameList) {
-	if (verifyIp($vmName)) {
-		$ip = $vmName
-		readFile $ip $guestUser $guestPassword $filePath
-	} else {
-		$server = newServer $serverAddress $serverUser $serverPassword
-		$vmList = get-vm -name "$vmName" -server $server.viserver -EA SilentlyContinue
-		if (!$vmList) {
-			writeCustomizedMsg "Fail - get VM $vmName"
-			[Environment]::exit("0")
-		}
-		$vmList | % { 
-			$vm = newVmWin $server $_.name $guestUser $guestPassword
-			$vm.waitfortools()
-			$ip = $vm.getIPv4()
-			$vm.enablePsRemote()
-			readFile $ip 
-		}
-	}
 }

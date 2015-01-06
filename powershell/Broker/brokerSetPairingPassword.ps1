@@ -31,9 +31,11 @@ THE SOFTWARE.
 		
 	.FUNCTIONALITY
 		Broker
+	
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
 #>
-
-## Author: Jerry Liu, liuj@vmware.com
 
 Param (
 	[parameter(
@@ -96,7 +98,7 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 function setPairingPassword {
 	param ($ip, $guestUser, $guestPassword, $pairingPassword, $timeout)
-	$remoteWinBroker = newRemoteWin $ip $guestUser $guestPassword
+	$remoteWinBroker = newRemoteWinBroker $ip $guestUser $guestPassword
 	$remoteWinBroker.setPairingPassword($pairingPassword, $timeout)
 }	
 

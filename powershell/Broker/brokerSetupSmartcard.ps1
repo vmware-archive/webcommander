@@ -30,9 +30,11 @@ THE SOFTWARE.
 		
 	.FUNCTIONALITY
 		Broker
+	
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
 #>
-
-## Author: Jerry Liu, liuj@vmware.com
 
 Param (
 	[parameter(
@@ -73,7 +75,7 @@ Param (
 		$guestPassword=$env:defaultPassword, 
 		
 	[parameter(
-		Mandatory=$true
+		Mandatory=$true,
 		HelpMessage="CA certificate"
 	)]
 	[string]	
@@ -90,7 +92,7 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 function setupSmartCard {
 	param ($ip, $guestUser, $guestPassword, $certFile)
-	$remoteWinBroker = newRemoteWin $ip $guestUser $guestPassword
+	$remoteWinBroker = newRemoteWinBroker $ip $guestUser $guestPassword
 	$remoteWinBroker.sendFile("$certFile", "C:\temp\certnew.cer")
 	$script = {
 		remove-item c:\temp\trust.key -ea silentlyContinue

@@ -22,17 +22,18 @@ THE SOFTWARE.
 
 <#
 	.SYNOPSIS
-        Set farm HTML access
+		Add farms with RDS servers 
 
 	.DESCRIPTION
-        This command enables or disables HTML access of farms.
-		This command could execute on multiple brokers and farms.
+		This command adds farms with RDS servers on a broker.
 		
 	.FUNCTIONALITY
-		Broker
+		Broker_RDS
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
 #>
-
-## Author: Jerry Liu, liuj@vmware.com
 
 Param (
 	[parameter(
@@ -55,7 +56,7 @@ Param (
 	
 	[parameter(
 		Mandatory=$true,
-		HelpMessage="Name of broker VM or IP / FQDN of broker machine. Support multiple values seperated by comma. VM name and IP could be mixed."
+		HelpMessage="Name of broker VM or IP / FQDN of broker machine"
 	)]
 	[string]
 		$vmName, 
@@ -74,20 +75,17 @@ Param (
 		
 	[parameter(
 		Mandatory=$true,
-		HelpMessage="Farm ID. Support multiple values seperated by comma."
+		HelpMessage="Farm name. Support multiple values seperated by comma"
 	)]
 	[string]
-		$farmId,
-	
+		$farmName,
+			
 	[parameter(
-		HelpMessage="Switch, select true to enable or false to disable. Default is false"
-	)]
-	[ValidateSet(
-		"false",
-		"true"
+		Mandatory=$true,
+		HelpMessage="RDS server FQDN. Support multiple values seperated by comma."
 	)]
 	[string]
-		$switch="false"
+		$rdsServerDnsName
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -98,17 +96,24 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-function setFarmHtmlAccess {
-	param ($ip, $guestUser, $guestPassword, $farmIdList, $switch)
+function addFarmWithRds {
+	param ($ip, $guestUser, $guestPassword, $farmList, $rdsList)
 	$remoteWinBroker = newRemoteWinBroker $ip $guestUser $guestPassword
 	$remoteWinBroker.initialize()
-	$farmIdList | % {
-		$remoteWinBroker.setFarmHtmlAccess($_, $switch)
+	for ($i=0;$i -lt $farmList.count; $i++) {
+		$remoteWinBroker.addFarm($farmList[$i])
+		$remoteWinBroker.addRdsServerToFarm($farmList[$i],$rdsList[$i])
 	}
 }
 
-$farmIdList = $farmId.split(",") | %{$_.trim()}
+$farmList = @($farmName.split(",") | %{$_.trim()})
+$rdsList = @($rdsServerDnsName.split(",") | %{$_.trim()})
+if ($farmList.count -ne $rdsList.count) {
+	writeCustomizedMsg "Fail - numbers of farmName and rdsServerDnsName don't match"
+	[Environment]::exit("0")
+}
+
 $ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
 $ipList | % {
-	setFarmHtmlAccess $_ $guestUser $guestPassword $farmIdList $switch
+	addFarmWithRds $_ $guestUser $guestPassword $farmList $rdsList
 }

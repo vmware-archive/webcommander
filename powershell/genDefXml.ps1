@@ -28,16 +28,30 @@ THE SOFTWARE.
         This command generates _def.xml.
 		It parses all powershell scripts to get information from comment
 		based help and parameter attributes.
+	
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
 #>
-
-## Author: Jerry Liu, liuj@vmware.com
 
 . .\objects.ps1
 
+function getDev {
+	param ($h)
+	$email = $h.alertset.alert.text.split("`n") | ?{$_ -match "EMAIL: "}
+	$dev = $email.split("EMAIL: ")[-1]
+	return $dev
+}	
 function createCmdDefXml {
 	param ($cmd,$scriptPath)
 	$xml = ""
-	$help = get-help $cmd.definition -full
+	try {
+		$help = get-help $cmd.definition -full -ea stop
+	} catch {
+		writeCustomizedMsg "Fail - get help of $($cmd.definition)"
+		writeStderr
+		exit
+	}
 	$name = ($cmd.name -replace ".ps1","")
 	if ($help.gettype().name -eq "PSCustomObject") {
 		if ($help.functionality -match "noshow") {return}
@@ -45,7 +59,9 @@ function createCmdDefXml {
 			'" synopsis="' + $help.synopsis + '"'
 		if ($help.functionality -match "hidden") {
 			$xml += ' hidden="1"'
-		}		
+		}
+		$dev = getDev $help
+		if ($dev) { $xml += ' developer="' + $dev + '"'}
 		$xml += '>'
 		
 		if ($help.description) {
@@ -102,7 +118,7 @@ function createCmdDefXml {
 					$xml += '<option value="' + $v + '">' + $v + '</option>'
 				}
 				$xml += '</options></parameter>'
-			} elseif ($name -match "(script|property|url)$") {
+			} elseif ($name -match "(script|property|url|workflow|body)$") {
 				$xml += 'type="textarea" />'
 			} elseif ($name -match "file$") {
 				$xml += 'type="file" />'

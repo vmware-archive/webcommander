@@ -20,13 +20,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		List VMs and snapshots
+
+	.DESCRIPTION
+		This command lists VMs and snapshots information.
+		
+	.FUNCTIONALITY
+		Snapshot, VM
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName="*"
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM. Support multiple values seperated by comma and also wildcard."
+	)]
+	[string]
+		$vmName
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -37,16 +71,29 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-$server = newServer $serverAddress $serverUser $serverPassword
+function listVmAndSnapshot {
+	param([parameter(valueFromPipeLine=$true)]$vivm)
+	process {	
+		foreach ($v in $vivm) {
+			write-output "<virtualmachine>"
+			$snapshots = get-snapshot -vm $v
+			write-output ("<name><![CDATA[" + $v.name + "]]></name>")
+			write-output ("<power>$($v.powerstate)</power>")
+			$ip = (Get-VMGuest $v).IPAddress[0]
+			write-output ("<ip>$ip</ip>")
+			if ($snapshots.count -gt 1) {
+				foreach ($s in $snapshots) {
+					write-output ("<snapshot><![CDATA[" + $s.name + "]]></snapshot>")
+				}
+			} elseif ($snapshots) {
+				write-output ("<snapshot><![CDATA[" + $snapshots.name + "]]></snapshot>")
+			} else {
+				write-output "<nosnapshot/>"
+			}
+			write-output "</virtualmachine>"
+		}
+	}
+} 
 
-try {
-	$vm = get-vm -name $vmName -Server $server.viserver -wa 0 -EA stop
-} catch {
-	writeCustomizedMsg "Fail - get VM $vmName"
-	writeStderr
-	[Environment]::exit("0")
-}
-
-$vm | listVmAndSnapshot
-#$json = $vm | get-snapshot | convertto-json -depth 1
-#writeStdout $json
+$vivmList = getVivmList $vmName $serverAddress $serverUser $serverPassword
+$vivmList | listVmAndSnapshot

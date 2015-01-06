@@ -29,12 +29,15 @@ THE SOFTWARE.
 		
 	.FUNCTIONALITY
 		OVA
+	
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
 #>
-
-## Author: Jerry Liu, liuj@vmware.com
 
 Param (
 	[parameter(
+		Mandatory=$true,
 		HelpMessage="IP or FQDN of VC server to which the OVA will be deployed"
 	)]
 	[string]$vcAddress, 
@@ -125,7 +128,7 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-$cmd = "& `"C:\Program Files\VMware\VMware OVF Tool\ovftool.exe`" --acceptAllEulas --hideEula --noSSLVerify --datastore=`"$datastore`" --diskMode=$storageFormat --network=`"$portGroup`" --name=`"$vmName`""
+$cmd = "& `"C:\Program Files\VMware\VMware OVF Tool\ovftool.exe`" --acceptAllEulas --allowAllExtraConfig --hideEula --noSSLVerify --datastore=`"$datastore`" --diskMode=$storageFormat --network=`"$portGroup`" --name=`"$vmName`""
 if ($advancedProperty) {
 	$advancedProperty = $advancedProperty.replace("`r`n"," ")
 	$cmd += " $advancedProperty"

@@ -20,13 +20,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+        Synchronize time on ESX and VM
+
+	.DESCRIPTION
+        This command synchronizes time of ESX hosts and VMs to an NTP server.
+		This command could execute on multiple ESX or VC servers to 
+		synchronize all ESX hosts and VMs.
+	
+		
+	.FUNCTIONALITY
+		vSphere
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$ntpServerAddress="10.132.71.1"
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP or FQDN of the ESX or VC server. Support multiple values seperated by comma."
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]	
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]	
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP or FQDN of the NTP server"
+	)]
+	[string]
+		$ntpServerAddress
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -37,44 +74,34 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-add-pssnapin vmware.vimautomation.core -ea silentlycontinue
-
-try {
-	connect-VIServer $serverAddress -user $serverUser -password $serverPassword -wa 0 -EA stop
-} catch {
-	writeCustomizedMsg "Fail - connect to server $address"
-	writeStderr
-	[Environment]::exit("0")
-}
-
-get-vmhost | % {
-	try {
-		$_ | add-vmhostNtpServer $ntpServerAddress -ea SilentlyContinue
-		$_ | Get-VMHostFirewallException | where {$_.Name -eq "NTP client"} | Set-VMHostFirewallException -Enabled:$true
-		$_ | Get-VmHostService | ? {$_.key -eq "ntpd"} | Start-VMHostService
-		$_ | Get-VmHostService | ? {$_.key -eq "ntpd"} | Set-VMHostService -policy "automatic"
-	} catch {
-		writeCustomizedMsg "Fail - configure NTP settings for vmhost $($_.name)"
-		writeStderr
-		#[Environment]::exit("0")
+$serverAddressList = $serverAddress.split(",") | %{$_.trim()}
+foreach ($serverAddress in $serverAddressList) {
+	$server = newServer $serverAddress $serverUser $serverPassword 
+	get-vmhost -Server $server.viserver | % {
+		try {
+			$_ | add-vmhostNtpServer $ntpServerAddress -ea SilentlyContinue
+			$_ | Get-VMHostFirewallException | where {$_.Name -eq "NTP client"} | `
+				Set-VMHostFirewallException -Enabled:$true
+			$_ | Get-VmHostService | ? {$_.key -eq "ntpd"} | Start-VMHostService
+			$_ | Get-VmHostService | ? {$_.key -eq "ntpd"} | Set-VMHostService -policy "automatic"
+			writeCustomizedMsg "Success - configure NTP settings for vmhost $($_.name)"
+		} catch {
+			writeCustomizedMsg "Fail - configure NTP settings for vmhost $($_.name)"
+			writeStderr
+		}
 	}
-	writeCustomizedMsg "Success - configure NTP settings for vmhost $($_.name)"
-}
-
-get-vm | % {
-	try {
-		$spec = New-Object VMware.Vim.VirtualMachineConfigSpec
-		$spec.changeVersion = $_.ExtensionData.Config.ChangeVersion
-		$spec.tools = New-Object VMware.Vim.ToolsConfigInfo
-		$spec.tools.syncTimeWithHost = $true
-		$_this = Get-View -Id $_.Id
-		$_this.ReconfigVM_Task($spec)
-	} catch {
-		writeCustomizedMsg "Fail - configure time sync settings for vm $($_.name)"
-		writeStderr
-		#[Environment]::exit("0")
+	get-vm -Server $server.viserver | % {
+		try {
+			$spec = New-Object VMware.Vim.VirtualMachineConfigSpec
+			$spec.changeVersion = $_.ExtensionData.Config.ChangeVersion
+			$spec.tools = New-Object VMware.Vim.ToolsConfigInfo
+			$spec.tools.syncTimeWithHost = $true
+			$_this = Get-View -Id $_.Id -server $server.viserver
+			$_this.ReconfigVM_Task($spec)
+			writeCustomizedMsg "Success - configure time sync settings for vm $($_.name)"
+		} catch {
+			writeCustomizedMsg "Fail - configure time sync settings for vm $($_.name)"
+			writeStderr
+		}
 	}
-	writeCustomizedMsg "Success - configure time sync settings for vm $($_.name)"
 }
-
-disconnect-VIServer -Server * -Force -Confirm:$false

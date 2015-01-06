@@ -20,14 +20,55 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Set port group
+
+	.DESCRIPTION
+		This command sets VM network port group.
+		This command could run against multiple virtual machines.
+		
+	.FUNCTIONALITY
+		VM
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName,
-	$portGroup
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM. Support multiple values seperated by comma and also wildcard."
+	)]
+	[string]
+		$vmName,
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of the port group"
+	)]
+	[string]
+		$portGroup
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -38,24 +79,14 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-add-pssnapin vmware.vimautomation.core -ea silentlycontinue
-
-try {
-	connect-VIServer $serverAddress -user $serverUser -password $serverPassword -wa 0 -EA stop
-} catch {
-	writeCustomizedMsg "Fail - connect to server $address"
-	writeStderr
-	[Environment]::exit("0")
+$vivmList = getVivmList $vmName $serverAddress $serverUser $serverPassword
+$vivmList | % {
+	try {
+		$pg = get-virtualPortGroup -name $portGroup -vmHost $_.host -ea stop
+		Get-NetworkAdapter -vm $_ | Set-NetworkAdapter -PortGroup $pg -confirm:$false -ea stop
+		writeCustomizedMsg "Success - set VM network port group on $($_.name)"
+	} catch {
+		writeCustomizedMsg "Fail - set VM network port group on $($_.name)"
+		writeStderr
+	}
 }
-
-try {
-	$pg = get-virtualportgroup -name $portGroup -ea Stop
-	get-vm -name $vmName -ea Stop | Get-NetworkAdapter | Set-NetworkAdapter -PortGroup $pg -confirm:$false -ea stop
-} catch {
-	writeCustomizedMsg "Fail - set VM network port group"
-	writeStderr
-	[Environment]::exit("0")
-}
-
-writeCustomizedMsg "Success - set VM network port group"
-disconnect-VIServer -Server * -Force -Confirm:$false

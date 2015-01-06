@@ -31,9 +31,11 @@ THE SOFTWARE.
 		
 	.FUNCTIONALITY
 		Broker
+	
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
 #>
-
-## Author: Jerry Liu, liuj@vmware.com
 
 Param (
 	[parameter(
@@ -105,8 +107,8 @@ function setPoolName {
 	}
 }	
 
-$poolIdList = $poolId.split(",") | %{$_.trim()}
-$poolNameList = $poolName.split(",") | %{$_.trim()}
+$poolIdList = @($poolId.split(",") | %{$_.trim()})
+$poolNameList = @($poolName.split(",") | %{$_.trim()})
 if ($poolIdList.count -ne $poolNameList.count) {
 	writeCustomizedMsg "Fail - pool ID number and pool name number don't match"
 	[Environment]::exit("0")

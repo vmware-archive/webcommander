@@ -20,18 +20,81 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Install WebCommander 
+
+	.DESCRIPTION
+		This command installs and configures WebCommander.
+		This command could execute on multiple machines.
+		
+	.FUNCTIONALITY
+		Install
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword,
-	$packageUrl="http://download3.vmware.com/software/vmw-tools/webcommander/WebCommander_v3.0.zip",
-	$authentication="windows",
-	$defaultPassword=$env:defaultPassword
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM or IP / FQDN of target machine. Support multiple values seperated by comma. VM name and IP could be mixed."
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of target machine (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword,
+		
+	[parameter(
+		HelpMessage="URL to WebCommander package, default is https://github.com/vmware/webcommander/archive/master.zip"
+	)]
+	[string]
+		$packageUrl="https://github.com/vmware/webcommander/archive/master.zip",
+		
+	[parameter(
+		HelpMessage="Authentication type of WebCommander web applcation, default is 'Windows'"
+	)]
+	[ValidateSet(
+		"Windows",
+		"Anonymous"
+	)]
+	[string]
+		$authentication="windows",
+	
+	[parameter(
+		HelpMessage="Default password that will be used by WebCommander commands"
+	)]
+	[string]
+		$defaultPassword=$env:defaultPassword
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -42,35 +105,22 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-if (verifyIp($vmName)) {
-	$ip = $vmName
-} else {
-	$server = newServer $serverAddress $serverUser $serverPassword
-	$vm = newVmWin $server $vmName $guestUser $guestPassword
-	$vm.waitfortools()
-	$ip = $vm.getIPv4()
-	$vm.enablePsRemote()
+function installWebCommander {
+	param ($ip, $guestUser, $guestPassword, $packageUrl, $authentication, $defaultPassword)
+	$remoteWin = newRemoteWin $ip $guestUser $guestPassword
+	$remoteWin.sendFile(".\install\setup.ps1","c:\temp\setup.ps1")
+	$cmd = "c:\temp\setup.ps1 '$packageUrl' '$authentication' '$guestPassword' '$defaultPassword'"
+	$result = $remoteWin.executePsTxtRemote($cmd, "trigger setup script in remote machine")
+	writeStdout $result
+	if (($result -match "WebCommander website updated successfully") `
+		-or ($result -match "WSMAN settings changed successfully")) {
+		writeCustomizedMsg "Success - install WebCommander"
+	} else {
+		writeCustomizedMsg "Fail - install WebCommander"
+	}
 }
-$remoteWin = newRemoteWin $ip $guestUser $guestPassword
-$remoteWin.sendFile(".\install\setup.ps1","c:\temp\setup.ps1")
-$cmd = "c:\temp\setup.ps1 '$packageUrl' '$authentication' '$guestPassword' '$defaultPassword'"
-$result = $remoteWin.executePsTxtRemote($cmd, "trigger setup script in remote machine")
-writeStdout $result
-# try {
-	# Write-Output "<stdOutput><![CDATA["
-	# invoke-command -FilePath "..\setup.ps1" `
-		# -argumentlist $packageUrl, $authentication, $guestPassword, $defaultPassword `
-		# -session $remoteWin.session -EA stop -outvariable $result | out-null
-	# Write-Output "]]></stdOutput>"
-# } catch {
-	# writeCustomizedMsg "Fail - install WebCommander"
-	# writeStderr
-	# [Environment]::exit("0")
-# }
 
-if (($result -match "WebCommander website updated successfully") `
-	-or ($result -match "WSMAN settings changed successfully")) {
-	writeCustomizedMsg "Success - install WebCommander"
-} else {
-	writeCustomizedMsg "Fail - install WebCommander"
+$ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
+$ipList | % {
+	installWebCommander $_ $guestUser $guestPassword $packageUrl $authentication $defaultPassword
 }

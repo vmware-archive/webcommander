@@ -20,13 +20,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+        List VM hosts
+
+	.DESCRIPTION
+        This command lists all VM hosts on ESX or vCenter server.
+		This command could execute against multiple servers.
+		
+	.FUNCTIONALITY
+		vSphere
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress,
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword,
-	$format="XML"
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP or FQDN of the ESX or VC server. Support multiple values seperated by comma."
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]	
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]	
+		$serverPassword=$env:defaultPassword
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -37,15 +65,17 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-$server = newServer $serverAddress $serverUser $serverPassword
-$vmHost = get-VMHost -Server $server.viserver
-
-if ($format -eq "JSON") {
-	$vmHostJson = $vmHost | select Name,ConnectionState,PowerState,Manufacturer,Model,NumCpu,CpuTotalMhz,CpuUsageMhz,LicenseKey,MemoryUsageGB,MemoryTotalGB,Version | convertTo-Json -depth 1
-	writeStdout $vmHostJson
-} else {
-	$vmHostXml = $vmHost | select Name,ConnectionState,PowerState,Manufacturer,Model,NumCpu,CpuTotalMhz,CpuUsageMhz,LicenseKey,MemoryUsageGB,MemoryTotalGB,Version | convertTo-xml -as string -notypeinformation
-	$vmHostXml = $vmHostXml.trimstart('<?xml version="1.0"?>')
-	$vmHostXml = $vmHostXML.replace('Object','VmHost')
-	$vmHostXml
+$serverAddressList = $serverAddress.split(",") | %{$_.trim()}
+foreach ($serverAddress in $serverAddressList) {
+	$server = newServer $serverAddress $serverUser $serverPassword
+	$vmHost = get-VMHost -Server $server.viserver
+	foreach ($h in ($vmHost | sort))
+	{
+		$vmHostXml = $h | select Name,ConnectionState,PowerState,Manufacturer,Model,`
+			NumCpu,CpuTotalMhz,CpuUsageMhz,LicenseKey,MemoryUsageGB,MemoryTotalGB,Version `
+			| convertTo-xml -as string -notypeinformation
+		$vmHostXml = $vmHostXml.trimstart('<?xml version="1.0"?>')
+		$vmHostXml = $vmHostXML.replace('Object','VmHost')
+		$vmHostXml
+	}
 }

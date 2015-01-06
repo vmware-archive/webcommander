@@ -30,9 +30,11 @@ THE SOFTWARE.
 		
 	.FUNCTIONALITY
 		vSphere
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
 #>
-
-## Author: Jerry Liu, liuj@vmware.com
 
 Param (	
 	[parameter(

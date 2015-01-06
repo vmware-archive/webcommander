@@ -20,15 +20,60 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Install Powershell 2.0 
+
+	.DESCRIPTION
+		This command installs Powershell 2.0 on Windows XP and 2003 VM.
+		This command could execute on multiple virtual machines.
+		This command only works on virtual machine.
+		
+	.FUNCTIONALITY
+		Powershell, VM, Install
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM. Support multiple values seperated by comma."
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of target machine (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -40,6 +85,10 @@ foreach ($paramKey in $psboundparameters.keys) {
 . .\objects.ps1
 
 $server = newServer $serverAddress $serverUser $serverPassword
-$vm = newVmWin $server $vmName $guestUser $guestPassword
-$vm.waitForTools() 
-$vm.enablePsRemote()
+$vmNameList = $vmName.split(",") | %{$_.trim()}
+$vivmList = get-vm -name $vmNameList -server $server.viserver
+$vivmList | select -uniq | % { 
+	$vm = newVmWin $server $_.name $guestUser $guestPassword
+	$vm.waitForTools() 
+	$vm.enablePsRemote()
+}

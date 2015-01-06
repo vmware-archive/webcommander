@@ -76,7 +76,7 @@ THE SOFTWARE.
 			Command Name: <i><xsl:value-of select="@cmd"/></i><br/>
 			Developer: <i><a class="devName">
 				<xsl:attribute name="href">
-					<xsl:value-of select="concat('mailto:', @developer, '@vmware.com')"/>
+					<xsl:value-of select="concat('mailto:', @developer)"/>
 				</xsl:attribute>
 				<xsl:value-of select="@developer"/>
 			</a></i><br/>
