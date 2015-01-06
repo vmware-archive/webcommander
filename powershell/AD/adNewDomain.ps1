@@ -29,9 +29,11 @@ THE SOFTWARE.
 		
 	.FUNCTIONALITY
 		AD
+	
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
 #>
-
-## Author: Jerry Liu, liuj@vmware.com
 
 Param (
 	[parameter(

@@ -20,14 +20,55 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Set memory size
+
+	.DESCRIPTION
+		This command sets VM memory size in term of GB.
+		This command could run against multiple virtual machines.
+		
+	.FUNCTIONALITY
+		VM
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress,
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword,
-	$vmName,
-	$memoryGb
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM. Support multiple values seperated by comma and also wildcard."
+	)]
+	[string]
+		$vmName,
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Memory size in gigabytes (GB)"
+	)]
+	[string]
+		$memoryGb
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -38,33 +79,13 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-add-pssnapin vmware.vimautomation.core -ea silentlycontinue
-
-try {
-	connect-VIServer $serverAddress -user $serverUser -password $serverPassword -wa 0 -EA stop
-} catch {
-	writeCustomizedMsg "Fail - connect to server $address"
-	writeStderr
-	[Environment]::exit("0")
-}
-
-$vmList = $vmName.split(",") | %{$_.trim()}	
-foreach ($vmName in $vmList) {	
+$vivmList = getVivmList $vmName $serverAddress $serverUser $serverPassword
+$vivmList | % {
 	try {
-		$vmList = get-vm -name "$vmName" -server $server.viserver -EA Stop
-	} catch {
-		writeCustomizedMsg "Fail - get VM $vmName"
-		writeStderr
-		[Environment]::exit("0")
-	}
-	$vmList | % { 
-		try {
-			set-vm -vm $_ -memoryGb $memoryGb -confirm:$false -ea Stop
-		} catch {
-			writeCustomizedMsg "Fail - set memory for VM $($_.name)"
-			writeStderr
-			[Environment]::exit("0")
-		}
+		set-vm -vm $_ -memoryGb $memoryGb -confirm:$false -ea Stop
 		writeCustomizedMsg "Success - set memory for VM $($_.name)"
+	} catch {
+		writeCustomizedMsg "Fail - set memory for VM $($_.name)"
+		writeStderr
 	}
 }

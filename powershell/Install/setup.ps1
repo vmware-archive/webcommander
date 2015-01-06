@@ -1,4 +1,4 @@
-﻿<#
+<#
 Copyright (c) 2012-2014 VMware, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,7 +20,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Install WebCommander 
+
+	.DESCRIPTION
+		This command installs and configures WebCommander.
+		This command should not show on the index page.
+		
+	.FUNCTIONALITY
+		noshow
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
 	$packageUrl = 'https://github.com/vmware/webcommander/archive/master.zip',
@@ -49,7 +63,7 @@ $download = {
 	if (!$webCommanderOnly) {
 		write-output "Downloading PowerCLI, WPI and Advanced Logging..."
 		if (test-connection buildweb.eng.vmware.com -quiet) {
-			$webClient.downloadfile('http://build-squid.eng.vmware.com/build/mts/release/bora-1931983/publish/VMware-PowerCLI-5.5.0-1931983.exe',
+			$webClient.downloadfile('http://build-squid.eng.vmware.com/build/mts/release/bora-1997510/publish/VMware-PowerCLI-5.8.0-1997510.exe',
 				'C:\WebCommander\PowerCLI.exe')
 		}
 		$webClient.downloadfile('http://go.microsoft.com/fwlink/?LinkId=255386',

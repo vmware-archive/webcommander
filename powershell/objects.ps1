@@ -26,9 +26,11 @@ THE SOFTWARE.
 		
 	.FUNCTIONALITY
 		noshow
+	
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
 #>
-
-## Author: Jerry Liu, liuj@vmware.com
 
 #$errorActionPreference = "SilentlyContinue"
 $current = $host.ui.rawui.buffersize
@@ -61,56 +63,6 @@ function getUniqueString {
 	$rand = new-object System.Random
 	1..$length | foreach { $string = $string + [char]$rand.next(101,107) }
 	return $string
-}
-
-function listVmAndSnapshot {
-	param([parameter(valueFromPipeLine=$true)]$vivm)
-	process {	
-		foreach ($v in $vivm) {
-			write-output "<virtualmachine>"
-			$snapshots = get-snapshot -vm $v
-			write-output ("<name><![CDATA[" + $v.name + "]]></name>")
-			write-output ("<power>$($v.powerstate)</power>")
-			$ip = (Get-VMGuest $v).IPAddress[0]
-			write-output ("<ip>$ip</ip>")
-			if ($snapshots.count -gt 1) {
-				foreach ($s in $snapshots) {
-					write-output ("<snapshot><![CDATA[" + $s.name + "]]></snapshot>")
-				}
-			} elseif ($snapshots) {
-				write-output ("<snapshot><![CDATA[" + $snapshots.name + "]]></snapshot>")
-			} else {
-				write-output "<nosnapshot/>"
-			}
-			write-output "</virtualmachine>"
-		}
-	}
-} 
-
-Function listResourcePool{
-	param([parameter(valueFromPipeLine=$true)]$resourcePool)
-	process {
-		foreach ($r in $resourcePool) {
-			# $view = Get-View $r.id
-			# $path = $view.Name
-			# Do { $parent = get-View ($view).parent
-				# $path = $parent.Name + "\" + $path
-				# $view = "$parent"
-			# } While ($parent)
-			$name = $r.name
-			$id = $r.id
-			$path = $r.name
-			Do { $parent = $r.parent
-				$path = $parent.Name + "\" + $path
-				$r = $parent
-			} While ($parent)
-			write-output "<resourcepool>"
-			write-output "<name>$name</name>"
-			write-output "<id>$id</id>"
-			write-output "<path>$path</path>"
-			write-output "</resourcepool>"
-		}
-	}
 }
 
 function newUnc {
@@ -1809,10 +1761,23 @@ function getWebCommanderJobResult {
 	get-job | remove-job
 }
 
+function getVivmList {
+	param($vmName, $serverAddress, $serverUser, $serverPassword)
+	$vmNameList = parseInput $vmName
+	$server = newServer $serverAddress $serverUser $serverPassword
+	$vivmList = get-vm -name $vmNameList -server $server.viserver -EA SilentlyContinue
+	if (!$vivmList) {
+		writeCustomizedMsg "Fail - get VM $vmName"
+		[Environment]::exit("0")
+	}
+	$vivmList = $vivmList | select -uniq
+	return $vivmList
+}
+
 function getVmIpList {
 	param($vmName, $serverAddress, $serverUser, $serverPassword)
 	$ipList = @()
-	$vmNameList = $vmName.split(",") | %{$_.trim()}	
+	$vmNameList = parseInput $vmName	
 	foreach ($vmName in $vmNameList) {
 		$ip = verifyIp($vmName)
 		if ($ip) {
@@ -1821,18 +1786,19 @@ function getVmIpList {
 			if (!$server) {
 				$server = newServer $serverAddress $serverUser $serverPassword
 			}
-			$vmList = get-vm -name "$vmName" -server $server.viserver -EA SilentlyContinue
-			if (!$vmList) {
+			$vivmList = get-vm -name "$vmName" -server $server.viserver -EA SilentlyContinue
+			if (!$vivmList) {
 				writeCustomizedMsg "Fail - get VM $vmName"
-				[Environment]::exit("0")
+				#[Environment]::exit("0")
+			} else {
+				$vivmList | % { 
+					$vm = newVmWin $server $_.name $guestUser $guestPassword
+					$vm.waitfortools()
+					$ip = $vm.getIPv4()
+					$vm.enablePsRemote()
+					$ipList += $ip
+				}
 			}
-			$vmList | % { 
-				$vm = newVmWin $server $_.name $guestUser $guestPassword
-				$vm.waitfortools()
-				$ip = $vm.getIPv4()
-				$vm.enablePsRemote()
-				$ipList += $ip
-			}	
 		}	
 	}
 	$ipList = $ipList | select -uniq
@@ -1842,9 +1808,9 @@ function getVmIpList {
 function restoreSnapshot {
 	param($ssName, $vmName, $serverAddress, $serverUser, $serverPassword)
 	$server = newServer $serverAddress $serverUser $serverPassword
-	$vmNameList = $vmName.split(",") | %{$_.trim()}
-	$vmList = get-vm -name $vmNameList -server $server.viserver -EA SilentlyContinue
-	if (!$vmList) {
+	$vmNameList = parseInput $vmName
+	$vivmList = get-vm -name $vmNameList -server $server.viserver -EA SilentlyContinue
+	if (!$vivmList) {
 		writeCustomizedMsg "Fail - get VM $vmName"
 		[Environment]::exit("0")
 	}
@@ -1854,4 +1820,14 @@ function restoreSnapshot {
 		$vm.start()
 		$vm.waitfortools()
 	}	
+}
+
+function parseInput {
+	param($content)
+	try {
+		$c = @(invoke-expression $content)
+	} catch {
+		$c = @($content.split(",") | %{$_.trim()})
+	}
+	return $c
 }

@@ -20,13 +20,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+        List port groups
+
+	.DESCRIPTION
+        This command lists all network port groups on ESX or vCenter server.
+		This command could execute against multiple servers.
+		
+	.FUNCTIONALITY
+		vSphere
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress,
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword,
-	$format="XML"
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP or FQDN of the ESX or VC server. Support multiple values seperated by comma."
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]	
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]	
+		$serverPassword=$env:defaultPassword
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -37,10 +65,10 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-$server = newServer $serverAddress $serverUser $serverPassword
-$portgroup = get-virtualportgroup -Server $server.viserver
-
-if ($format -eq "XML") {
+$serverAddressList = $serverAddress.split(",") | %{$_.trim()}
+foreach ($serverAddress in $serverAddressList) {
+	$server = newServer $serverAddress $serverUser $serverPassword
+	$portgroup = get-virtualportgroup -Server $server.viserver
 	foreach ($group in ($portgroup | sort))
 	{
 		write-host "<portGroup>"
@@ -49,7 +77,4 @@ if ($format -eq "XML") {
 		write-host "<virtualSwitchName>$($group.virtualswitchname)</virtualSwitchName>"
 		write-host "</portGroup>"
 	}
-} else {
-	$json = ($portgroup | sort) | convertto-json -depth 1
-	writeStdout $json
 }

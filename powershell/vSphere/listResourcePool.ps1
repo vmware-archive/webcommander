@@ -20,13 +20,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+        List resource pools
+
+	.DESCRIPTION
+        This command lists all resource pools on ESX or vCenter server.
+		This command could execute against multiple servers.
+		
+	.FUNCTIONALITY
+		vSphere
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$resourcePoolName="*"
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP or FQDN of the ESX or VC server. Support multiple values seperated by comma."
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]	
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]	
+		$serverPassword=$env:defaultPassword
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -37,14 +65,29 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-$server = newServer $serverAddress $serverUser $serverPassword
-
-try {
-	$resourcePool = get-resourcepool -name $resourcePoolName -Server $server.viserver -wa 0 -EA stop
-} catch {
-	writeCustomizedMsg "Fail - get resource pool $resourcePoolName"
-	writeStderr
-	[Environment]::exit("0")
+Function listResourcePool{
+	param([parameter(valueFromPipeLine=$true)]$resourcePool)
+	process {
+		foreach ($r in $resourcePool) {
+			$name = $r.name
+			$id = $r.id
+			$path = $r.name
+			Do { $parent = $r.parent
+				$path = $parent.Name + "\" + $path
+				$r = $parent
+			} While ($parent)
+			write-output "<resourcepool>"
+			write-output "<name>$name</name>"
+			write-output "<id>$id</id>"
+			write-output "<path>$path</path>"
+			write-output "</resourcepool>"
+		}
+	}
 }
 
-$resourcePool | listResourcePool
+$serverAddressList = $serverAddress.split(",") | %{$_.trim()}
+foreach ($serverAddress in $serverAddressList) {
+	$server = newServer $serverAddress $serverUser $serverPassword
+	$resourcePool = get-resourcepool -Server $server.viserver
+	$resourcePool | sort | listResourcePool
+}

@@ -20,15 +20,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Update VMware Tools 
+
+	.DESCRIPTION
+		This command updates VMware Tools.
+		This command could update multiple virtual machines.
+		
+	.FUNCTIONALITY
+		VM
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName,
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM. Support multiple values seperated by comma and also wildcard."
+	)]
+	[string]
+		$vmName
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -39,18 +72,13 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-$server = newServer $serverAddress $serverUser $serverPassword
-$vmNameList = $vmName.split(",") | %{$_.trim()}	
-foreach ($vmName in $vmNameList) {
+$vivmList = getVivmList $vmName $serverAddress $serverUser $serverPassword
+$vivmList | % {
 	try {
-		get-vm -name $vmName -server $server.viserver -ea stop | % {
-			Update-Tools -vm $_ -EA Stop
-			writeCustomizedMsg "Success - update VMware Tools for VM $($_.name)"
-		}
+		Update-Tools -vm $_ -EA Stop
+		writeCustomizedMsg "Success - update VMware Tools for VM $($_.name)"
 	} catch {
 		writeCustomizedMsg "Fail - update VMware Tools for VM $($_.name)"
 		writeStderr
-		[Environment]::exit("0")
 	}	
 }
-disconnect-VIServer -Server * -Force -Confirm:$false

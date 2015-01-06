@@ -29,9 +29,11 @@ THE SOFTWARE.
 		
 	.FUNCTIONALITY
 		AD
+	
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
 #>
-
-## Author: Jerry Liu, liuj@vmware.com
 
 Param (
 	[parameter(
@@ -82,7 +84,7 @@ Param (
 		HelpMessage="Netbios name (short name) of the domain"
 	)]
 	[string]
-		$domainName,
+		$netbiosName,
 	
 	[parameter(
 		Mandatory=$true,

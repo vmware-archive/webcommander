@@ -20,17 +20,82 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Run script remotely
+
+	.DESCRIPTION
+		This command runs a user defined script on Windows machine.
+		This command could execute on multiple machines.
+		
+	.FUNCTIONALITY
+		Windows
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser=".\administrator", 
-	$guestPassword=$env:defaultPassword,   
-	$script,
-	$type="Bat"
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM or IP / FQDN of target machine. Support multiple values seperated by comma. VM name and IP could be mixed."
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of target machine (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword,   
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Script to run"
+	)]
+	[string]
+		$script,
+	
+	[parameter(
+		HelpMessage="Type of script
+			Bat: asynchronous, command returns immediately after triggering the script
+			Powershell: synchronous, command returns on script completion
+			Interactive: synchronous, guestUser must have already logged on
+			InteractivePs1: synchronous, guestUser must have already logged on"
+	)]
+	[ValidateSet(
+		"Bat",
+		"Powershell",
+		"Interactive",
+		"InteractivePs1"
+	)]
+	[string]	
+		$type="Bat"
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -57,39 +122,10 @@ function runScript {
 		$script = "Invoke-WmiMethod -path win32_process -name create -argumentlist 'c:\temp\script.bat'"
 		$result = $remoteWin.executePsTxtRemote($script, "trigger batch script in VM")
 	}
-	writeStdout($result)
+	writeStdout $result
 }
 
-$vmList = $vmName.split(",") | %{$_.trim()}	
-foreach ($vmName in $vmList) {
-	if (verifyIp($vmName)) {
-		$ip = $vmName
-		writeCustomizedMsg "Info - remote machine is $ip"
-		runScript $ip $guestUser $guestPassword $script $type
-	} else {
-		if (!$server) {
-			$server = newServer $serverAddress $serverUser $serverPassword
-		}
-		$vmList = get-vm -name "$vmName" -server $server.viserver -EA SilentlyContinue
-		if (!$vmList) {
-			writeCustomizedMsg "Fail - get VM $vmName"
-			[Environment]::exit("0")
-		}
-		$vmList | % { 
-			$vm = newVmWin $server $_.name $guestUser $guestPassword
-			$vm.waitfortools()
-			writeCustomizedMsg "Info - VM name is $($vm.name)"
-			if ($type -eq "bash") {
-				$result = $vm.runScript($script, "Bash")
-				writeStdout($result)
-			} else {
-				$ip = $vm.getIPv4()
-				$vm.enablePsRemote()
-				$vm.enableCredSSP()
-				runScript $ip $guestUser $guestPassword $script $type
-			}
-		}
-	}
-	writeSeperator
+$ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
+$ipList | % {
+	runScript $_ $guestUser $guestPassword $script $type
 }
-get-pssession | remove-pssession

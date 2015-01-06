@@ -20,12 +20,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+        List datastores
+
+	.DESCRIPTION
+        This command lists all datastores on ESX or vCenter server.
+		This command could execute against multiple servers.
+		
+	.FUNCTIONALITY
+		vSphere
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress,
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP or FQDN of the ESX or VC server. Support multiple values seperated by comma."
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]	
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]	
+		$serverPassword=$env:defaultPassword
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -36,16 +65,18 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-$server = newServer $serverAddress $serverUser $serverPassword
-$datastore = get-datastore -Server $server.viserver
-
-foreach ($store in ($datastore | sort))
-{
-	$fs = "{0:N2}" -f $store.FreeSpaceGB	
-	$ts = "{0:N2}" -f $store.CapacityGB
-	write-host "<datastore>"
-	write-host ("<name>" + $store.name + "</name>")
-	write-host ("<freespace>$fs</freespace>")
-	write-host ("<capacity>$ts</capacity>")
-	write-host "</datastore>"
+$serverAddressList = $serverAddress.split(",") | %{$_.trim()}
+foreach ($serverAddress in $serverAddressList) {
+	$server = newServer $serverAddress $serverUser $serverPassword
+	$datastore = get-datastore -Server $server.viserver
+	foreach ($store in ($datastore | sort))
+	{
+		$fs = "{0:N2}" -f $store.FreeSpaceGB	
+		$ts = "{0:N2}" -f $store.CapacityGB
+		write-host "<datastore>"
+		write-host ("<name>" + $store.name + "</name>")
+		write-host ("<freespace>$fs</freespace>")
+		write-host ("<capacity>$ts</capacity>")
+		write-host "</datastore>"
+	}
 }

@@ -20,15 +20,62 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+        Add adapter to distributed switch
+
+	.DESCRIPTION
+        This command adds a physical network adapter to a distributed switch.
+		This command could configure multiple ESX hosts controlled by multiple VC servers. 
+		If no specific ESX is defined, all of them are affected.
+	
+	.FUNCTIONALITY
+		vSphere
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$vcAddress,
-	$vcUser="administrator", 
-	$vcPassword=$env:defaultPassword,
-	$esxAddress='*',
-	$dsName,
-	$nicName
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP or FQDN of the VC server"
+	)]
+	[string]
+		$vcAddress,
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is administrator)"
+	)]
+	[string]	
+		$vcUser="administrator", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]	
+		$vcPassword=$env:defaultPassword,
+	
+	[parameter(
+		HelpMessage="FQDN or IP of ESX host. Support multiple values seperated by comma. Default is '*'"
+	)]
+	[string]	
+		$esxAddress='*',
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name distributed switch"
+	)]
+	[string]
+		$dsName,
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of physical network adapter"
+	)]
+	[string]
+		$nicName
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -39,25 +86,21 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-add-pssnapin vmware* -ea silentlycontinue
-try {
-	connect-VIServer $vcAddress -user $vcUser -password $vcPassword -wa 0 -EA stop
-} catch {
-	writeCustomizedMsg "Fail - connect to server $address"
-	writeStderr
-	[Environment]::exit("0")
-}
 $esxAddressList = $esxAddress.split(",") | %{$_.trim()}
-try {
-	$ds = get-VDSwitch -name $dsName
-	get-vmhost $esxAddressList -ea stop | % {
-		$vmhostNetworkAdapter = $_ | Get-VMHostNetworkAdapter -Physical -Name $nicName -ea Stop
-		$ds | Add-VDSwitchPhysicalNetworkAdapter -VMHostNetworkAdapter $vmhostNetworkAdapter -confirm:$false -ea Stop
-		writeCustomizedMsg "Success - add physical NIC to distributed switch on ESX $_"
+$vcAddressList = $vcAddress.split(",") | %{$_.trim()}
+foreach ($vcAddress in $vcAddressList) {
+	$vc = newServer $vcAddress $serverUser $serverPassword 
+	$ds = get-VDSwitch -name $dsName -server $vc.viserver
+	get-vmhost -name $esxAddressList -server $vc.viserver -ea stop | % {
+		try {
+			$vmhostNetworkAdapter = $_ | Get-VMHostNetworkAdapter -Physical `
+				-Name $nicName -ea Stop
+			$ds | Add-VDSwitchPhysicalNetworkAdapter -VMHostNetworkAdapter `
+				$vmhostNetworkAdapter -confirm:$false -ea Stop
+			writeCustomizedMsg "Success - add physical NIC to distributed switch on ESX $_"
+		} catch {
+			writeCustomizedMsg "Fail - add physical NIC to distributed switch on ESX $_"
+			writeStderr
+		}
 	}
-} catch {
-	writeCustomizedMsg "Fail - add physical NIC to distributed switch on ESX $_"
-	writeStderr
-	[Environment]::exit("0")
 }
-disconnect-VIServer -Server * -Force -Confirm:$false

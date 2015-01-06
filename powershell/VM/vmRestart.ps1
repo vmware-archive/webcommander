@@ -20,17 +20,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Restart VM
+
+	.DESCRIPTION
+		This command could restart multiple virtual machines.
+		
+	.FUNCTIONALITY
+		VM
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword,   
-	$script,
-	$type="Bat"
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM. Support multiple values seperated by comma."
+	)]
+	[string]
+		$vmName
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -41,24 +70,13 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-add-pssnapin vmware.vimautomation.core -ea silentlycontinue
-
-try {
-	connect-VIServer $serverAddress -user $serverUser -password $serverPassword -wa 0 -EA stop
-} catch {
-	writeCustomizedMsg "Fail - connect to server $address"
-	writeStderr
-	[Environment]::exit("0")
+$vivmList = getVivmList $vmName $serverAddress $serverUser $serverPassword
+$vivmList | % { 
+	try {
+		restart-vmguest -vm $_ -confirm:$false -EA Stop
+		writeCustomizedMsg "Success - restart VM $($_.name)"
+	} catch {
+		writeCustomizedMsg "Fail - restart VM $($_.name)"
+		writeStderr
+	}	
 }
-
-try {
-	get-vm -name $vmName | invoke-vmscript -scriptText $script -ScriptType $type -GuestUser $guestUser `
-		-GuestPassword $guestPassword -confirm:$false -toolswaitsecs 0 -RunAsync -ea Stop
-} catch {
-	writeCustomizedMsg "Fail - invoke VM script"
-	writeStderr
-	[Environment]::exit("0")
-}
-
-writeCustomizedMsg "Success - invoke VM script"
-disconnect-VIServer -Server * -Force -Confirm:$false

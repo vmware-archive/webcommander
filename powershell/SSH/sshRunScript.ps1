@@ -20,13 +20,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Run script remotely via SSH 
+
+	.DESCRIPTION
+		This command runs user defined script remotely over SSH.
+		This command could run script on multiple SSH servers.
+		
+	.FUNCTIONALITY
+		SSH
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword,   
-	$script
+	[parameter(
+		HelpMessage="IP or FQDN of SSH server. Support multiple values seperated by comma."
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword,   
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Script to run"
+	)]
+	[string]
+		$script
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -37,5 +71,8 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-$sshServer = newSshServer $serverAddress $serverUser $serverPassword
-$sshServer.runCommand($script)
+$serverList = @($serverAddress.split(",") | %{$_.trim()})
+$serverList | % {
+	$sshServer = newSshServer $_ $serverUser $serverPassword
+	$sshServer.runCommand($script)
+}

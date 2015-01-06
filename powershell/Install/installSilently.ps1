@@ -20,19 +20,88 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Install application silently 
+
+	.DESCRIPTION
+		This command downloads and installs an application silently.
+		This command could execute on multiple machines.
+		
+	.FUNCTIONALITY
+		Install
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	[string]$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword,  
-	$ssName="", 
-	$installerUrl, 
-	$silentInstallParam,
-	$downloadOnly="false"
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM or IP / FQDN of target machine. Support multiple values seperated by comma. VM name and IP could be mixed."
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of target machine (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword,  
+	
+	[parameter(
+		HelpMessage="Snapshot name. If defined, VM will be restored to the snapshot first."
+	)]
+	[string]
+		$ssName, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="URL to the installer file"
+	)]
+	[string]
+		$installerUrl, 
+	
+	[parameter(
+		HelpMessage="Silent install parameters, such as ' /s /v /qn'"
+	)]
+	[string]
+		$silentInstallParam,
+	
+	[parameter(
+		HelpMessage="Download the installer without installing it"
+	)]
+	[ValidateSet(
+		"false",
+		"true"
+	)]
+	[string]
+		$downloadOnly="false"
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -43,41 +112,36 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-if (verifyIp($vmName)) {
-	$ip = $vmName
-} else {
-	$server = newServer $serverAddress $serverUser $serverPassword
-	$vm = newVmWin $server $vmName $guestUser $guestPassword
-	if ($ssName -ne "") {
-		$vm.restoreSnapshot($ssName)
-		$vm.start()
-	}
-	$vm.waitfortools()
-	$ip = $vm.getIPv4()
-	$vm.enablePsRemote()
-}
-
-$remoteWin = newRemoteWin $ip $guestUser $guestPassword
-
 $installer = ($installerUrl.split("/"))[-1]
-
-$cmd = "
+$cmd1 = "
 	new-item c:\temp -type directory -force | out-null
 	`$wc = new-object system.net.webclient;
 	`$wc.downloadfile('$installerUrl', 'c:\temp\$installer');
 	get-item 'c:\temp\$installer' -ea Stop | out-null
 "
-$remoteWin.executePsTxtRemote($cmd, "download file $installer", "1200")
-
-if ($downloadOnly -eq "true") {
-	[Environment]::exit("0")
-}
-
-$cmd = "	
+$cmd2 = "	
 	`$installprocess = [System.Diagnostics.Process]::Start('c:\temp\$installer', '$silentInstallParam')
 	`$installprocess.WaitForExit()
-	If ((0,3010) -notcontains `$installprocess.ExitCode) {    
+	If ((0,1641,3010) -notcontains `$installprocess.ExitCode) {    
 		throw ('Fail to install $installer. Exit code:' + `$installprocess.ExitCode)
 	}
 "
-$remoteWin.executePsTxtRemote($cmd, "install $installer", 2400)
+
+function silentInstall {
+	param ($ip, $guestUser, $guestPassword, $downloadOnly)
+	$remoteWin = newRemoteWin $ip $guestUser $guestPassword
+	$remoteWin.executePsTxtRemote($cmd1, "download file $installer", "1200")
+	if ($downloadOnly -eq "true") {
+		return
+	}
+	$remoteWin.executePsTxtRemote($cmd2, "install $installer", 2400)
+}
+
+if ($ssName) {
+	restoreSnapshot $ssName $vmName $serverAddress $serverUser $serverPassword
+}
+
+$ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
+$ipList | % {
+	silentInstall $_ $guestUser $guestPassword $downloadOnly
+}

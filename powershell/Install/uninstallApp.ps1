@@ -20,16 +20,68 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Uninstall MSI applications 
+
+	.DESCRIPTION
+		This command uninstalls applications from Windows machines.
+		This command could execute on multiple machines to uninstall
+		multiple applications.
+		Only support applications with MSI installers.
+		
+	.FUNCTIONALITY
+		Broker_RDS
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword,  
-	$appName
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM or IP / FQDN of target machine. Support multiple values seperated by comma. VM name and IP could be mixed."
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of target machine (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword,  
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of application to uninstall. Support multiple values seperated by comma."
+	)]
+	[string]
+		$appName
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -41,70 +93,51 @@ foreach ($paramKey in $psboundparameters.keys) {
 . .\objects.ps1
 
 function uninstallApp {
-	param ($ip, $guestUser, $guestPassword, $appName)
+	param ($ip, $guestUser, $guestPassword, $appList)
 	$remoteWin = newRemoteWin $ip $guestUser $guestPassword
-	if ($appName -match "VMwareVDMDS") {
-		$cmd = "
-			`$cmdPara = ' /q /force /i:VMwareVDMDS'
-			`$cmd = 'c:\windows\adam\adamuninstall.exe'
-			`$installprocess = [System.Diagnostics.Process]::Start(`$cmd, `$cmdPara)
-			`$installprocess.WaitForExit()
-		"
-		$remoteWin.executePsTxtRemote($cmd, "remove AD LDS instance $appName")
-	} else {
-		$reg = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
-		$cmd = "
-			`$app = Get-WmiObject -Class Win32_Product | ? { 
-				`$_.Name -match '$appName'
-			}
-			if (`$app) {
-				`$app.Uninstall()
-			} else {
-				`$app = Get-ItemProperty '$reg\*' | ? {
-					`$_.displayname -match '$appName'
+	foreach ($appName in $appList) {
+		if ($appName -match "VMwareVDMDS") {
+			$cmd = "
+				`$cmdPara = ' /q /force /i:VMwareVDMDS'
+				`$cmd = 'c:\windows\adam\adamuninstall.exe'
+				`$installprocess = [System.Diagnostics.Process]::Start(`$cmd, `$cmdPara)
+				`$installprocess.WaitForExit()
+			"
+			$remoteWin.executePsTxtRemote($cmd, "remove AD LDS instance $appName")
+		} else {
+			$reg = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+			$cmd = "
+				`$app = Get-WmiObject -Class Win32_Product | ? { 
+					`$_.Name -match '$appName'
 				}
 				if (`$app) {
-					if (`$app.uninstallstring) {
-						get-process | ?{'$appName' -match `$_.processName} | kill
-						`$uninstaller = `$app.uninstallstring.replace('""', '').replace(' ', '` ')
-						# `$installprocess = [System.Diagnostics.Process]::Start(`$uninstaller, ' /S')
-						# `$installprocess.WaitForExit()
-						Start-process `$uninstaller -wait -argumentlist ' /S' -ea Stop
-					} else {
-						throw '$appName does not provide an uninstall string'
-					}			
+					`$app.Uninstall()
 				} else {
-					throw 'Can not find $appName on the target machine'
+					`$app = Get-ItemProperty '$reg\*' | ? {
+						`$_.displayname -match '$appName'
+					}
+					if (`$app) {
+						if (`$app.uninstallstring) {
+							get-process | ?{'$appName' -match `$_.processName} | kill
+							`$uninstaller = `$app.uninstallstring.replace('""', '').replace(' ', '` ')
+							# `$installprocess = [System.Diagnostics.Process]::Start(`$uninstaller, ' /S')
+							# `$installprocess.WaitForExit()
+							Start-process `$uninstaller -wait -argumentlist ' /S' -ea Stop
+						} else {
+							throw '$appName does not provide an uninstall string'
+						}			
+					} else {
+						throw 'Can not find $appName on the target machine'
+					}
 				}
-			}
-		"
-		$remoteWin.executePsTxtRemote($cmd, "uninstall application $appName")
+			"
+			$remoteWin.executePsTxtRemote($cmd, "uninstall application $appName")
+		}
 	}
 }		
 
-$vmNameList = $vmName.split(",") | %{$_.trim()}	
-foreach ($vmName in $vmNameList) {
-	if (verifyIp($vmName)) {
-		$ip = $vmName
-		writeCustomizedMsg "Info - remote machine is $ip"
-		uninstallApp $ip $guestUser $guestPassword $appName
-	} else {
-		if (!$server) {
-			$server = newServer $serverAddress $serverUser $serverPassword
-		}
-		$vmList = get-vm -name "$vmName" -server $server.viserver -EA SilentlyContinue
-		if (!$vmList) {
-			writeCustomizedMsg "Fail - get VM $vmName"
-			[Environment]::exit("0")
-		}
-		$vmList | % { 
-			$vm = newVmWin $server $_.name $guestUser $guestPassword
-			$vm.waitfortools()
-			$ip = $vm.getIPv4()
-			$vm.enablePsRemote()
-			writeCustomizedMsg "Info - VM name is $($vm.name)"
-			uninstallApp $ip $guestUser $guestPassword $appName
-			writeSeperator
-		}	
-	}	
+$appList = $appName.split(",") | %{$_.trim()}
+$ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
+$ipList | % {
+	uninstallApp $_ $guestUser $guestPassword $appList
 }

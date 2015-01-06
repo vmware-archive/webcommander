@@ -20,14 +20,54 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Copy a file to SFTP server 
+
+	.DESCRIPTION
+		This command uploads a file to SFTP servers.
+		This command could copy the file to multiple SFTP servers.
+		
+	.FUNCTIONALITY
+		SSH
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$file,
-	$destination
+	[parameter(
+		HelpMessage="IP or FQDN of SFTP server. Support multiple values seperated by comma."
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword,  
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="File to copy"
+	)]
+	[string]
+		$file,
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Destination path, such as /home/temp/"
+	)]
+	[string]
+		$destination
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -38,5 +78,8 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-$sshServer = newSshServer $serverAddress $serverUser $serverPassword
-$sshServer.copyFileSftp($file, $destination)
+$serverList = @($serverAddress.split(",") | %{$_.trim()})
+$serverList | % {
+	$sshServer = newSshServer $_ $serverUser $serverPassword
+	$sshServer.copyFileSftp($file, $destination)
+}

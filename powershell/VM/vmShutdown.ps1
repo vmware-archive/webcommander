@@ -1,4 +1,4 @@
-﻿<#
+<#
 Copyright (c) 2012-2014 VMware, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,14 +20,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Shutdown VM 
+
+	.DESCRIPTION
+		This command could shutdown multiple virtual machines.
+		
+	.FUNCTIONALITY
+		VM
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$vcAddress,
-	$vcUser="administrator", 
-	$vcPassword=$env:defaultPassword,
-	$esxAddress='*',
-	$portGroup
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM. Support multiple values seperated by comma and also wildcard."
+	)]
+	[string]
+		$vmName
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -38,26 +71,17 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-add-pssnapin vmware.vimautomation.core -ea silentlycontinue
-try {
-	connect-VIServer $vcAddress -user $vcUser -password $vcPassword -wa 0 -EA stop
-} catch {
-	writeCustomizedMsg "Fail - connect to server $address"
-	writeStderr
-	[Environment]::exit("0")
-}
-$esxAddressList = $esxAddress.split(",") | %{$_.trim()}
-try {
-	$pg = get-virtualPortGroup -name $portGroup -ea Stop
-	$vSwitch = $pg.virtualSwitch
-	get-vmhost $esxAddressList -ea stop | % {
-		New-VMHostNetworkAdapter -vmhost $_ -PortGroup $portGroup -VirtualSwitch $vSwitch `
-			-VsanTrafficEnabled:$true -confirm:$false -consoleNic:$false -ea Stop
-		writeCustomizedMsg "Success - add host network adapter for VSAN on ESX $_"
+$vivmList = getVivmList $vmName $serverAddress $serverUser $serverPassword
+$vivmList | % { 
+	if ($_.PowerState -ne "PoweredOff") {
+		try {
+			stop-vm -vm $_ -confirm:$false -runAsync:$false -EA Stop
+			writeCustomizedMsg "Success - shutdown VM $($_.name)"
+		} catch {
+			writeCustomizedMsg "Fail - shutdown VM $($_.name)"
+			writeStderr
+		}
+	} else {
+		writeCustomizedMsg "Info - VM $($_.name) is already powered off"
 	}
-} catch {
-	writeCustomizedMsg "Fail - add host network adapter for VSAN on ESX $_"
-	writeStderr
-	[Environment]::exit("0")
 }
-disconnect-VIServer -Server * -Force -Confirm:$false

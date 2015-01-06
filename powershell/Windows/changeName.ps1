@@ -20,16 +20,67 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Change machine name 
+
+	.DESCRIPTION
+		This command changes name of Windows machine.
+		This command could execute on multiple machines.
+		
+	.FUNCTIONALITY
+		Windows
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword,
-	$newGuestName
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM or IP / FQDN of target machine. 
+			Support multiple values seperated by comma. VM name and IP could be mixed."
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of target machine (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword,
+		
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="New machine name. Support multiple values seperated by comma."
+	)]
+	[string]
+		$newGuestName
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -57,29 +108,12 @@ function changeMachineName{
 	}
 }	
 
-$vmNameList = $vmName.split(",") | %{$_.trim()}	
-foreach ($vmName in $vmNameList) {
-	if (verifyIp($vmName)) {
-		$ip = $vmName
-		if (!$newGuestName) {
-			writeCustomizedMsg "Fail - newGuestName is not defined"
-			[Environment]::exit("0")	
-		}
-		changeMachineName $ip $guestUser $guestPassword $newGuestName
-	} else {
-		$server = newServer $serverAddress $serverUser $serverPassword
-		$vmList = get-vm -name "$vmName" -server $server.viserver -EA SilentlyContinue
-		if (!$vmList) {
-			writeCustomizedMsg "Fail - get VM $vmName"
-			[Environment]::exit("0")
-		}
-		$vmList | % { 
-			$vm = newVmWin $server $_.name $guestUser $guestPassword
-			$vm.waitfortools()
-			$ip = $vm.getIPv4()
-			$vm.enablePsRemote()
-			$newGuestName = $vm.name
-			changeMachineName $ip $guestUser $guestPassword $newGuestName
-		}
-	}
+$ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
+$newNameList = parseInput $newGuestName
+if ($ipList.count -ne $newNameList.count) {
+	writeCustomizedMsg "Fail - machine number and name number don't match"
+	[Environment]::exit("0")
+}
+for ($i=0;$i -lt $ipList.count; $i++) {
+	changeMachineName $ipList[$i] $guestUser $guestPassword $newNameList[$i]
 }

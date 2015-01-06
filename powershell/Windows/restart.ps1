@@ -20,15 +20,59 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+		Restart Windows machine
+
+	.DESCRIPTION
+		This command reboots Windows machine.
+		This command could execute on multiple machines.
+		
+	.FUNCTIONALITY
+		Windows
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
 
 Param (
-	$serverAddress, 
-	$serverUser="root", 
-	$serverPassword=$env:defaultPassword, 
-	$vmName, 
-	$guestUser="administrator", 
-	$guestPassword=$env:defaultPassword
+	[parameter(
+		HelpMessage="IP or FQDN of the ESX or VC server where target VM is located"
+	)]
+	[string]
+		$serverAddress, 
+	
+	[parameter(
+		HelpMessage="User name to connect to the server (default is root)"
+	)]
+	[string]
+		$serverUser="root", 
+	
+	[parameter(
+		HelpMessage="Password of the user"
+	)]
+	[string]
+		$serverPassword=$env:defaultPassword, 
+	
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of target VM or IP / FQDN of target machine. Support multiple values seperated by comma. VM name and IP could be mixed."
+	)]
+	[string]
+		$vmName, 
+	
+	[parameter(
+		HelpMessage="User of target machine (default is administrator)"
+	)]
+	[string]	
+		$guestUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of guestUser"
+	)]
+	[string]	
+		$guestPassword=$env:defaultPassword
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -39,26 +83,8 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 . .\objects.ps1
 
-$vmNameList = $vmName.split(",") | %{$_.trim()}	
-foreach ($vmName in $vmNameList) {
-	if (verifyIp($vmName)) {
-		$ip = $vmName
-		writeCustomizedMsg "Info - remote machine is $ip"
-		$remoteWin = newRemoteWin $ip $guestUser $guestPassword
-		$remoteWin.restart()
-	} else {
-		if (!$server) {
-			$server = newServer $serverAddress $serverUser $serverPassword
-		}
-		try {
-			get-vm -name $vmName -server $server.viserver -ea stop | % {
-				restart-vmguest -vm $_ -confirm:$false -EA Stop
-				writeCustomizedMsg "Success - restart VM $($_.name)"
-			}
-		} catch {
-			writeCustomizedMsg "Fail - restart VM"
-			writeStderr
-			[Environment]::exit("0")
-		}	
-	}	
+$ipList = getVmIpList $vmName $serverAddress $serverUser $serverPassword
+$ipList | % {
+	$remoteWin = newRemoteWin $_ $guestUser $guestPassword
+	$remoteWin.restart()
 }

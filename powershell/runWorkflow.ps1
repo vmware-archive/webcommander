@@ -20,14 +20,62 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 #>
 
-## Author: Jerry Liu, liuj@vmware.com
+<#
+	.SYNOPSIS
+        Run workflow as command
 
-param (
-	$name,
-	$type="serial", 
-	$errorAction="stop",
-	$workflow,
-	$emailTo='liuj@vmware.com'
+	.DESCRIPTION
+        This command runs a workflow as a command.
+		This command could also be embedded in a workflow.
+	
+	.FUNCTIONALITY
+		Workflow
+		
+	.NOTES
+		AUTHOR: Jerry Liu
+		EMAIL: liuj@vmware.com
+#>
+
+Param (
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of the workflow"
+	)]
+	[string]
+		$name,
+		
+	[parameter(
+		HelpMessage="Type of the workflow. Default is 'serial'"
+	)]
+	[validateSet(
+		"serial",
+		"parallel"
+	)]
+	[string]
+		$type="serial",	
+		
+	[parameter(
+		HelpMessage="Action upon error. Default is 'stop'"
+	)]
+	[validateSet(
+		"stop",
+		"continue"
+	)]
+	[string]
+		$actionOnError="stop",
+
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="Workflow in form of JSON"
+	)]
+	[string]
+		$workflow,	
+	
+	[parameter(
+		HelpMessage="Email address of the result notification"
+	)]
+	[string]
+		$emailTo="liuj@vmware.com"
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -104,7 +152,7 @@ if ($type -eq "parallel") {
 			$msg.body += "$cmdResult - command $i"
 			$msg.body += "`n===================`n"
 			$msg.body += $s.innerXml
-			if (($cmdResult -eq "Fail") -and ($errorAction -eq "stop")) {
+			if (($cmdResult -eq "Fail") -and ($actionOnError -eq "stop")) {
 				$result = "Fail"
 				break
 			} else { $i++ }
