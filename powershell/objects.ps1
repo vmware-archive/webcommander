@@ -119,7 +119,13 @@ function newSshServer { ##Server supports SSH access
 	$sshServer | add-member -MemberType ScriptMethod -value {
         param($cmd)
 		$cmd = $cmd -replace "`r`n","`n"
-		$result = invoke-sshcommand -command $cmd -sshSession $this.sshSession
+		try {
+			$result = invoke-sshcommand -command $cmd -sshSession $this.sshSession -ea stop
+		} catch {
+			writeCustomizedMsg "Fail - run SSH script"
+			writeStderr
+			[Environment]::exit("0")
+		}
 		if ($result.exitStatus -eq 0) {
 			writeCustomizedMsg "Success - run SSH script"
 		} else {
@@ -130,14 +136,15 @@ function newSshServer { ##Server supports SSH access
 	
 	$sshServer | add-member -MemberType ScriptMethod -value {
         param($localFile, $remotePath)
+		$fileName = ($localFile.split("\"))[-1]
 		try {
-			set-sftpfile -sftpsession $this.sftpsession -localfile $localFile -remotePath $remotePath
+			set-sftpfile -sftpsession $this.sftpsession -localfile $localFile -remotePath $remotePath -ea stop
+			writeCustomizedMsg "Success - copy file $fileName to $($this.address)"
 		} catch {
-			writeCustomizedMsg "Fail - copy file via SFTP"
+			writeCustomizedMsg "Fail - copy file $fileName to $($this.address)"
 			writeStderr
-			[Environment]::exit("0")
+			#[Environment]::exit("0")
 		}
-		writeCustomizedMsg "Success - copy file via SFTP"
 	} -name copyFileSftp
 	
 	$sshServer | add-member -MemberType ScriptMethod -value {
@@ -1354,7 +1361,7 @@ function newRemoteWin {
 		$cmd = "
 			#schtasks /delete /f /tn runScript | out-null
 			remove-item c:\temp\output*.txt -force -ea silentlycontinue
-			`$date = get-date '2014/12/31' -format (Get-ItemProperty -path 'HKCU:\Control Panel\International').sshortdate
+			`$date = get-date '12/31/2014'.replace('2014',(get-date).year+1) -format (Get-ItemProperty -path 'HKCU:\Control Panel\International').sshortdate
 			schtasks /create /f /it /tn runScript /ru '$guestUser' /rp '$guestPassword' /rl HIGHEST /sc once /sd `$date /st 00:00:00 /tr 'c:\temp\script.bat > c:\temp\output$timeSuffix.txt' | out-null 
 			schtasks /run /tn runScript | out-null
 		"
@@ -1805,6 +1812,23 @@ function getVmIpList {
 	return $ipList
 }
 
+function getFileList {
+	param($fileUrl)
+	$files = @()
+	$fileList = @($fileUrl.split("`n") | %{$_.trim()})
+	$wc = new-object system.net.webclient;	
+	$fileList | % {
+		if (test-path $_) {
+			$files += $_
+		} elseif (invoke-webrequest $_) {
+			$fileName = ($_.split("/"))[-1]
+			$wc.downloadfile("$_", "..\www\upload\$fileName");
+			$files += "..\www\upload\$fileName"
+		}
+	}
+	return $files
+}
+
 function restoreSnapshot {
 	param($ssName, $vmName, $serverAddress, $serverUser, $serverPassword)
 	$server = newServer $serverAddress $serverUser $serverPassword
@@ -1826,6 +1850,7 @@ function parseInput {
 	param($content)
 	try {
 		$c = @(invoke-expression $content)
+		$c[0].tostring()
 	} catch {
 		$c = @($content.split(",") | %{$_.trim()})
 	}
