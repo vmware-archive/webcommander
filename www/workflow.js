@@ -97,7 +97,7 @@ function addWorkflow(jsonString){
 			jsonString = jsonString.replace(line, "");
 			var variable = line.split("=");
 			if (variable != ''){
-				var regex = new RegExp(variable[0], 'g');
+				var regex = new RegExp(variable[0], 'ig');
 				//text = text.replace(regex, '<br />');
 				//jsonString = jsonString.replace(variable[0], variable[1]);
 				jsonString = jsonString.replace(regex, variable[1]);
@@ -456,7 +456,13 @@ $(function() {
 						line = lines[i];	
 						var variable = line.split("=");
 						if (variable != ''){
-							globalVariable[variable[0].trim()]=variable[1].trim(); 
+							var vname = variable[0].trim();
+							var vvalue = variable[1].trim();
+							$.each(globalVariable, function(key, value){ 
+								var regex = new RegExp(key, 'ig');
+								vvalue = vvalue.replace(regex, value); 
+							});
+							globalVariable[vname]=vvalue; 
 						}			
 					}
 					setTimeout(function(){
@@ -474,7 +480,7 @@ $(function() {
 							var fieldValue = $(this).val();
 							if (fieldValue != "") {
 								$.each(globalVariable, function(key, value){ 
-									var regex = new RegExp(key, 'g');
+									var regex = new RegExp(key, 'ig');
 									fieldValue = fieldValue.replace(regex, value); 
 								});
 							} else {

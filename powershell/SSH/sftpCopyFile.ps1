@@ -38,6 +38,7 @@ THE SOFTWARE.
 
 Param (
 	[parameter(
+		Mandatory=$true,
 		HelpMessage="IP or FQDN of SFTP server. Support multiple values seperated by comma."
 	)]
 	[string]
@@ -56,8 +57,13 @@ Param (
 		$serverPassword=$env:defaultPassword,  
 	
 	[parameter(
-		Mandatory=$true,
-		HelpMessage="File to copy"
+		HelpMessage="Files to copy from local server or online. Each file per line."
+	)]
+	[string]
+		$fileUrl,
+	
+	[parameter(
+		HelpMessage="File to upload from client machine"
 	)]
 	[string]
 		$file,
@@ -79,7 +85,15 @@ foreach ($paramKey in $psboundparameters.keys) {
 . .\objects.ps1
 
 $serverList = @($serverAddress.split(",") | %{$_.trim()})
+$files = getFileList $fileUrl
+if ($file) {$files += $file}
+if (!$files) {
+	writeCustomizedMsg "Fail - find file to copy"
+	[Environment]::exit("0")
+}
 $serverList | % {
 	$sshServer = newSshServer $_ $serverUser $serverPassword
-	$sshServer.copyFileSftp($file, $destination)
+	$files | % {
+		$sshServer.copyFileSftp($_, $destination)
+	}
 }
