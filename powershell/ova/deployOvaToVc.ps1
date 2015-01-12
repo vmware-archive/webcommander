@@ -68,14 +68,12 @@ Param (
 		$cluster, 
 		
 	[parameter(
-		Mandatory=$true,
 		HelpMessage="Name of ESX host to which the OVA will be deployed"
 	)]
 	[string]	
 		$esxHost, 
 		
 	[parameter(
-		Mandatory=$true,
 		HelpMessage="Name of datastore to which the OVA will be deployed"
 	)]
 	[string]
@@ -93,7 +91,6 @@ Param (
 		$storageFormat,
 		
 	[parameter(
-		Mandatory=$true,
 		HelpMessage="Name of Virtual Machine Port Group to which the OVA will connect"
 	)]
 	[string]
@@ -127,6 +124,17 @@ foreach ($paramKey in $psboundparameters.keys) {
 }
 
 . .\objects.ps1
+
+if (!$datastore -or !$portGroup -or !$esxHost) {
+	add-pssnapin vm* -ea silentlyContinue
+	connect-viserver $vcAddress -user $vcUser -password $vcPassword
+	$container = get-datacenter $datacenter
+	if ($cluster) { $container = get-cluster $cluster -location $container}
+	if (!$esxHost) { $esxHost = get-vmhost -location $container | select -first 1}
+	if (!datastore) { $datastore = (get-datastore -vmhost $esxhost | sort freespacegb -desc | select -first 1).name } 
+	if (!portGroup) { $portgroup = (get-virtualportgroup -vmhost $esxhost | ?{$_.port -eq $null} | select -first 1).name }
+	$esxHost = $esxHost.name
+}
 
 $cmd = "& `"C:\Program Files\VMware\VMware OVF Tool\ovftool.exe`" --acceptAllEulas --allowAllExtraConfig --hideEula --noSSLVerify --datastore=`"$datastore`" --diskMode=$storageFormat --network=`"$portGroup`" --name=`"$vmName`""
 if ($advancedProperty) {
