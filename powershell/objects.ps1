@@ -144,8 +144,9 @@ function newSshServer { ##Server supports SSH access
 			}
 		} else {
 			writeCustomizedMsg "Fail - run SSH script"
+			writeStdout $result.error
 		}
-		writeStdout ($result.output)
+		if ($result.output) {writeStdout $result.output}
 	} -name runCommand
 	
 	$sshServer | add-member -MemberType ScriptMethod -value {
