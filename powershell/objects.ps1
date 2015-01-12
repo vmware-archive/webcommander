@@ -117,7 +117,7 @@ function newSshServer { ##Server supports SSH access
 	}
 	
 	$sshServer | add-member -MemberType ScriptMethod -value {
-        param($cmd)
+        param($cmd, $outputCheck, $pattern)
 		$cmd = $cmd -replace "`r`n","`n"
 		try {
 			$result = invoke-sshcommand -command $cmd -sshSession $this.sshSession -ea stop
@@ -128,6 +128,20 @@ function newSshServer { ##Server supports SSH access
 		}
 		if ($result.exitStatus -eq 0) {
 			writeCustomizedMsg "Success - run SSH script"
+			if ($pattern) {
+				try {
+					$verification = invoke-expression "'$($result.output)' -$outputCheck '$pattern'"
+					if ($verification) {
+						writeCustomizedMsg "Success - verify SSH script output"
+					} else {
+						writeCustomizedMsg "Fail - verify SSH script output"
+					}
+				} catch {
+					writeCustomizedMsg "Fail - syntax error to verify SSH script"
+					writeStderr
+					[Environment]::exit("0")
+				}
+			}
 		} else {
 			writeCustomizedMsg "Fail - run SSH script"
 		}

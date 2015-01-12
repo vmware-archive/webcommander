@@ -27,6 +27,8 @@ THE SOFTWARE.
 	.DESCRIPTION
 		This command runs user defined script remotely over SSH.
 		This command could run script on multiple SSH servers.
+		If the remote scipt's exit code is not 0, it returns a failure.
+		The remote script's output could also be checked for verification.
 		
 	.FUNCTIONALITY
 		SSH
@@ -38,6 +40,7 @@ THE SOFTWARE.
 
 Param (
 	[parameter(
+		Mandatory=$true,
 		HelpMessage="IP or FQDN of SSH server. Support multiple values seperated by comma."
 	)]
 	[string]
@@ -60,7 +63,25 @@ Param (
 		HelpMessage="Script to run"
 	)]
 	[string]
-		$script
+		$script,
+		
+	[parameter(
+		HelpMessage="Method to check if specific string could (or could not) be found in output. Default is 'like'."
+	)]
+	[ValidateSet(,
+		"like",
+		"notlike",
+		"match",
+		"notmatch"
+	)]
+	[string]
+		$outputCheck="like",
+		
+	[parameter(
+		HelpMessage="String pattern to find"
+	)]
+	[string]
+		$pattern
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -74,5 +95,5 @@ foreach ($paramKey in $psboundparameters.keys) {
 $serverList = @($serverAddress.split(",") | %{$_.trim()})
 $serverList | % {
 	$sshServer = newSshServer $_ $serverUser $serverPassword
-	$sshServer.runCommand($script)
+	$sshServer.runCommand($script, $outputCheck, $pattern)
 }
