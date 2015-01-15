@@ -130,10 +130,13 @@ if (!$datastore -or !$portGroup -or !$esxHost) {
 	connect-viserver $vcAddress -user $vcUser -password $vcPassword
 	$container = get-datacenter $datacenter
 	if ($cluster) { $container = get-cluster $cluster -location $container}
-	if (!$esxHost) { $esxHost = get-vmhost -location $container | select -first 1}
-	if (!datastore) { $datastore = (get-datastore -vmhost $esxhost | sort freespacegb -desc | select -first 1).name } 
-	if (!portGroup) { $portgroup = (get-virtualportgroup -vmhost $esxhost | ?{$_.port -eq $null} | select -first 1).name }
-	$esxHost = $esxHost.name
+	if (!$esxHost) { 
+		$vmhost = get-vmhost -location $container | select -first 1
+	} else {
+		$vmhost = get-vmhost -name $esxHost -location $container
+	}
+	if (!$datastore) { $datastore = (get-datastore -vmhost $vmhost | sort freespacegb -desc | select -first 1).name } 
+	if (!$portGroup) { $portgroup = (get-virtualportgroup -vmhost $vmhost | ?{$_.port -eq $null} | select -first 1).name }
 }
 
 $cmd = "& `"C:\Program Files\VMware\VMware OVF Tool\ovftool.exe`" --acceptAllEulas --allowAllExtraConfig --hideEula --noSSLVerify --datastore=`"$datastore`" --diskMode=$storageFormat --network=`"$portGroup`" --name=`"$vmName`""
@@ -145,16 +148,22 @@ $viPath = "vi://$vcUser`:$vcPassword@$vcAddress/$datacenter/host/"
 if($cluster) {
 	$viPath += "$cluster/"
 }
-$viPath += "$esxHost/"
+if($esxHost) {
+	$viPath += "$esxHost/"
+} else {
+	$viPath += "$($vmhost.name)/"
+}
 $cmd += " `"$ovaUrl`" `"$viPath`""
+writeCustomizedMsg "Info - start to deploy OVA"
 try {
 	$output = invoke-expression $cmd -EA stop
 	if ($output -notcontains "Completed successfully") {
 		throw $output
+	} else {
+		writeCustomizedMsg "Success - deploy OVA"
 	}
 } catch {
 	writeCustomizedMsg "Fail - deploy OVA"
 	writeStderr
 	[Environment]::exit("0")
 }
-writeCustomizedMsg "Success - deploy OVA"
