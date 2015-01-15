@@ -41,6 +41,35 @@ function getDev {
 	$email = $h.alertset.alert.text.split("`n") | ?{$_ -match "EMAIL: "}
 	$dev = $email.split("EMAIL: ")[-1]
 	return $dev
+}
+function createWfDefXml {
+	param ($wf)
+	$xml = ""
+	try {
+		$wfJson = ((get-content $wf) -join "`n" | convertfrom-json)[0]
+	} catch {
+		writeCustomizedMsg "Fail - get workflow definition of $wf"
+		writeStderr
+		exit
+	}
+	if ($wfJson.functionality -match "noshow") {return}
+	$xml += '<command type="workflow" synopsis="' + $wfJson.synopsis + '"'
+	if ($help.functionality -match "hidden") {
+		$xml += ' hidden="1"'
+	}
+	$xml += '>'
+	if ($wfJson.functionality) {
+		$xml += '<functionalities><functionality>Workflow</functionality>'
+		foreach ($fun in $wfJson.functionality.split(",").trim()) {
+			if ($fun -eq "hidden") {continue}
+			$xml += '<functionality>' + $fun + '</functionality>'
+		}
+		$xml += '</functionalities>'
+	}
+	$template = ($wf.fullname -split "www\\", 2)[1].replace("\","/")
+	$xml += '<script>' + $template + '</script>'
+	$xml += '</command>'
+	return $xml
 }	
 function createCmdDefXml {
 	param ($cmd,$scriptPath)
@@ -149,6 +178,11 @@ foreach ($cmd in $commands) {
 	} else {
 		$xml += createCmdDefXml $cmd ($scriptPath + "\")
 	}
+}
+$workflowPath = $scriptPath.replace("powershell", "www\workflow")
+$workflows = gci $workflowPath\*.json -recurse 
+foreach ($wf in $workflows) {
+	$xml += createWfDefXml $wf
 }
 $xml += '</webcommander>'
 

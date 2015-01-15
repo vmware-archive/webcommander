@@ -90,7 +90,14 @@ THE SOFTWARE.
 						</xsl:attribute>
 						<a class="cmdName" target="_self">
 							<xsl:attribute name="href">
-								<xsl:value-of select="concat('webCmd.php?command=', @name)"/>
+								<xsl:choose>
+									<xsl:when test="@type = 'workflow'">
+										<xsl:value-of select="concat('workflow.html?', script)"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="concat('webCmd.php?command=', @name)"/>
+									</xsl:otherwise>	
+								</xsl:choose>
 							</xsl:attribute>
 							<xsl:choose>
 								<xsl:when test="./functionalities/*[1] = 'VM'">

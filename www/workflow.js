@@ -87,6 +87,29 @@ function updateOrder(){
 	});
 }
 
+function addWorkflowFromJson(workflowJson) {
+	workflowJson.forEach(function(command){
+		if (command.description !== undefined && command.command == undefined) {
+			var desc = '<div id="workflowDesc" title="Workflow Description">\
+				' + command.description + '</div>';
+			$('#sortable').after(desc);
+			$( "#workflowDesc" ).dialog({width:600});
+		} else {
+			var currentCommand = $('div.command:last');
+			addCommand(currentCommand);
+			$('div.command:last')
+				.find('.cmdlist')
+				.find('option[value="' + command.command + '"]')
+				.prop('selected',true)
+				.change();	
+			var form = $('div.command:last').find('form:first');
+			populate(form,command);
+		}
+	});
+	updateOrder();
+	return false;
+}
+
 function addWorkflow(jsonString){
 	var lines = jsonString.split("\n");
 	for (var i in lines) {
@@ -95,28 +118,28 @@ function addWorkflow(jsonString){
 			break;
 		} else {
 			jsonString = jsonString.replace(line, "");
-			var variable = line.split("=");
-			if (variable != ''){
-				var regex = new RegExp(variable[0], 'ig');
-				//text = text.replace(regex, '<br />');
-				//jsonString = jsonString.replace(variable[0], variable[1]);
-				jsonString = jsonString.replace(regex, variable[1]);
+			if (line.match(/.json$/i)) {
+				$.ajax({
+					url: line,
+					dataType: 'json',
+					async: false,
+					success: function(data) {
+						addWorkflowFromJson(data);
+					}
+				});			
+			} else {
+				var variable = line.split("=");
+				if (variable != ''){
+					var regex = new RegExp(variable[0], 'ig');
+					//text = text.replace(regex, '<br />');
+					//jsonString = jsonString.replace(variable[0], variable[1]);
+					jsonString = jsonString.replace(regex, variable[1]);
+				}
 			}
 		}		
 	}
 	var workflow = $.parseJSON( jsonString );
-	workflow.forEach(function(command){
-		var currentCommand = $('div.command:last');
-		addCommand(currentCommand);
-		$('div.command:last')
-			.find('.cmdlist')
-			.find('option[value="' + command.command + '"]')
-			.prop('selected',true)
-			.change();	
-		var form = $('div.command:last').find('form:first');
-		populate(form,command);
-	});
-	updateOrder();
+	addWorkflowFromJson(workflow);
 	return false;
 }
 
@@ -771,5 +794,18 @@ $(function() {
 			$table.hide().show('slow');
 			//return false;
 		});
+		
+		var template = document.location.search.substr(1);
+		if ( template !== "") {
+			$.ajax({
+				url: template,
+				dataType: 'json',
+				async: false,
+				success: function(data) {
+					$("div.command").remove();
+					addWorkflowFromJson(data);
+				}
+			});			
+		}
 	});		
 });

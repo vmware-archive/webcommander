@@ -174,7 +174,7 @@ if ( $command == ""){
 	$list = $thedocument->getElementsByTagName('command');
 	foreach ($list as $domElement){
 		$scriptName = $domElement->getElementsByTagName('script')->item(0)->textContent;
-		if (!file_exists("../powershell/" . $scriptName . ".ps1")) {
+		if (!file_exists("../powershell/" . $scriptName . ".ps1") and !file_exists("./" . $scriptName)) {
 			#$thedocument->removeChild($domElement);
 			$domElement->setAttribute("hidden","1");
 		}
