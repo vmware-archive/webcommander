@@ -1,0 +1,39 @@
+[{
+	"synopsis": "Upgrade Powershell to 4.0 in VM",
+	"functionality": "Powershell",
+	"description": "This is a sample workflow template for upgrading Powershell to 4.0 in VM. Just define variable values in A0 and run the workflow."
+},
+{
+	"command": "defineVariable",
+	"variableList": "serverAddress=\r\nserverUser=\r\nserverPassword=\r\nvmName=\r\nguestUser=\r\nguestPassword=",
+	"wf_des": "A0 - define global variables \r\nto be used as parameter values for following commands"
+},
+{
+	"command": "installDotNet",
+	"serverAddress": "",
+	"serverUser": "",
+	"serverPassword": "",
+	"vmName": "",
+	"guestUser": "",
+	"guestPassword": "",
+	"wf_key": "",
+	"wf_tag": "",
+	"wf_des": "A1 - install dotNet 4.5 in VM"
+},
+{
+	"command": "sleep",
+	"second": "60",
+	"wf_des": "A2 - wait 1 minute for restarting VM"
+},
+{
+	"command": "installPowershell4",
+	"serverAddress": "",
+	"serverUser": "",
+	"serverPassword": "",
+	"vmName": "",
+	"guestUser": "",
+	"guestPassword": "",
+	"wf_key": "",
+	"wf_tag": "",
+	"wf_des": "A3 - install Powershell 4.0 in VM"
+}]

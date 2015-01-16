@@ -650,7 +650,7 @@ $(function() {
 							<functionality>Workflow</functionality>\
 						</functionalities>\
 					</command>')
-			.find('command[hidden!="1"]');
+			.find('command[hidden!="1"]').filter('command[type!="workflow"]');
 
 		cmd_list = $(cmd_list)
 			.sort(function(a, b){
