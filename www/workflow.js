@@ -470,6 +470,7 @@ $(function() {
 						var xml = '<webcommander><result><customizedOutput>Info - sleep ' + second + ' seconds</customizedOutput></result></webcommander>';
 						xml = $.parseXML(xml);
 						renderResult('4488',executionTime,xml,status,detail);
+						if ($('#autoDisable').is(':checked')) {form.parents('div.command').find('.onoff').trigger('click');}
 						$(document).dequeue("ajaxRequests");
 					}, second * 1000);
 				} else if (form.attr('name')=='defineVariable'){
@@ -538,6 +539,7 @@ $(function() {
 								var value = $(xml).find(tag).text();
 								globalVariable[key]=value;
 							}
+							if ($('#autoDisable').is(':checked')) {form.parents('div.command').find('.onoff').trigger('click');}
 							$(document).dequeue("ajaxRequests");
 						}
 						else {return false;}

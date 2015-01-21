@@ -52,7 +52,14 @@ body {
 .execute {
 	width: 60px;
 	height: 60px;
-	margin-left: 25px;
+	margin-left: 15px;	
+}
+#autoDisable {
+	width:55px;
+	height:55px;
+	margin-left:15px;	
+	-moz-appearance:none;
+	vertical-align:top;
 }
 #iteration {
 	background-image:url('images/button-repeat-icon.png');
