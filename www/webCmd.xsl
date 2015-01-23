@@ -31,11 +31,11 @@ THE SOFTWARE.
 			<title>webCommander</title>
 				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 				<link href='//fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css' />
-				<link href="webCmd.css" rel="stylesheet" type="text/css" />
+				<link href="/webCmd.css" rel="stylesheet" type="text/css" />
 				<link rel="stylesheet" href="//code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
 				<script src="//code.jquery.com/jquery-1.8.3.js"></script>
 				<script src="//code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
-				<script src="webCmd.js"></script>
+				<script src="/webCmd.js"></script>
 				<!--script>
 					function IsAttributeSupported(tagName, attrName) {
 						var val = false;
@@ -70,7 +70,7 @@ THE SOFTWARE.
 	
 	<xsl:template name="header">
 		<div id="logo">
-			<a href="webcmd.php" class="logo">web<span>Commander</span></a>
+			<a href="/webcmd.php" class="logo">web<span>Commander</span></a>
 		</div>
 		<div id="commandname">
 			Command Name: <i><xsl:value-of select="@cmd"/></i><br/>
@@ -82,7 +82,7 @@ THE SOFTWARE.
 			</a></i><br/>
 			Script: <i><a class="devName" target="_blank">
 				<xsl:attribute name="href">
-					<xsl:value-of select="concat('viewsource.php?scriptName=', @script)"/>
+					<xsl:value-of select="concat('/viewsource.php?scriptName=', @script)"/>
 				</xsl:attribute>
 				<xsl:value-of select="@script"/>
 			</a></i>
@@ -107,7 +107,7 @@ THE SOFTWARE.
 	</xsl:template>
 	
 	<xsl:template name="returnCode">
-		<div id="returnCode"><a href="webcmd.php?command=showReturnCode" class="code" target="_blank"><xsl:value-of select="returnCode"/></a></div>
+		<div id="returnCode"><a href="/webcmd.php?command=showReturnCode" class="code" target="_blank"><xsl:value-of select="returnCode"/></a></div>
 	</xsl:template>
 	
 	<xsl:template name="description">
@@ -129,7 +129,7 @@ THE SOFTWARE.
 		<div class="round-corner">
 			<center>
 				<xsl:if test="parameters/parameter">
-					<form id="form1" method="post" enctype="multipart/form-data" action="webcmd.php?command={@cmd}">
+					<form id="form1" method="post" enctype="multipart/form-data" action="/webcmd.php?command={@cmd}">
 						<table id="paraTable">
 							<tr>
 								<th>Parameter</th>
@@ -141,7 +141,7 @@ THE SOFTWARE.
 							</xsl:for-each>
 							<tr>
 								<td colspan="3" style="text-align:right">
-									<img id="imgWait" src="images/progress-bar.gif" style="vertical-align:middle; margin-right:20px; visibility:hidden;" />
+									<img id="imgWait" src="/images/progress-bar.gif" style="vertical-align:middle; margin-right:20px; visibility:hidden;" />
 									<input id="btnSubmit" type="button" value="Submit" />
 									<input id="btnJson" type="button" value="JSON" />
 									<input id="btnUrl" type="button" value="URL" />
@@ -249,6 +249,9 @@ THE SOFTWARE.
 						</xsl:when> 
 						<xsl:when test="name() = 'stdOutput'">
 							<pre><xsl:value-of select="text()" /></pre>
+						</xsl:when>
+						<xsl:when test="name() = 'separator'">
+							<hr class="separator" />
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:call-template name="pvTable"/>

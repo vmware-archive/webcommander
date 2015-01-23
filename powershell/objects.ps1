@@ -1762,9 +1762,8 @@ function writeCustomizedMsg {
 	Write-Host "<customizedOutput>$logtime$message</customizedOutput>"
 }
 
-function writeSeperator {
-	#Write-Host "<customizedOutput>- - - - - - - - - - - - - - - - - - - - - - - - - - -</customizedOutput>"
-	Write-Host "<customizedOutput><![CDATA[                    ]]></customizedOutput>"
+function writeSeparator {
+	"<separator/>"
 }
 
 function getWebCommanderJobResult {

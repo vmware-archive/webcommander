@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /*
 Copyright (c) 2012-2014 VMware, Inc.
 
@@ -198,7 +198,7 @@ if ( $command == ""){
 		header("Content-type:text/xml");
 		//include("include/functionLib.php");
 		$xmloutput .= '<?xml version="1.0" encoding="UTF-8" ?>';
-		$xmloutput .= '<?xml-stylesheet type="text/xsl" href="webCmd.xsl"?>';
+		$xmloutput .= '<?xml-stylesheet type="text/xsl" href="/webCmd.xsl"?>';
 		$scriptName = (string)$target->script;
 		$xmloutput .= '<webcommander cmd="' . $command . '" developer="' . $target["developer"] . '" script="' . $scriptName . '">';
 		$annotation = $target->xpath("annotation");
