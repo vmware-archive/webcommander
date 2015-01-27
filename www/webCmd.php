@@ -101,14 +101,18 @@ function getIpAddress() {
 function missParamNotice() {
 	global $xmloutput;
 	header("return-code:4000");
-	$xmloutput .= "<result><customizedOutput>Missing parameters</customizedOutput></result>";
+	$xmloutput .= "<result><customizedOutput>[";
+	$xmloutput .= date("Y-m-d H:i:s");
+	$xmloutput .= "] Missing parameters</customizedOutput></result>";
 	$xmloutput .= "<returnCode>4000</returnCode>";
 }
 
 function missFileNotice() {	
 	global $xmloutput;
 	header("return-code:4000");
-	$xmloutput .= "<result>Missing parameters - fail to upload file</result>";
+	$xmloutput .= "<result><customizedOutput>[";
+	$xmloutput .= date("Y-m-d H:i:s");
+	$xmloutput .= "] Missing parameters - fail to upload file</customizedOutput></result>";
 	$xmloutput .= "<returnCode>4000</returnCode>";
 }
 
@@ -119,13 +123,8 @@ function cleanPsParam($string) {
 }
 
 function callPs1($cmd) {
-
 	global $xmloutput, $codeArray;
-	
-	$t0 = microtime(true);
-
 	exec($cmd,$result,$exitcode);
-	
 	foreach ($result as $line) {
 		$output .= $line . "\r\n";
 	}
@@ -133,10 +132,8 @@ function callPs1($cmd) {
 		$output = "<stdOutput><![CDATA[" . $output . "]]></stdOutput>";
 		$output .= "<customizedOutput> [";
 		$output .= date("Y-m-d H:i:s") . "] Fail - run Powershell script</customizedOutput>";
-	}
-		
+	}	
 	$xmloutput .= "<result>" . $output . "</result>";
-	
 	if (strpos($output, "] Fail - ") === FALSE) {
 		header("return-code:4488");
 		$xmloutput .= "<returnCode>4488</returnCode>";
@@ -156,9 +153,6 @@ function callPs1($cmd) {
 			$xmloutput .= "<returnCode>4444</returnCode>";
 		}
 	}
-
-	$t1 = microtime(true);
-	$xmloutput .= sprintf("<executiontime>%.1f seconds</executiontime>", $t1 - $t0);
 }
 
 $command = $_REQUEST["command"];
@@ -194,6 +188,7 @@ if ( $command == ""){
 		$xmloutput .= "<script>alert('Could not find command \"" . $command . "\"!')</script>";
 		$xmloutput .= "<script>document.location.href='webcmd.php'</script>";
 	} else {
+		$t0 = microtime(true);
 		$target = $target[0];
 		header("Content-type:text/xml");
 		//include("include/functionLib.php");
@@ -254,7 +249,9 @@ if ( $command == ""){
 			callPs1($cmd);
 		}
 		
-		$xmloutput .= '<url><![CDATA[' . $url . ']]></url>';
+		//$xmloutput .= '<url><![CDATA[' . $url . ']]></url>';
+		$t1 = microtime(true);
+		$xmloutput .= sprintf("<executiontime>%.1f seconds</executiontime>", $t1 - $t0);
 		$xmloutput .= '</webcommander>';
 	}
 	echo $xmloutput;
