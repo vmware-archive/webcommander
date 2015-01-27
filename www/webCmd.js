@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 $.fn.serializeObject = function(){
     var o = {};
-	o["command"] = this.attr('action').replace("webcmd.php?command=", "");;
+	o["command"] = this.attr('action').replace("/webcmd.php?command=", "");;
     var a = this.serializeArray();
     $.each(a, function() {
         if (o[this.name] !== undefined) {
@@ -39,7 +39,15 @@ $.fn.serializeObject = function(){
     return o;
 };
 
+function countCmd() {
+	$('span.number').remove();
+	$("ol > li").filter(":visible").each(function(i){
+		$(this).find('a').after('<span class="number">' + (i + 1) + '</span>');
+	});
+}
+
 $(document).ready(function() {
+	countCmd();
 	
 	$('.catchk').change(function() {
 		var filter = [];
@@ -48,9 +56,11 @@ $(document).ready(function() {
 		});
 		if (filter.length == 0) {
 			$("ol > li").show();
+			countCmd();
 		} else {
 			$("ol > li").hide();
 			$("ol > li").filter(filter.join(', ')).show();
+			countCmd();
 		}
     });
 	
@@ -358,7 +368,7 @@ $(document).ready(function() {
 	$('#btnUrl').click(function() {	
 		$("#dialogExport").remove();
 		var dialog = '<div id="dialogExport" title="Export command to URL"><center><textarea style="width:760px;height:300px" id="jsonExport" class="json">';
-		dialog += window.location.protocol + "//" + window.location.host + "/" + $('form').attr("action") + "&";
+		dialog += window.location.protocol + "//" + window.location.host + $('form').attr("action") + "&";
 		dialog += $('form').serialize();
 		dialog += '</textarea></center></div>';
 		$('#btnUrl').after(dialog);
