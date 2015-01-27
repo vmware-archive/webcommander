@@ -235,7 +235,13 @@ THE SOFTWARE.
 		<div id="result">
 		<div class="round-corner-result">
 			<h2>Result</h2>
-			<ul>
+			<xsl:if test="contains(result, 'Missing parameters')">
+				<ul>
+					<li><xsl:value-of select="result"/></li>
+				</ul>
+			</xsl:if>
+			<xsl:if test="not(contains(result, 'Missing parameters'))">
+				<ul>
 				<xsl:for-each select="result/*">
 					<xsl:choose>
 						<xsl:when test="name() = 'customizedOutput'">
@@ -252,9 +258,12 @@ THE SOFTWARE.
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:for-each>
-			</ul>
-			<hr class="separator"/>
-			<h2 align="right">Execution Time : <xsl:value-of select="executiontime"/></h2>
+				</ul>
+				<h2>Execution Time</h2>
+				<ul>
+					<li><xsl:value-of select="executiontime"/></li>
+				</ul>
+			</xsl:if>	
 		</div>
 		</div>
 	</xsl:template>

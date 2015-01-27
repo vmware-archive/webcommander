@@ -118,7 +118,6 @@ $i = 1
 
 foreach ($hash in $paramHashList) {
 	writeSeparator
-	writeCustomizedMsg ("Info - start command $i")
 	if ($hash.command -eq "sleep") {
 		$hash = replaceHash $hash $existVar
 		$second = [int]$hash.second
@@ -129,8 +128,8 @@ foreach ($hash in $paramHashList) {
 	} elseif ($hash.command -eq "defineVariable") {
 		$varList = $hash.variableList.split("`n") | %{$_.trim()}
 		foreach ($var in $varList) {
-			$varName = $var.split('=',2)[0]
-			$varValue = replaceVar $var.split('=',2)[1] $existVar
+			$varName = $var.split('=')[0]
+			$varValue = replaceVar $var.split('=')[1] $existVar
 			Set-Variable -Name $varName -Value $varValue -Scope global
 		}
 		writeCustomizedMsg ("Info - define global variables")
@@ -146,23 +145,14 @@ foreach ($hash in $paramHashList) {
 				$cmdResult = "Fail"
 			} else {
 				$cmdResult = "Success"
-				if ($hash.variableList) {
-					$varList = $hash.variableList.split("`n") | %{$_.trim()}
-					foreach ($var in $varList) {
-						$varName = $var.split('=',2)[0]
-						$varValue = $s.selectNodes($var.split('=',2)[1])."#text"
-						Set-Variable -Name $varName -Value $varValue -Scope global
-					}
-				}
 			}
 			writeCustomizedMsg ("$cmdResult - execute command $i")
 			$s.webcommander.result.innerxml
+			if (($cmdResult -eq "Fail") -and ($actionOnError -eq "stop")) {
+				$result = "Fail"
+				break
+			}
 		}
-	}
-	writeCustomizedMsg ("Info - end command $i")
-	if (($cmdResult -eq "Fail") -and ($actionOnError -eq "stop")) {
-		$result = "Fail"
-		break
 	}
 	$i++
 }

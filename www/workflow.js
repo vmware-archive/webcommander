@@ -453,6 +453,8 @@ $(function() {
 			var detail = form.parents('div.command').find('.detail');
 			status.empty();
 			detail.empty();
+			var key = form.find('input[name="wf_key"]').val();
+			var tag = form.find('input[name="wf_tag"]').val();
 			$(document).queue("ajaxRequests", function(){
 				if (form.hasClass('off')) {
 					//status.html('<font color="Gray">Skipped</font>');
@@ -476,7 +478,7 @@ $(function() {
 					var lines = kvList.split("\n");
 					for (var i in lines) {
 						line = lines[i];	
-						var variable = line.split(/=(.+)?/);
+						var variable = line.split("=");
 						if (variable != ''){
 							var vname = variable[0].trim();
 							var vvalue = variable[1].trim();
@@ -533,17 +535,10 @@ $(function() {
 						var executionTime = ($.now() - start) / 1000 + " seconds";
 						renderResult(returnCode,executionTime,xml,status,detail);
 						if (returnCode=='4488'){
-							var kvList = form.find('textarea[name="variableList"]').val();
-							var lines = kvList.split("\n");
-							for (var i in lines) {
-								line = lines[i];	
-								var variable = line.split(/=(.+)?/);
-								if (variable != ''){
-									var vname = variable[0].trim();
-									var vvalue = $(xml).xpath(variable[1]).text();
-									globalVariable[vname]=vvalue; 
-								}			
-							}						
+							if (key && tag) {
+								var value = $(xml).find(tag).text();
+								globalVariable[key]=value;
+							}
 							if ($('#autoDisable').is(':checked')) {form.parents('div.command').find('.onoff').trigger('click');}
 							$(document).dequeue("ajaxRequests");
 						}
@@ -643,7 +638,7 @@ $(function() {
 			.find('webcommander')
 			.append('<command name="sleep" synopsis="Sleep">\
 						<parameters>\
-							<parameter name="second" helpmessage="number of second to sleep" />\
+							<parameter name="second" helpmessage="number of second to sleep" mandatory="1" />\
 						</parameters>\
 						<functionalities>\
 							<functionality>Workflow</functionality>\
@@ -651,7 +646,7 @@ $(function() {
 					</command>\
 					<command name="defineVariable" synopsis="Define variables">\
 						<parameters>\
-							<parameter name="variableList" helpmessage="Define variables in key=value pairs, one definition per line" type="textarea" />\
+							<parameter name="variableList" helpmessage="Define variables in key=value pairs" mandatory="1" type="textarea" />\
 						</parameters>\
 						<functionalities>\
 							<functionality>Workflow</functionality>\
@@ -780,10 +775,10 @@ $(function() {
 				table += '</td><td>'  + param.attr('helpmessage') + '</td></tr>';
 			});
 			if (0 > $.inArray(xml.attr('name'),['sleep','defineVariable'])) {
-				table += '<tr class="wf"><td>variableList</td><td>';
-				table += '<textarea type="textarea" name="variableList" placeholder="Define variables based on command output"></textarea></td>';
-				table += '<td>Define variables in key=XPath_expression pairs, one definition per line.<br/>\
-							The XPath_expression is used to get the text of an XML element from this command output. </td></tr>';
+				table += '<tr class="wf"><td>Define workflow variable</td><td>';
+				table += '<input type="text" size="20" name="wf_key" placeholder="variable name"></input> = ';
+				table += '<input type="text" size="20" name="wf_tag" placeholder="xml tag from the result"></input></td>';
+				table += '<td>Define a variable with the command output to be used by other commands in the workflow</td></tr>';
 			}
 			table += '<tr class="wf"><td>Command description</td><td>';
 			table += '<textarea type="textarea" name="wf_des"></textarea></td>';
