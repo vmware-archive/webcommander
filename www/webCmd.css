@@ -154,7 +154,8 @@ a.code, a.code:hover {
 
 h2 {
 	font:normal 24px 'Roboto Condensed';
-	color:black;
+	color:#1697D1;
+	margin-top:10px;
 }
 
 #logo { 
