@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 <#
 	.SYNOPSIS
-        Add composer
+        Add vCenter
 
 	.DESCRIPTION
         This command adds VC servers on a broker.
