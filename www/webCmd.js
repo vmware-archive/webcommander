@@ -344,8 +344,7 @@ $(document).ready(function() {
 	
 	$('#btnSubmit').click(function() {	
 		$('#btnSubmit').attr('disabled', true);
-		$('#btnSubmit').attr('value', 'Running');
-		$('#imgWait').css({"visibility":"visible"});
+		$('#btnSubmit').css({"background-image": "url(/images/progress-spin.gif)"});
 		$('#returnCode').css({"visibility":"hidden"});
 		$('#result').html('<center><h3>webCommander is handling your request. Please wait.</h3></center>');
 		$('#form1').submit();
@@ -374,6 +373,16 @@ $(document).ready(function() {
 		$('#btnUrl').after(dialog);
 		$( "#dialogExport" ).dialog({width:800});
     });
+	
+	$('#btnHelp').click(function() {
+		var dialogWidth;
+		if ($("#widthSetter").length) {
+			dialogWidth = $("#widthSetter").width() + 24;
+		} else {
+			dialogWidth = 500;
+		}
+		$( "#dialog" ).dialog({width:dialogWidth});
+	});
 });
 /*
 function IsAttributeSupported(tagName, attrName) {

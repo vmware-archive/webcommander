@@ -27,7 +27,7 @@ body {
 	padding:0px; 
 	width:100%; 
 	background:#1697D1; 
-	color:white; 
+	color:black; 
 	font:normal 13px 'Roboto Condensed';
 	background-image:url('images/bgcorner.png');
 	background-repeat:no-repeat;
@@ -142,6 +142,10 @@ a.devName, a.devName:hover {
 	color:gold;
 }
 
+a.devName img {
+	vertical-align:bottom;
+}
+
 a.logo, a.logo:hover {
 	text-decoration:none;
 	color:#ffffff;
@@ -166,6 +170,7 @@ h2 {
 	padding:0px; 
 	font:normal 39px/1.2em 'Roboto Condensed'; 
 	letter-spacing:-2px;
+	color:white;
 }
 
 #returnCode { 
@@ -187,6 +192,7 @@ h3{
 
 #commandname { 
 	position:absolute;
+	color:white;
 	top:22px;
 	left:360px;
 	margin:0; 
@@ -200,35 +206,6 @@ h3{
 	margin:0px 0 0 10; 
 }
 
-#developer { 
-	position:absolute;
-	top:50px;
-	left:400px;
-	margin:0px; 
-	padding:0px; 
-}
-
-#script1 { 
-	position:absolute;
-	top:50px;
-	left:500px;
-	margin:0px; 
-	padding:0px; 
-}
-
-#content {
-	position:absolute;
-	top:100px;
-	width:100%;
-}
-
-#table { 
-	margin:0 120px 30px 120px; 
-	padding:50px; 
-	background:#fbfbfc;
-	border-radius:20px;
-}
-
 #annotation { 
 	margin:0 120px 20px 120px; 
 	padding:20px 20px 20px 20px; 
@@ -239,16 +216,16 @@ h3{
 	font:bold 16px 'Roboto Condensed';
 }
 
-
-h1 {
-    margin: 0 0 10px 0
+#hisTable td{
+	background: #fbfbfc;
+	font:normal 14px/1.8em 'Roboto Condensed';
 }
 
 #paraTable, .pvTable {
 	margin:15px;
 	border-collapse:collapse;
 	border:1px solid black;
-	width:80%;
+	width:90%;
 }
 
 #paraTable  td{
@@ -293,7 +270,7 @@ h1 {
 	background:#323235;
 	color:gold;
 	padding:5px;
-	font:bold 14px/1.8em 'Roboto Condensed';
+	font:14px/1.8em 'Roboto Condensed';
 }
 
 ul, ol { 
@@ -365,8 +342,33 @@ ul, ol {
     position: absolute;
 }
 
-input#btnJson,input#btnUrl {
-	margin-left:10px;
+input.cmdbtn {
+	margin-left:30px;
+	margin-right:30px;
+	background-repeat:no-repeat;
+	width:64px;
+	height:64px;
+	border:0;
+}
+
+input#btnSubmit{
+	background:url(/images/button-run.png);
+}
+
+input#btnJson{
+	background:url(/images/button-json.png);
+}
+
+input#btnUrl{
+	background:url(/images/button-url.png);
+}
+
+input#btnHelp{
+	background:url(/images/button-help.png);
+}
+
+input#btnHistory{
+	background:url(/images/button-history.png);
 }
 
 div.sidebar-container {

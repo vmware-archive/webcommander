@@ -157,8 +157,8 @@ function callPs1($cmd) {
 
 $command = $_REQUEST["command"];
 $dom = new DOMDocument();
-$xml->preserveWhiteSpace = false;
-$xml->formatOutput = true; 
+$dom->preserveWhiteSpace = false;
+$dom->formatOutput = true; 
 $dom->load("webcmd.xml", LIBXML_XINCLUDE | LIBXML_NOENT);
 $dom->xinclude();
 $xmloutput = "";
@@ -187,6 +187,7 @@ if ( $command == ""){
 	if (count($target) == 0){
 		$xmloutput .= "<script>alert('Could not find command \"" . $command . "\"!')</script>";
 		$xmloutput .= "<script>document.location.href='webcmd.php'</script>";
+		echo $xmloutput;
 	} else {
 		$t0 = microtime(true);
 		$target = $target[0];
@@ -195,9 +196,8 @@ if ( $command == ""){
 		$xmloutput .= '<?xml version="1.0" encoding="UTF-8" ?>';
 		$xmloutput .= '<?xml-stylesheet type="text/xsl" href="/webCmd.xsl"?>';
 		$scriptName = (string)$target->script;
-		$xmloutput .= '<webcommander cmd="' . $command . '" developer="' . $target["developer"] . '" script="' . $scriptName . '">';
-		$annotation = $target->xpath("annotation");
-		if ( $annotation ){$xmloutput .= $annotation[0]->asXML();}
+		$xmloutput .= '<webcommander cmd="' . $command . '" developer="' . $target["developer"] . '" ';
+		$xmloutput .= 'synopsis="' . $target["synopsis"] . '" script="' . $scriptName . '">';
 		$description = $target->xpath("description");
 		if ( $description ){$xmloutput .= $description[0]->asXML();}
 		$xmloutput .= '<parameters>';
@@ -252,8 +252,28 @@ if ( $command == ""){
 		//$xmloutput .= '<url><![CDATA[' . $url . ']]></url>';
 		$t1 = microtime(true);
 		$xmloutput .= sprintf("<executiontime>%.1f seconds</executiontime>", $t1 - $t0);
-		$xmloutput .= '</webcommander>';
+		$user = get_current_user();
+		$userAgent = $_SERVER['HTTP_USER_AGENT'];
+		$userAddr = $_SERVER['REMOTE_ADDR'];
+		$time = time();
+		$xmloutput .= "<user>" . $user . '</user>';
+		$xmloutput .= "<useragent>" . $userAgent . '</useragent>';
+		$xmloutput .= "<useraddr>" . $userAddr . '</useraddr>';
+		$xmloutput .= "<time>" . date('Y-m-d H:i:s',$time) . '</time>';
+		$xmloutput .= "</webcommander>";
+		
+		$dom->loadXML($xmloutput);
+		$dom->formatOutput = true;
+		echo $dom->saveXML();
+		if (!$missParam) {
+			$xml = simplexml_import_dom($dom);
+			$returncode = $xml->xpath('/webcommander/returnCode');
+			$filename = '../www/history/' . $user . '/' . $userAddr . '/' . $command . '/' . $returncode[0];
+			$filename .=  '/output-' . $time . '.xml';
+			$dirname = dirname($filename);
+			if (!is_dir($dirname)) {mkdir($dirname, 0755, true);}
+			$dom->save($filename);
+		}
 	}
-	echo $xmloutput;
 }
 ?>

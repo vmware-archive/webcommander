@@ -151,6 +151,9 @@ THE SOFTWARE.
 								<xsl:when test="./functionalities/*[1] = 'Windows'">
 									<img src="images/icon-windows.png" alt="icon" />
 								</xsl:when>
+								<xsl:when test="./functionalities/*[1] = 'History'">
+									<img src="images/icon-show.png" alt="icon" />
+								</xsl:when>
 								<xsl:otherwise>
 									<img src="images/icon-default.jpg" alt="icon" />
 								</xsl:otherwise>

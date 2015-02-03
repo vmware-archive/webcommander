@@ -36,6 +36,8 @@ THE SOFTWARE.
 				<script src="//code.jquery.com/jquery-1.8.3.js"></script>
 				<script src="//code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 				<script src="/webCmd.js"></script>
+				<link rel="stylesheet" href="//cdn.datatables.net/1.10.4/css/jquery.dataTables.min.css" />
+				<script src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
 				<!--script>
 					function IsAttributeSupported(tagName, attrName) {
 						var val = false;
@@ -56,9 +58,7 @@ THE SOFTWARE.
 				<xsl:call-template name="header"/>
 				<xsl:call-template name="returnCode"/>
 				<xsl:if test="/webcommander/description">
-					<xsl:if test="returnCode = '4000'">
-						<xsl:call-template name="description"/>
-					</xsl:if>
+					<xsl:call-template name="description"/>
 				</xsl:if>
 				<div id="container">
 					<xsl:call-template name="parameters"/>
@@ -87,23 +87,6 @@ THE SOFTWARE.
 				<xsl:value-of select="@script"/>
 			</a></i>
 		</div>
-		<!--div id="commandname">Command Name: <i><xsl:value-of select="@cmd"/></i></div>
-		<div id="developer">Developer: 
-			<i><a class="devName">
-				<xsl:attribute name="href">
-					<xsl:value-of select="concat('mailto:', @developer, '@vmware.com')"/>
-				</xsl:attribute>
-				<xsl:value-of select="@developer"/>
-			</a></i>
-		</div>
-		<div id="script">Script: 
-			<i><a class="devName">
-				<xsl:attribute name="href">
-					<xsl:value-of select="concat('viewsource.php?scriptName=', @script)"/>
-				</xsl:attribute>
-				<xsl:value-of select="@script"/>
-			</a></i>
-		</div-->
 	</xsl:template>
 	
 	<xsl:template name="returnCode">
@@ -111,18 +94,7 @@ THE SOFTWARE.
 	</xsl:template>
 	
 	<xsl:template name="description">
-		<div id="dialog" title="Command Description"><xsl:copy-of disable-output-escaping="yes" select="description"/></div>
-		<script>
-			$(function() {
-				var dialogWidth;
-				if ($("#widthSetter").length) {
-					dialogWidth = $("#widthSetter").width() + 24;
-				} else {
-					dialogWidth = 500;
-				}
-				$( "#dialog" ).dialog({width:dialogWidth});
-			});
-		</script>
+		<div id="dialog" title="Command Description" style="display:none"><xsl:copy-of disable-output-escaping="yes" select="description"/></div>
 	</xsl:template>
 	
 	<xsl:template name="parameters">
@@ -139,15 +111,19 @@ THE SOFTWARE.
 							<xsl:for-each select="parameters/parameter">
 								<xsl:call-template name="parameter"/>
 							</xsl:for-each>
-							<tr>
-								<td colspan="3" style="text-align:right">
-									<img id="imgWait" src="/images/progress-bar.gif" style="vertical-align:middle; margin-right:20px; visibility:hidden;" />
-									<input id="btnSubmit" type="button" value="Submit" />
-									<input id="btnJson" type="button" value="JSON" />
-									<input id="btnUrl" type="button" value="URL" />
-								</td>
-							</tr>
 						</table>
+						<input id="btnSubmit" type="button" title="Run" class="cmdbtn" />
+						<input id="btnJson" type="button" title="Export JSON" class="cmdbtn" />
+						<input id="btnUrl" type="button" title="Export URL" class="cmdbtn" />
+						<xsl:if test="/webcommander/description">
+							<input id="btnHelp" type="button" title="Help" class="cmdbtn" />
+						</xsl:if>
+						<a target="_blank">
+							<xsl:attribute name="href">
+								<xsl:value-of select="concat('/webcmd.php?command=showHistory&amp;cmdName=', @cmd)"/>
+							</xsl:attribute>
+							<input id="btnHistory" type="button" title="History" class="cmdbtn" />
+						</a>
 					</form>
 				</xsl:if>
 			</center>
@@ -246,6 +222,37 @@ THE SOFTWARE.
 						</xsl:when>
 						<xsl:when test="name() = 'separator'">
 							<hr class="separator" />
+						</xsl:when>
+						<xsl:when test="name() = 'history'">
+							<hr class="separator"/>
+							<center><table id="hisTable">
+								<thead><tr><th>Number</th><th>Time</th><th>User</th><th>User Address</th><th>Command name</th><th>Result code</th><th>File</th></tr></thead>
+								<tbody>
+								<xsl:for-each select="record">
+									<tr>
+										<td><xsl:value-of select="number" /></td>
+										<td><xsl:value-of select="time"/></td>
+										<td><xsl:value-of select="user"/></td>
+										<td><xsl:value-of select="useraddr" /></td>
+										<td><xsl:value-of select="cmdname"/></td>
+										<td><xsl:value-of select="resultcode"/></td>
+										<td>
+											<a target="_blank">
+												<xsl:attribute name="href">
+													<xsl:value-of select="concat('/history/', user, '/', useraddr, '/', cmdname, '/', resultcode, '/', filename)"/>
+												</xsl:attribute>
+												<xsl:value-of select="filename"/>
+											</a>
+										</td>
+									</tr>
+								</xsl:for-each>
+								</tbody>
+							</table></center>
+							<script>
+								$(function(){
+									$('#hisTable').DataTable();
+								});
+							</script>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:call-template name="pvTable"/>
