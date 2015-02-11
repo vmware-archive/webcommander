@@ -40,6 +40,15 @@ $current = $host.ui.rawui.windowsize
 $current.width = 128
 $host.ui.rawui.windowsize = $current
 
+$runFromWeb = $false
+$currentId = $pid
+while ($currentId = (gwmi win32_process -Filter "processid='$currentId'").parentprocessid) {
+	$process = get-process -id $currentId -ea silentlycontinue
+	if ($process.processName -eq "php-cgi") {
+		$runFromWeb = $true
+	}
+}
+
 function verifyIp {
 	param($ipAddress)
 	try {
@@ -1737,14 +1746,16 @@ function newRemoteWin {
 
 function writeStdout {
 	Param($output)
-	#$output = [System.Web.HttpUtility]::HtmlEncode($output)
-	Write-Output "<stdOutput><![CDATA["
-	Write-Output $output
-	Write-Output "]]></stdOutput>"
+	if($runFromWeb) {
+		Write-Host "<stdOutput><![CDATA[$output]]></stdOutput>"
+	} else {
+		Write-Host $output
+	}
 }
 
 function writeStderr {
-	$errMessage = @"
+	if($runFromWeb) {
+		$errMessage = @"
 <exceptionType>$($_.Exception.GetType())</exceptionType>
 <fullyQualifiedErrorId>$($_.FullyQualifiedErrorId)</fullyQualifiedErrorId>
 <errMessage><![CDATA[$($_.Exception.Message)]]></errMessage>
@@ -1752,18 +1763,58 @@ function writeStderr {
 <scriptLineNumber>$($_.InvocationInfo.ScriptLineNumber)</scriptLineNumber>
 <offsetInLine>$($_.InvocationInfo.OffsetInLine)</offsetInLine>
 "@
-	Write-Host "<stderr>$errMessage</stderr>"
+		Write-Host "<stderr>$errMessage</stderr>"
+	} else {
+		Write-Error $_.exception 
+	}
 }
 
 function writeCustomizedMsg {
 	Param($message)
-	$message = [System.Web.HttpUtility]::HtmlEncode($message)
-	$logtime = get-date -format "[yyyy-MM-dd HH:mm:ss] "
-	Write-Host "<customizedOutput>$logtime$message</customizedOutput>"
+	if($runFromWeb) {
+		$message = [System.Web.HttpUtility]::HtmlEncode($message)
+		$logtime = get-date -format "[yyyy-MM-dd HH:mm:ss] "
+		Write-Host "<customizedOutput>$logtime$message</customizedOutput>"
+	} else {
+		if ($message -match "^Success") {
+			Write-Host -ForegroundColor Green $message
+		} elseif ($message -match "^Fail") {
+			Write-Host -ForegroundColor Red $message
+		} elseif ($message -match "^Warn") {
+			Write-Host -ForegroundColor Yellow $message
+		} else {
+			Write-Host $message
+		}
+	}
 }
 
 function writeSeparator {
-	"<separator/>"
+	if($runFromWeb) {
+		"<separator/>"
+	} else {
+		"`n------------------------------------------------------------`n"
+	}
+}
+
+function outputObj {
+	param($obj, $name)
+	if($runFromWeb) {
+		$xml = $obj | convertTo-xml -as string -notypeinformation
+		$xml = $xml.trimstart('<?xml version="1.0"?>')
+		$xml = $xml.replace('<Objects>','').replace('</Objects>','')
+		$xml = $xml.replace('Object',$name).trim()
+		$xml
+	} else {
+		"$name`:"
+		$obj | ft
+	}
+}
+
+function writeXml {
+	param($xml)
+	if($runFromWeb) {
+		$xml
+	}
 }
 
 function getWebCommanderJobResult {
