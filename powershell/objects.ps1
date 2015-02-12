@@ -1747,9 +1747,9 @@ function newRemoteWin {
 function writeStdout {
 	Param($output)
 	if($runFromWeb) {
-		Write-Host "<stdOutput><![CDATA[$output]]></stdOutput>"
+		Write-Output "<stdOutput><![CDATA[$output]]></stdOutput>"
 	} else {
-		Write-Host $output
+		Write-Output $output
 	}
 }
 
