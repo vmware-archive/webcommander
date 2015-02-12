@@ -187,6 +187,11 @@ h3{
 	text-shadow: -1px -1px #000,1px 1px #000;
 	font:bold 30px 'Roboto Condensed';
 } 
+
+h4.kuser {
+	color:gold;
+	font:normal 23px 'Roboto Condensed';
+}
       
 #logo span { color:gold;}
 
@@ -308,15 +313,15 @@ ul, ol {
 }
 
 .fbg { padding:0px 0 0 0; border-top:1px solid #5e5f62; background:#484e55 url(../images/fbg_bg.gif) bottom repeat-x; margin:0px 0 10px 0;}
-.fbg_resize { margin:0 auto; padding:5px 5px; width:1080px;}
+.fbg_resize { margin:0 auto; padding:5px 5px; width:1280px;}
 .fbg  h2 { color:#dedddd;}
 .fbg  p { color:#959595;}
 .fbg  a { color:#3a99d5; text-decoration:none;}
 .fbg  img { padding:4px; border:1px solid #cfd2d4; background-color:#fff;}
 .fbg .col { margin:0; float:left;}
-.fbg .c1 { padding:0 16px 0 0; width:266px;}
+.fbg .c1 { padding:0 16px 0 0; width:440px;}
 .fbg .c2 { padding:0 16px; width:480px;}
-.fbg .c3 { padding:0 0 0 16px; width:260px;}
+.fbg .c3 { padding:0 16px 0 16px; width:260px;}
 .fbg .c1 img { margin:8px;}
 .fbg .c3 img { margin-bottom:10px; float:top; background-color:#323235; border:0px}
 .clr { clear:both; padding:0; margin:0; width:100%; font-size:0px; line-height:0px;}	
