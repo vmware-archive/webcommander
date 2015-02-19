@@ -100,7 +100,13 @@ function replaceHash {
 	return $newHash
 }
 
-$json = $workflow | convertFrom-Json
+try {
+	$json = $workflow | convertFrom-Json
+} catch {
+	writeCustomizedMsg "Fail - read workflow JSON"
+	writeStderr
+	[Environment]::exit("0")
+}
 $url = "http://127.0.0.1/webcmd.php"
 $existVar = get-variable -scope global
 $paramHashList = @()
