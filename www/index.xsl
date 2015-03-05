@@ -175,7 +175,7 @@ THE SOFTWARE.
 				<div id="users" class="col c1">
 					<h2>Known users</h2>
 					<h4 class="kuser">
-						Accarda, Auckland University, Bridge Point Education, Cigna Health, Cloudmark, EMC, Laval University, Qualcomm, Seek, TomTom, Wells Fargo
+						Accarda, Auckland University, Bridge Point Education, Cigna Health, Cloudmark, EMC, Laval University, Qualcomm, Seek, Wells Fargo
 					</h4>
 				</div>
 				<script type="text/javascript">
