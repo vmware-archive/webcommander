@@ -220,6 +220,14 @@ THE SOFTWARE.
 						<xsl:when test="name() = 'stdOutput'">
 							<pre><xsl:value-of select="text()" /></pre>
 						</xsl:when>
+						<xsl:when test="name() = 'link'">
+							<a target="_blank">
+								<xsl:attribute name="href">
+									<xsl:value-of select="url"/>
+								</xsl:attribute>
+								<xsl:value-of select="title"/>
+							</a>
+						</xsl:when>
 						<xsl:when test="name() = 'separator'">
 							<hr class="separator" />
 						</xsl:when>

@@ -1817,6 +1817,15 @@ function writeXml {
 	}
 }
 
+function writeLink {
+	param($title, $url)
+	if($runFromWeb) {
+		write-host "<link><title>$title</title><url><![CDATA[$url]]></url></link>"
+	} else {
+		write-host "$title - $url"
+	}
+}
+
 function getWebCommanderJobResult {
 	get-job | wait-job | out-null
 	foreach($job in get-job) {
