@@ -1,6 +1,8 @@
 webcommander
 ============
 
+!!! PLEASE NOTE THAT ADVANCED INFORMATIONS ARE PROVIDED IN WIKI !!!
+
 There are many Powershell and PowerCLI Users ranging from vSphere Administrators to developers, 
 all of these are creating scripts to aid with common automation tasks and integration. Their 
 scripts are highly valuable resources that should be reused and shared.
