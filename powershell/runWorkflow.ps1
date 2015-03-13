@@ -74,24 +74,36 @@ foreach ($paramKey in $psboundparameters.keys) {
 . .\objects.ps1
 
 function replaceVar {
-	param ($varValue, $existVar)
+	param ($varValue, $definedVar)
 	$newValue = $varValue
-	$definedVar = get-variable -scope global -exclude $existVar.name
-	foreach ($dv in $definedVar) {
-		$newValue = $newValue.replace($dv.name, $dv.value)
+	if ($definedVar) {
+		foreach ($dv in $definedVar) {
+			if ($dv.value.gettype().name -eq "string") {
+				$newValue = $newValue.replace($dv.name, $dv.value)
+			}
+		}
+		$regex = [regex]"(\['[(\w)\-]*'\])+"
+		$squareText = $regex.matches($newValue).value
+		foreach ($s in $squareText) {
+			$k = $s.replace('][','.').replace("['",'$').trim(']').replace("JSON'",'JSON')
+			$k = invoke-expression $k
+			if ($k) {
+				$newValue = $newValue.replace($s,$k)
+			}
+		}
 	}
 	return $newValue
 }
 
 function replaceHash {
-	param ($hashTable, $existVar)
+	param ($hashTable, $definedVar)
 	$newHash = @{}
 	foreach ($key in $hashTable.keys) {
-		$definedVar = get-variable -scope global -name $key -ea silentlycontinue
+		$keyVar = get-variable -scope global -name $key -ea silentlycontinue
 		if ($hashTable.$key) {
-			$value = replaceVar $hashTable.$key $existVar
-		} elseif ($definedVar) {
-			$value = $definedVar.value
+			$value = replaceVar $hashTable.$key $definedVar
+		} elseif ($keyVar) {
+			$value = $keyVar.value
 		} else {
 			$value = ""
 		}
@@ -125,8 +137,9 @@ $i = 1
 foreach ($hash in $paramHashList) {
 	writeSeparator
 	writeCustomizedMsg ("Info - start command $i")
+	$definedVar = get-variable -scope global -exclude $existVar.name
 	if ($hash.command -eq "sleep") {
-		$hash = replaceHash $hash $existVar
+		$hash = replaceHash $hash $definedVar
 		$second = [int]$hash.second
 		if ($second -lt 1){$second = 1}
 		elseif ($second -gt 3600) {$second = 3600}
@@ -136,14 +149,14 @@ foreach ($hash in $paramHashList) {
 		$varList = $hash.variableList.split("`n") | %{$_.trim()}
 		foreach ($var in $varList) {
 			$varName = $var.split('=',2)[0]
-			$varValue = replaceVar $var.split('=',2)[1] $existVar
-			Set-Variable -Name $varName -Value $varValue -Scope global
+			$varValue = replaceVar $var.split('=',2)[1] $definedVar
+			Set-Variable -Name $varName -Value $varValue -Scope global -force
 		}
 		writeCustomizedMsg ("Info - define global variables")
 	} else {
-		$hash = replaceHash $hash $existVar
+		$hash = replaceHash $hash $definedVar
 		if ($type -eq "parallel") {
-			start-job -scriptBlock {
+			start-job -ScriptBlock {
 				invoke-webRequest -timeoutsec 86400 -uri $args[0] -body $args[1]
 			} -argumentList $url,$hash -name "command $i"
 		} else {
@@ -156,7 +169,11 @@ foreach ($hash in $paramHashList) {
 					$varList = $hash.variableList.split("`n") | %{$_.trim()}
 					foreach ($var in $varList) {
 						$varName = $var.split('=',2)[0]
-						$varValue = $s.selectNodes($var.split('=',2)[1])."#text"
+						if ($varName -match "json`$") {
+							$varValue = $s.selectNodes($var.split('=',2)[1])."#cdata-section" | convertfrom-json
+						} else {
+							$varValue = $s.selectNodes($var.split('=',2)[1])."#text"
+						}
 						Set-Variable -Name $varName -Value $varValue -Scope global
 					}
 				}

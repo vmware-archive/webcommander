@@ -192,6 +192,31 @@ function guid() {
 		s4() + '-' + s4() + s4() + s4();
 };
 
+function parseValue(fieldValue, fieldName) {
+	if (fieldValue != "") {
+		$.each(globalVariable, function(key, value){ 
+			if (typeof(value)=='string') {
+				var regex = new RegExp(key, 'ig');
+				fieldValue = fieldValue.replace(regex, value); 
+			}
+		});
+		var squareText = fieldValue.match(/(\['[(\w)\-]*'\])+/ig);
+		if (squareText) {
+			$.each(squareText, function(i){
+				var squareValue = eval("globalVariable" + squareText[i]);
+				if (squareValue !== undefined) {
+					fieldValue = fieldValue.replace(squareText[i], squareValue);
+				}
+			});
+		}
+	} else {
+		if (globalVariable[fieldName]) {
+			fieldValue = globalVariable[fieldName];
+		}
+	}
+	return fieldValue
+}
+
 $(function() {
 
 	$.ajaxSetup({
@@ -463,6 +488,7 @@ $(function() {
 				status.html('<font color="Gold">Running...</font>');
 				if (form.attr('name')=='sleep'){
 					var second = form.find('input[name="second"]').val();
+					second = parseValue(second,"second");
 					setTimeout(function(){
 						var executionTime = second + " seconds";
 						var xml = '<webcommander><result><customizedOutput>Info - sleep ' + second + ' seconds</customizedOutput></result></webcommander>';
@@ -479,17 +505,20 @@ $(function() {
 						var variable = line.split(/=(.+)?/);
 						if (variable != ''){
 							var vname = variable[0].trim();
-							var vvalue = variable[1].trim();
-							$.each(globalVariable, function(key, value){ 
-								var regex = new RegExp(key, 'ig');
-								vvalue = vvalue.replace(regex, value); 
-							});
+							if (variable[1] !== undefined) {
+								var vvalue = variable[1].trim();
+							} else {
+								alert('Variable "' + vname + '" is not defined!');
+								status.html("");
+								return false;
+							}
+							vvalue = parseValue(vvalue,vname);
 							globalVariable[vname]=vvalue; 
 						}			
 					}
 					setTimeout(function(){
 						var executionTime = "1 second";
-						var xml = '<webcommander><result><stdOutput>' + JSON.stringify(globalVariable) + '</stdOutput></result></webcommander>';
+						var xml = '<webcommander><result><stdOutput>' + JSON.stringify(globalVariable, null, "\t") + '</stdOutput></result></webcommander>';
 						xml = $.parseXML(xml);
 						renderResult('4488',executionTime,xml,status,detail);
 						$(document).dequeue("ajaxRequests");
@@ -500,16 +529,7 @@ $(function() {
 						var fieldName = $(this).attr('name');
 						if ($(this).attr('type') != 'file') {
 							var fieldValue = $(this).val();
-							if (fieldValue != "") {
-								$.each(globalVariable, function(key, value){ 
-									var regex = new RegExp(key, 'ig');
-									fieldValue = fieldValue.replace(regex, value); 
-								});
-							} else {
-								if (globalVariable[fieldName]) {
-									fieldValue = globalVariable[fieldName];
-								}
-							}
+							fieldValue = parseValue(fieldValue,fieldName);
 							formData.append(fieldName,fieldValue);
 						} else {
 							var fileToUpload = $(this)[0].files[0];
@@ -540,8 +560,12 @@ $(function() {
 								var variable = line.split(/=(.+)?/);
 								if (variable != ''){
 									var vname = variable[0].trim();
-									var vvalue = $(xml).xpath(variable[1]).text();
-									globalVariable[vname]=vvalue; 
+									if (vname.match('JSON$')) {
+										var vvalue = $.parseJSON($(xml).xpath(variable[1]).text());
+									} else {
+										var vvalue = $(xml).xpath(variable[1]).text();
+									}	
+									globalVariable[vname]=vvalue;
 								}			
 							}						
 							if ($('#autoDisable').is(':checked')) {form.parents('div.command').find('.onoff').trigger('click');}
