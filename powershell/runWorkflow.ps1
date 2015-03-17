@@ -138,7 +138,9 @@ foreach ($hash in $paramHashList) {
 	writeSeparator
 	writeCustomizedMsg ("Info - start command $i")
 	$definedVar = get-variable -scope global -exclude $existVar.name
-	if ($hash.command -eq "sleep") {
+	if ($hash.wf_off -eq "1") {
+		writeCustomizedMsg ("Info - skip command $i which is disabled")
+	} elseif ($hash.command -eq "sleep") {
 		$hash = replaceHash $hash $definedVar
 		$second = [int]$hash.second
 		if ($second -lt 1){$second = 1}
