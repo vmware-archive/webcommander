@@ -75,7 +75,8 @@ function populate(frm, data) {
 				$ctrl.find('option[value="' + value + '"]').prop('selected',true);
 				break;
 		}  
-    });  
+    }); 
+	if (data['wf_off']) {frm.parents('div.command').find('.onoff').trigger('click');}
 }
 
 function updateOrder(){
@@ -642,7 +643,11 @@ $(function() {
 		var dialog = '<div id="dialogExport" title="Export workflow to JSON"><center><textarea id="jsonExport" class="json">[';
 		var workflow = '';
 		$('form').each(function(){
-			workflow += JSON.stringify($(this).serializeObject(), null, '\t');
+			var wj = $(this).serializeObject();
+			if ($(this).is('.off')) {
+				wj['wf_off'] = '1';
+			}
+			workflow += JSON.stringify(wj, null, '\t');
 			workflow += ',\n';
 		});	
 		dialog += workflow.slice(0, -2);
