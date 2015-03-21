@@ -1,6 +1,9 @@
 webcommander
 ============
 
+Video Tutorials
+1. How to execute an individual command http://youtu.be/CREkoloCOmk 
+
 !!! PLEASE NOTE THAT ADVANCED INFORMATIONS ARE PROVIDED IN WIKI !!!
 
 There are many Powershell and PowerCLI Users ranging from vSphere Administrators to developers, 
