@@ -3,7 +3,8 @@ Video Tutorials
 
 1. How to execute an individual command http://youtu.be/CREkoloCOmk
 2. Workflow basics http://youtu.be/ZJtU36kM2YY
-3. Workflow variables http://youtu.be/i6z_HKgeiqY
+3. Workflow variable http://youtu.be/i6z_HKgeiqY
+4. Workflow template http://youtu.be/adXa6AHJaB8
 
 
 webcommander
