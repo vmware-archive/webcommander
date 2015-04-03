@@ -1896,8 +1896,9 @@ function getFileList {
 			$files += $_
 		} elseif (invoke-webrequest $_) {
 			$fileName = ($_.split("/"))[-1]
-			$wc.downloadfile("$_", "..\www\upload\$fileName");
-			$files += "..\www\upload\$fileName"
+			$path = resolve-path "..\www\upload"
+			$wc.downloadfile($_, "$path\$fileName")
+			$files += "$path\$fileName"
 		}
 	}
 	return $files

@@ -155,7 +155,8 @@ function callPs1($cmd) {
 	}
 }
 
-$command = $_REQUEST["command"];
+$req = array_change_key_case($_REQUEST, CASE_LOWER);
+$command = $req["command"];
 $dom = new DOMDocument();
 $dom->preserveWhiteSpace = false;
 $dom->formatOutput = true; 
@@ -209,10 +210,10 @@ if ( $command == ""){
 		$cmd = "powershell .\\" . $scriptName . ".ps1";
 		$url = "http://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . "/webcmd.php?command=" . $command;
 		foreach($params as $param){
-			$name = (string)$param["name"];
-			$param->addAttribute("value", $_REQUEST[$name]);
+			$name = strtolower((string)$param["name"]);
+			$param->addAttribute("value", $req[$name]);
 			$xmloutput .= $param->asXML();
-			if ((string)$param["mandatory"] == "1" && $_REQUEST[$name] == "" && $_FILES[$name] == "") {
+			if ((string)$param["mandatory"] == "1" && $req[$name] == "" && $_FILES[$name] == "") {
 				$missParam = true;
 			}
 			if ($_FILES[$name] != "") {
@@ -230,12 +231,12 @@ if ( $command == ""){
 					$cmd .= " -" . $name . " " . realpath($fileName); 
 				}
 			}
-			if ($_REQUEST[$name] != "") {
-				$cmd .= " -" . $name . " " . urlencode($_REQUEST[$name]); 
-				$url .= "&" . $name . "=" . urlencode($_REQUEST[$name]);
+			if ($req[$name] != "") {
+				$cmd .= " -" . $name . " " . urlencode($req[$name]); 
+				$url .= "&" . $name . "=" . urlencode($req[$name]);
 			}
 		}
-		header("url:" . $url);
+		//header("url:" . $url);
 		$xmloutput .= '</parameters>';
 
 		if ($missParam) {
