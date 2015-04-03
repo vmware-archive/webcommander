@@ -46,6 +46,9 @@ THE SOFTWARE.
 						<xsl:when test="name() = 'stdOutput'">
 							<pre><xsl:value-of select="text()" /></pre>
 						</xsl:when>
+						<xsl:when test="name() = 'separator'">
+							<hr class="separator" />
+						</xsl:when>
 						<xsl:otherwise>
 							<xsl:call-template name="pvTable"/>
 						</xsl:otherwise>

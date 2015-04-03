@@ -38,6 +38,13 @@ THE SOFTWARE.
 
 Param (
 	[parameter(
+		Mandatory=$true,
+		HelpMessage="Name of the workflow"
+	)]
+	[string]
+		$name,
+		
+	[parameter(
 		HelpMessage="Type of the workflow. Default is 'serial'"
 	)]
 	[validateSet(
@@ -58,11 +65,22 @@ Param (
 		$actionOnError="stop",
 
 	[parameter(
-		Mandatory=$true,
-		HelpMessage="Workflow in form of JSON"
+		HelpMessage="Workflow in form of JSON. If content is too long, save it in a file and use workflowUrl or file to feed it in."
 	)]
 	[string]
-		$workflow
+		$workflow,
+	
+	[parameter(
+		HelpMessage="Workflow files on webcommander server or online. Each file per line."
+	)]
+	[string]
+		$workflowUrl,
+	
+	[parameter(
+		HelpMessage="Workflow file to upload from client machine"
+	)]
+	[string]
+		$file
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -79,7 +97,7 @@ function replaceVar {
 	if ($definedVar) {
 		foreach ($dv in $definedVar) {
 			if ($dv.value.gettype().name -eq "string") {
-				$newValue = $newValue.replace($dv.name, $dv.value)
+				$newValue = $newValue -ireplace $dv.name, $dv.value
 			}
 		}
 		$regex = [regex]"(\['[(\w)\-]*'\])+"
@@ -112,17 +130,35 @@ function replaceHash {
 	return $newHash
 }
 
-try {
-	$json = $workflow | convertFrom-Json
-} catch {
-	writeCustomizedMsg "Fail - read workflow JSON"
-	writeStderr
+function getJsonObj {
+	param ($jsonStr)
+	try {
+		$jsonObj = $jsonStr | convertFrom-Json
+		return $jsonObj
+	} catch {
+		writeCustomizedMsg "Fail - read workflow JSON"
+		writeStderr
+		[Environment]::exit("0")
+	}
+}
+
+$allFlow = @()
+if ($workflow) {$allFlow += getJsonObj $workflow}
+if ($workflowUrl) {$jsonFiles = getFileList $workflowUrl}
+if ($file) {$jsonfiles += $file}
+foreach ($jf in $jsonFiles) {
+	$allFlow += getJsonObj ((get-content $jf) -join "`n")
+}
+
+if (!$allFlow) {
+	writeCustomizedMsg "Fail - find workflow definition"
 	[Environment]::exit("0")
 }
+
 $url = "http://127.0.0.1/webcmd.php"
 $existVar = get-variable -scope global
 $paramHashList = @()
-foreach ($cmd in $json) {
+foreach ($cmd in $allFlow) {
 	$paramHash = @{}
 	$key = $cmd | get-member -memberType NoteProperty | select name
 	foreach ($k in $key) {
@@ -135,7 +171,8 @@ $result = "Success"
 $i = 1
 
 foreach ($hash in $paramHashList) {
-	writeSeparator
+	if ($hash.command -eq $null) {continue}
+	if ($i -gt 1) {writeSeparator}
 	writeCustomizedMsg ("Info - start command $i")
 	$definedVar = get-variable -scope global -exclude $existVar.name
 	if ($hash.wf_off -eq "1") {
