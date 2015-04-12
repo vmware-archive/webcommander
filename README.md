@@ -5,7 +5,7 @@ Video Tutorials
 2. Workflow basics http://youtu.be/ZJtU36kM2YY
 3. Workflow variable http://youtu.be/i6z_HKgeiqY
 4. Workflow template http://youtu.be/adXa6AHJaB8
-
+5. Run workflow as command https://youtu.be/DAm70VO62VY
 
 webcommander
 ============
