@@ -263,7 +263,7 @@ if ( $command == ""){
 		$xmloutput .= "<time>" . date('Y-m-d H:i:s',$time) . '</time>';
 		$xmloutput .= "</webcommander>";
 		
-		$dom->loadXML($xmloutput);
+		$dom->loadXML(utf8_encode($xmloutput));
 		$dom->formatOutput = true;
 		echo $dom->saveXML();
 		if (!$missParam) {
