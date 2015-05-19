@@ -40,6 +40,7 @@ THE SOFTWARE.
 				<script src="//sideroad.secret.jp/js/jquery.sidebar.js"></script>
 				<script src="//rawgit.com/davatron5000/Lettering.js/master/jquery.lettering.js"></script>
 				<script src="//jschr.github.io/textillate/jquery.textillate.js"></script>
+				<script src="//rawgit.com/JoelSutherland/GitHub-jQuery-Repo-Widget/master/jquery.githubRepoWidget.min.js"></script>
 			</head>
 			<body>
 				<xsl:call-template name="header"/>
@@ -173,16 +174,8 @@ THE SOFTWARE.
 		<div id="footer" class="fbg">
 			<div class="fbg_resize">
 				<div id="users" class="col c1">
-					<h2>Known users</h2>
-					<h4 class="kuser">
-						Accarda, Auckland University, Bridge Point Education, Cigna Health, Cloudmark, EMC, Laval University, Qualcomm, Seek
-					</h4>
+					<div class="github-widget" data-repo="vmware/webcommander"></div>
 				</div>
-				<script type="text/javascript">
-					$('.kuser').textillate({ 
-						out:{effect:'rollout'}
-					});
-				</script>
 				<div class="col c2">
 					<a class="twitter-timeline" height="200" href="https://twitter.com/search?q=webcommander" data-border-color="#959595" data-theme="dark" data-widget-id="507213777024995329">Tweets about "webcommander"</a>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
