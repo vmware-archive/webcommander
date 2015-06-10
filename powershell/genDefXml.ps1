@@ -149,6 +149,8 @@ function createCmdDefXml {
 				$xml += '</options></parameter>'
 			} elseif ($name -match "(script|property|url|workflow|body)$") {
 				$xml += 'type="textarea" />'
+			} elseif (@("datastore", "portGroup", "vmName") -contains $name ) {
+				$xml += 'type="selectText"><options></options></parameter>'
 			} elseif ($name -match "file$") {
 				$xml += 'type="file" />'
 			} else {

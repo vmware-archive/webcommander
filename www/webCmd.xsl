@@ -196,6 +196,9 @@ THE SOFTWARE.
 				<xsl:if test="@name = 'portGroup'">
 					<input type="button" id="btnGetPortGroup" value="List Port Group" />
 				</xsl:if>
+				<xsl:if test="@name = 'vmName'">
+					<input type="button" id="btnGetVmName" value="List VM name" />
+				</xsl:if>
 				<xsl:if test="@name = 'build'">
 					<input type="button" id="btnGetBuild" value="List Build" />
 				</xsl:if>
