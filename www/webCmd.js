@@ -134,7 +134,7 @@ $(document).ready(function() {
 		});
     });
 	
-	$('#btnGetPortGroup1').click(function() {	
+	$('#btnGetPortGroup').click(function() {	
 		if ($('#vcAddress').length > 0) {
 			srvAddr = $('#vcAddress').val();
 			if ($('#vcUser').val() == "") {
@@ -192,7 +192,7 @@ $(document).ready(function() {
 		});
     });
 	
-	$('#btnGetPortGroup').click(function() {	
+	$('#btnGetVmName').click(function() {	
 		if ($('#vcAddress').length > 0) {
 			srvAddr = $('#vcAddress').val();
 			if ($('#vcUser').val() == "") {
@@ -212,16 +212,17 @@ $(document).ready(function() {
 			return false;
 		}
 		
-		$('#btnGetPortGroup').attr('disabled', true);
-		$('#btnGetPortGroup').attr('value', 'Loading...');
+		$('#btnGetVmName').attr('disabled', true);
+		$('#btnGetVmName').attr('value', 'Loading...');
 
 		$.ajax({
 			type: "POST",
-			url: "webcmd.php?command=listPortGroup&format=JSON",
+			url: "webcmd.php?command=listVmAndSnapshot",
 			data: {
 				serverAddress: srvAddr,
 				serverUser: srvUser,
-				serverPassword: srvPwd
+				serverPassword: srvPwd,
+				vmName: '*'
 			},
 			dataType: 'xml'
 		})
@@ -231,24 +232,22 @@ $(document).ready(function() {
 				alert("Failed to list port group, please check server address and credential.");
 				return false;
 			} else {
-				$('#portGroup').children().remove();
-				$('#portGroup').append('<datalist id="portGroup">');
-				var jsonString = $(xml).find('stdOutput').text();
-				var portGroup = $.parseJSON( jsonString );
-				portGroup.forEach(function(pg){
-					$('#portGroup').append('<option value="' + pg.Name + '">' + pg.Name + '</option>');
+				$('#vmName').children().remove();
+				$('#vmName').append('<datalist id="vmName">');
+				$(xml).find('virtualmachine').each(function(){
+					vn = $(this).find('name').text();
+					$('#vmName').append('<option value="' + vn + '">' + vn + ' </option>');
 				});
-				
-				$('#portGroup').append('</datalist>');
+				$('#vmName').append('</datalist>');
 			}
 		})
 		.fail(function(ret) {
 			alert($('#').val());
-			alert("Load port group Error: " + ret);
+			alert("Load VM name Error: " + ret);
 		})
 		.always(function() {
-			$('#btnGetPortGroup').attr('value', 'List Port Group');
-			$('#btnGetPortGroup').attr('disabled', false);
+			$('#btnGetVmName').attr('value', 'List VM name');
+			$('#btnGetVmName').attr('disabled', false);
 		});
     });
 	
