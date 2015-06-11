@@ -84,13 +84,14 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 $scriptPath = split-path -parent $MyInvocation.MyCommand.Definition 
 $historyPath = $scriptPath.replace("powershell", "www\history")
-$records = gci $historyPath\*.xml -recurse | select fullname, directory, creationTime | sort creationTime -desc
+$records = [io.Directory]::EnumerateFiles($historyPath,"*.xml","AllDirectories")
+[datetime]$origin = '1970-01-01 00:00:00'
 try {
 	if ($behindTime) {
-		$records = $records | ?{$_.creationTime -ge $behindTime}
+		$records = $records | ?{$_.split("output-")[-1].replace(".xml","") -ge ([datetime]$behindTime - $origin).totalseconds}
 	}
 	if ($beforeTime) {
-		$records = $records | ?{$_.creationTime -le $beforeTime}
+		$records = $records | ?{$_.split("output-")[-1].replace(".xml","") -le ([datetime]$beforeTime - $origin).totalseconds}
 	}
 } catch {
 	writeCustomizedMsg "Fail - parse time string"
@@ -98,34 +99,32 @@ try {
 	[Environment]::exit("0")
 }
 if ($resultCode) {
-	$records = $records | ?{$_.directory.basename -match "$resultCode"}
+	$records = $records | ?{$_.split("\")[-2] -match "$resultCode"}
 }
 if ($cmdName) {
-	$records = $records | ?{$_.directory.parent.basename -match "$cmdName"}
+	$records = $records | ?{$_.split("\")[-3] -match "$cmdName"}
 }
 if ($userAddr) {
-	$records = $records | ?{$_.directory.parent.parent.basename -match "$userAddr"}
+	$records = $records | ?{$_.split("\")[-4] -match "$userAddr"}
 }
 if ($user) {
-	$records = $records | ?{$_.directory.parent.parent.parent.basename -match "$user"}
+	$records = $records | ?{$_.split("\")[-5] -match "$user"}
 }
 if ($records) {
 	writeCustomizedMsg "Success - find execution history"
-	"<history>"
-	$i = 1
+	
+	$stringBuilder = New-Object System.Text.StringBuilder
+	$null = $stringBuilder.append("<history>")
+
 	$records | % {
-		$path = $_.fullname.replace("$historyPath\","").split("\")
-		"<record><number>$i</number>"
-		"<time>" + $_.creationTime + "</time>"
-		"<user>" + $path[0] + "</user>"
-		"<useraddr>" + $path[1] + "</useraddr>"
-		"<cmdname>" + $path[2] + "</cmdname>"
-		"<resultcode>" + $path[3] + "</resultcode>"
-		"<filename>" + $path[4] + "</filename>"
-		"</record>"
-		$i++
+		$path = $_.replace("$historyPath\","").split("\")
+		$seconds = $_.split("output-")[-1].replace(".xml","")
+		$time = $origin.AddSeconds($seconds)
+		$record = "<record><time>$time</time><user>$($path[0])</user><useraddr>$($path[1])</useraddr><cmdname>$($path[2])</cmdname><resultcode>$($path[3])</resultcode><filename>$($path[4])</filename></record>"
+		$null = $stringBuilder.Append($record)
 	}
-	"</history>"
+	$null = $stringBuilder.append("</history>")
+	write-output $stringBuilder.toString()
 } else {
 	writeCustomizedMsg "Fail - find execution history"
 }
