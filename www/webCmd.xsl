@@ -240,8 +240,9 @@ THE SOFTWARE.
 								<thead><tr><th>Number</th><th>Time</th><th>User</th><th>User Address</th><th>Command name</th><th>Result code</th><th>File</th></tr></thead>
 								<tbody>
 								<xsl:for-each select="record">
+									<xsl:sort select="time" order="descending" />
 									<tr>
-										<td><xsl:value-of select="number" /></td>
+										<td><xsl:value-of select="position()" /></td>
 										<td><xsl:value-of select="time"/></td>
 										<td><xsl:value-of select="user"/></td>
 										<td><xsl:value-of select="useraddr" /></td>
