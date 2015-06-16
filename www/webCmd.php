@@ -207,7 +207,7 @@ if ( $command == ""){
 		$missFile = false;
 		$psPath = realpath('../powershell/');
 		chdir($psPath);
-		$cmd = "powershell .\\" . $scriptName . ".ps1";
+		$cmd = "set runFromWeb=true & powershell .\\" . $scriptName . ".ps1";
 		$url = "http://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . "/webcmd.php?command=" . $command;
 		foreach($params as $param){
 			$name = strtolower((string)$param["name"]);
@@ -236,7 +236,7 @@ if ( $command == ""){
 				$url .= "&" . $name . "=" . urlencode($req[$name]);
 			}
 		}
-		//header("url:" . $url);
+		header("url:" . $url);
 		$xmloutput .= '</parameters>';
 
 		if ($missParam) {
@@ -266,7 +266,7 @@ if ( $command == ""){
 		$dom->loadXML(utf8_encode($xmloutput));
 		$dom->formatOutput = true;
 		echo $dom->saveXML();
-		if (!$missParam) {
+		if (!$missParam && $command != "showHistory") {
 			$xml = simplexml_import_dom($dom);
 			$returncode = $xml->xpath('/webcommander/returnCode');
 			$filename = '../www/history/' . $user . '/' . $userAddr . '/' . $command . '/' . $returncode[0];

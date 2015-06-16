@@ -40,14 +40,7 @@ $current = $host.ui.rawui.windowsize
 $current.width = 128
 $host.ui.rawui.windowsize = $current
 
-$runFromWeb = $false
-$currentId = $pid
-while ($currentId = (gwmi win32_process -Filter "processid='$currentId'").parentprocessid) {
-	$process = get-process -id $currentId -ea silentlycontinue
-	if ($process.processName -eq "php-cgi") {
-		$runFromWeb = $true
-	}
-}
+$runFromWeb = [boolean]$env:runFromWeb
 
 function verifyIp {
 	param($ipAddress)
@@ -530,7 +523,7 @@ function newVm {
 		$this.waitForTools()
 		try {
 			$output = Invoke-VMScript -ScriptText $script -ScriptType $type -VM $this.vivm `
-				-Server $this.server.viserver -HostUser $this.server.admin -HostPassword $this.server.passwd -toolswaitsecs 0 `
+				-Server $this.server.viserver -HostUser $this.server.admin -HostPassword $this.server.passwd -toolswaitsecs 60 `
 				-GuestUser $this.user -GuestPassword $this.password -confirm:$false -EA Stop
 		} catch {
 			writeCustomizedMsg "Fail - run VM script $script"
@@ -1028,10 +1021,10 @@ function newRemoteWinBroker {
 		$this.executePsRemote($cmd, $argList, $msg)
 	} -Name setFarmHtmlAccess
 	
-	$broker | Add-Member -MemberType ScriptMethod -Value { ##setHtmlAccess
+	$broker | Add-Member -MemberType ScriptMethod -Value { ##setPoolAutoRecovery
 		Param($poolId,$action)
 		$msg = "set pool auto-recovery $action"
-		$argList = @($poolId,$switch)
+		$argList = @($poolId,$action)
 		$cmd = {
 			$pool = [ADSI]("LDAP://localhost:389/cn=" + $args[0] + ",ou=Server Groups,dc=vdi,dc=vmware,dc=int")
 			if ($args[1] -eq "enable") {
@@ -1043,6 +1036,22 @@ function newRemoteWinBroker {
 		}
 		$this.executePsRemote($cmd, $argList, $msg)
 	} -Name setPoolAutoRecovery
+	
+	$broker | Add-Member -MemberType ScriptMethod -Value { ##setMmrPolicy
+		Param($action)
+		$msg = "set MMR policy $action"
+		$argList = @($action)
+		$cmd = {
+			$pool = [ADSI]("LDAP://localhost:389/cn=0,ou=VDM,ou=Policies,dc=vdi,dc=vmware,dc=int")
+			if ($args[0] -eq "enable") {
+				$pool.put("pae-AllowMMR", "1")
+			} else {
+				$pool.put("pae-AllowMMR", "0")
+			}
+			$pool.setinfo()
+		}
+		$this.executePsRemote($cmd, $argList, $msg)
+	} -Name setMmrPolicy
 	
 	$broker | Add-Member -MemberType ScriptMethod -Value { ##addRdsDesktopPool
 		Param($farmId,$poolId)
