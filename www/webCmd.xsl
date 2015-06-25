@@ -232,7 +232,9 @@ THE SOFTWARE.
 							</a>
 						</xsl:when>
 						<xsl:when test="name() = 'separator'">
-							<hr class="separator" />
+						    <xsl:if test="following-sibling::*">
+								<hr class="separator" />
+							</xsl:if>
 						</xsl:when>
 						<xsl:when test="name() = 'history'">
 							<hr class="separator"/>

@@ -37,9 +37,7 @@ THE SOFTWARE.
 				<script src="//code.jquery.com/jquery-1.8.3.js"></script>
 				<script src="//code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 				<script src="webCmd.js"></script>
-				<script src="//sideroad.secret.jp/js/jquery.sidebar.js"></script>
-				<script src="//rawgit.com/davatron5000/Lettering.js/master/jquery.lettering.js"></script>
-				<script src="//jschr.github.io/textillate/jquery.textillate.js"></script>
+				<script src="//www.bcone.com/theme/master/src/jquery.sidebar.js"></script>
 				<script src="//rawgit.com/JoelSutherland/GitHub-jQuery-Repo-Widget/master/jquery.githubRepoWidget.min.js"></script>
 			</head>
 			<body>
@@ -172,18 +170,13 @@ THE SOFTWARE.
 	</xsl:template>	
 	<xsl:template name="footer">
 		<div id="footer" class="fbg">
-			<div class="fbg_resize">
-				<div id="users" class="col c1">
-					<div class="github-widget" data-repo="vmware/webcommander"></div>
-				</div>
-				<div class="col c2">
-					<a class="twitter-timeline" height="200" href="https://twitter.com/search?q=webcommander" data-border-color="#959595" data-theme="dark" data-widget-id="507213777024995329">Tweets about "webcommander"</a>
+		    <div class="col github-widget" data-repo="vmware/webcommander"></div>
+			<div class="col">
+				<a class="twitter-timeline" height="200" href="https://twitter.com/search?q=webcommander" data-border-color="#959595" data-theme="dark" data-widget-id="507213777024995329">Tweets about "webcommander"</a>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-				</div>
-				<div class="col c3">
-					<img class="animation" src="images/logo-vmware.png" width="200" height="200" />
-				</div>
-				<div class="clr"></div>
+			</div>
+			<div class="col">
+				<iframe width="380" height="200" src="https://www.youtube.com/embed/videoseries?list=PLwi0cwbJncw13h5CVtojr2ytdHQQVct1k" frameborder="0" allowfullscreen="0"></iframe>
 			</div>
 		</div>
 	</xsl:template>
