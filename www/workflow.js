@@ -41,7 +41,7 @@ $.fn.serializeObject = function(){
 
 function addCommand(currentCommand){
 	var $cmd = $('<div class="command"><p class="heading"><span class="orderNumber"></span>\
-		' + select_cmd + '<span class="description"></span><span class="status"></span><span class="right"> \
+		' + select_cmd + '<span class="description"></span><span class="right"><span class="status"></span> \
 		<input class="add" type="image" title="Add a new command" src="images/button-add-icon.png" /> \
 		<input class="delete" type="image" title="Delete this command" src="images/button-delete-icon.png" /> \
 		<input class="toggle" type="image" title="Toggle display" src="images/button-switch-icon.png" /> \

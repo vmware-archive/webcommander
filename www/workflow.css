@@ -34,20 +34,26 @@ body {
 	background-attachment:flow;
 	background-position:top right;
 }
+#sortable{
+	margin: 0 40px;
+}
+#header {
+	margin-top:30px;
+	margin-left:50px;
+	margin-right:50px;
+	padding:10px; 
+	overflow:hidden;
+}
 #logo { 
-	position:absolute;
-	top:30px;
-	left:50px;
-	margin:0px; 
-	padding:0px; 
 	font:normal 39px/1.2em 'Roboto Condensed'; 
 	letter-spacing:-2px;
+	float:left;
+	display:inline-block;
 }
 #logo span { color:gold;}
 #execute { 
-	position:absolute;
-	top:25px;
-	right:50px;
+	float:right;
+	display:inline-block;
 }
 .execute {
 	width: 60px;
@@ -60,6 +66,7 @@ body {
 	margin-left:15px;	
 	-moz-appearance:none;
 	vertical-align:top;
+	float: right;
 }
 #iteration {
 	background-image:url('images/button-repeat-icon.png');
@@ -67,13 +74,13 @@ body {
 	background-repeat:no-repeat;
 	background-position: center; 
 	height: 64px;
-    z-index: 1;
 	font: 30px/1.2em 'Roboto Condensed';
 	display:inline-block;
 	vertical-align: top;
 	text-align:center;
 	border:0px;
 	color:white;
+	width:128px;
 }
 .add, .delete, .toggle, .onoff {
 	width: 32px;
@@ -81,13 +88,9 @@ body {
 	margin-left: 15px;
 	vertical-align: top;
 }
-#sortable {
-	position:absolute;
-	top:90px;
-	width:100%;
-}
+
 .heading {
-	margin: 10px 70px 0 70px;
+	margin: 10px 30px 0px 30px;
 	color:#1697d1;
 	padding: 10px;
 	cursor: move;
@@ -97,24 +100,33 @@ body {
 	border-bottom:2px solid black;
 	border-radius: 8px;
 	font:normal 18px/1.2em 'Roboto Condensed';
-	height:30px;
 	vertical-align:middle;
-	/*background-image: linear-gradient(to right, white 35%, #1697d1 100%);*/
+	overflow:hidden;
 }
 .orderNumber {
 	display:inline-block;
+	margin-top:7px;
 	width:30px;
 	text-align:right;
 	color:black;
 }
-.right {float: right;}
+.orderNumber, .description { 
+  display:inline-block;
+  float: left;
+}
+.right {
+  float: right;
+  display:inline-block;
+  margin-left:100px;
+}
 .description {
-	width:500px; text-align:left; display:inline-block; margin-left:30px; margin-right:30px;
-}.status {
-	margin-right:30px;
+	margin-top:7px; text-align:left; display:inline-block; margin-left:30px; margin-right:30px;
+}
+.status {
+	margin-top:7px; margin-right:100px; display:inline-block;
 }
 .content, .detail {
-	margin: 0 105px 0 105px;
+	margin: 0 65px 0 65px;
 }
 .detail {
 	display: none;
@@ -179,6 +191,7 @@ select.cmdlist{
    border-radius: 0;
    height: 34px;
    -webkit-appearance: none;
+   float:left;
 }
 textarea {
 	width:100%;

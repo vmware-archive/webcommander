@@ -84,55 +84,23 @@ pre {
 	color:black;
 }
 
-@media screen and (min-width: 2081px) {
-	#index {
-		-webkit-column-count: 8;
-		-moz-column-count: 8;
-		column-count: 8;
-	}
-	#index li { 
-		font:normal 16px 'Roboto Condensed';
-	}
-}
 
-@media screen and (max-width: 2080px) and (min-width: 1681px) {
-	#index {
-		-webkit-column-count: 7;
-		-moz-column-count: 7;
-		column-count: 7;
-	}
-	#index li { 
-		font:normal 15px 'Roboto Condensed';
-	}
+#index {
+	-webkit-column-count: auto;
+	-webkit-column-width: 200px;
+	-moz-column-count: auto;
+	-moz-column-width: 200px;
+	column-count: auto;
+	column-width: 200px;
 }
-
-@media screen and (max-width: 1680px) and (min-width: 1281px) {
-	#index {
-		-webkit-column-count: 6;
-		-moz-column-count: 6;
-		column-count: 6;
-	}
-	#index li { 
-		font:normal 14px 'Roboto Condensed';
-	}
-}
-
-@media screen and (max-width: 1280px) {
-	#index {
-		-webkit-column-count: 5;
-		-moz-column-count: 5;
-		column-count: 5;
-	}
-	#index li { 
-		font:normal 13px 'Roboto Condensed';
-	}
+#index li { 
+	font:normal 15px 'Roboto Condensed';
 }
 
 i {
 	color:gold;
 	font:bold;
 }
-
 
 a.cmdName, a.cmdName:hover {
 	color:black;
@@ -312,19 +280,24 @@ ul, ol {
 	border: double;
 }
 
-.fbg { padding:0px 0 0 0; border-top:1px solid #5e5f62; background:#484e55 url(../images/fbg_bg.gif) bottom repeat-x; margin:0px 0 10px 0;}
-.fbg_resize { margin:0 auto; padding:5px 5px; width:1280px;}
-.fbg  h2 { color:#dedddd;}
-.fbg  p { color:#959595;}
-.fbg  a { color:#3a99d5; text-decoration:none;}
-.fbg  img { padding:4px; border:1px solid #cfd2d4; background-color:#fff;}
-.fbg .col { margin:0; float:left;}
-.fbg .c1 { padding:0 16px 0 0; width:440px;}
-.fbg .c2 { padding:0 16px; width:480px;}
-.fbg .c3 { padding:0 16px 0 16px; width:260px;}
-.fbg .c1 img { margin:8px;}
-.fbg .c3 img { margin-bottom:10px; float:top; background-color:#323235; border:0px}
-.clr { clear:both; padding:0; margin:0; width:100%; font-size:0px; line-height:0px;}	
+.fbg { 
+  text-align:center;
+  border-top:1px solid #5e5f62; 
+  background:#484e55 url(../images/fbg_bg.gif) bottom repeat-x; 
+}
+
+.col {
+  text-align: left; 
+  width: 380px;
+  padding: 15px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+* {
+    margin:0;
+    padding:0;
+}
 
 .slide-out-div {
 	padding: 20px;
@@ -332,11 +305,6 @@ ul, ol {
 	background: #ccc;
 	border: 1px solid #29216d;
 }      
-
-* {
-    margin:0;
-    padding:0;
-}
 
 .sidebar-root{
     position : relative;
