@@ -228,7 +228,7 @@ if ( $command == ""){
 					#$fileName = date("Ymd-his__") . $clientIp . "__" . $_FILES[$name]["name"];
 					$fileName = $folder . "/" . $_FILES[$name]["name"];
 					move_uploaded_file($_FILES[$name]["tmp_name"], $fileName);
-					$cmd .= " -" . $name . " " . realpath($fileName); 
+					$cmd .= " -" . $name . " '" . realpath($fileName) . "'"; 
 				}
 			}
 			if ($req[$name] != "") {
