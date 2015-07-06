@@ -156,6 +156,9 @@ THE SOFTWARE.
 					<xsl:when test="@type = 'password'">
 						<input type="password" id="{@name}" name="{@name}" size="40" />
 					</xsl:when>
+					<xsl:when test="@type = 'checkbox'">
+						<input type="checkbox" id="{@name}" name="{@name}" />
+					</xsl:when>
 					<xsl:when test="@type = 'option'">
 						<select name="{@name}" id="{@name}">
 							<xsl:if test="@name = 'isoPath'">
