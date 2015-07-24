@@ -43,12 +43,20 @@ function transformXml(xml, xsl) {
 	return html;
 }
 
-function addRow(curRow){
-  var curRowPos = curRow.index();
-  var curGroup = $(xml).find("group").eq(curRowPos);
-  curGroup.after(groupXml); 
+function addRow(curRow, groupXml){
+  if (typeof groupXml === "undefined") {
+    groupXml = "<group><cmd>No command defined yet</cmd></group>";
+  }
   var row = $(transformXml($.parseXML(groupXml),xsl)).find("div.row");
-  curRow.after(row);
+  if (curRow.length === 0) {
+    $(xml).find("supergroup").append(groupXml);
+    $(".pageData").append(row);
+  } else {
+    var curRowPos = curRow.index();
+    var curGroup = $(xml).find("group").eq(curRowPos);
+    curGroup.after(groupXml); 
+    curRow.after(row);
+  }
   row.hide().show('slow');
   drawCard();
 }
@@ -73,7 +81,8 @@ function orderRow(curRow, orderIcon){
   }
 }
 
-function addCard(curCard){
+function addCard(curCard){ 
+  var cmdXml = "<cmd>No command defined yet</cmd>";
   var curCardPos = curCard.index();
   var curRowPos = curCard.parent().parent().index();
   var curCmd = $(xml).find("group").eq(curRowPos).find("cmd").eq(curCardPos);
@@ -82,6 +91,15 @@ function addCard(curCard){
   curCard.after(card);
   card.hide().show('slow');
   drawCard();
+}
+
+function importCard(curRow, cmdXml){
+  var curRowPos = curRow.index();
+  var curGroup = $(xml).find("group").eq(curRowPos);
+  curGroup.append(cmdXml);
+  var card = $(transformXml($.parseXML(cmdXml),xsl)).find("div.card");
+  $(curRow).find('.rowData').append(card);
+  card.hide().show('slow');
 }
 
 function delCard(curCard){
@@ -139,6 +157,33 @@ function drawCard(){
       }
     }
   }).disableSelection();
+}
+
+function saveCard(theCard, theCmd) {
+  var selectCmd = $('#cmdDialog').find('.cmdlist').val();
+	var selectCmdXml = $(allCmdXml).find('command').filter(function() {
+	  return $(this).attr('name') == selectCmd;
+	});
+	selectCmdXml.find("parameter").each(function(){
+	  var field = $("#" + $(this).attr("name"));
+	  if (field.attr("type") != "file") {
+		$(this).attr('value', field.val());
+	  } else {
+		var fileVarName = 'f_' + curRowPos + '_' + curCardPos; 
+		globalVariable[fileVarName] = field[0].files[0];
+		$(this).attr('value', fileVarName);
+	  }
+	});
+	if (selectCmdXml[0].xml){
+	  selectCmdXml = selectCmdXml[0].xml;
+	} 
+	else {
+	  selectCmdXml = selectCmdXml[0].outerHTML;
+	}	
+	theCmd.empty();
+	theCmd.append(selectCmdXml);
+	theCard.find(".cmdDesc").text(selectCmd);
+	theCard.find(".execTime").text("0.0 seconds");
 }
 
 function runPage(){
@@ -282,35 +327,12 @@ function showCard(curCard) {
     title: 'Command Detail',
     buttons:{
       "Save": function(){
-        var selectCmd = $('#cmdDialog').find('.cmdlist').val();
-        var selectCmdXml = $(allCmdXml).find('command').filter(function() {
-          return $(this).attr('name') == selectCmd;
-        });
-        selectCmdXml.find("parameter").each(function(){
-          var field = $("#" + $(this).attr("name"));
-          if (field.attr("type") != "file") {
-            $(this).attr('value', field.val());
-          } else {
-            var fileVarName = 'f_' + curRowPos + '_' + curCardPos; 
-            globalVariable[fileVarName] = field[0].files[0];
-            $(this).attr('value', fileVarName);
-          }
-        });
-        if (selectCmdXml[0].xml){
-          selectCmdXml = selectCmdXml[0].xml;
-        } 
-        else {
-          selectCmdXml = selectCmdXml[0].outerHTML;
-        }	
-        curCmd.empty();
-        curCmd.append(selectCmdXml);
-        curCard.find(".cmdDesc").text(selectCmd);
-        curCard.find(".execTime").text("0.0 seconds");
+        saveCard(curCard, curCmd);
         $("#cmdDialog").dialog("close");
         return false;
       },
       "Execute": function(){
-        $(":button:contains('Save')").click();
+        saveCard(curCard, curCmd);
         $(":button:contains('Execute')").prop("disabled", true).addClass("ui-state-disabled running");
         setInterval(function() {
           $(":button.running").effect('fade',1000)
@@ -331,8 +353,6 @@ function showCard(curCard) {
 }
 
 function exportXml(xmlstring) {
-  //$( "#cmdDialog" ).html('<pre id="exportxml"></pre>');
-  //$( '#exportxml' ).text( xmlstring );
   $( "#cmdDialog" ).html('<textarea id="xmltext" wrap="off">' + xmlstring + '</textarea>');
   $( "#cmdDialog" ).dialog({
     width:1024,
@@ -345,7 +365,7 @@ function exportXml(xmlstring) {
 	return false;
 }
 
-function importXml() {
+function importXml(toRow) {
   $( "#cmdDialog" ).html('<textarea id="xmltext" wrap="off"></textarea>');
   $( "#cmdDialog" ).dialog({
     width:1024,
@@ -356,12 +376,18 @@ function importXml() {
     buttons:{
       "Import": function(){
         var newxml = $.parseXML($("#xmltext").val());
-        $(xml).find("supergroup").append($(newxml).find("supergroup").children());
-        console.log(xml);
-        $('body').html(transformXml(xml, xsl));
-        $(".card").hide().show("slow");
+        if (typeof toRow === "undefined") {
+          $(newxml).find("group").each(function(){
+            var grpXml = $(this)[0].outerHTML;
+            addRow($(".row:last"), grpXml);
+          });
+        } else {
+          $(newxml).find("cmd").each(function(){
+            var cmdXml = $(this)[0].outerHTML;
+            importCard(toRow, cmdXml);
+          });
+        }
         drawCard();
-        return false;
       }
     }
   });
@@ -372,8 +398,6 @@ xsl = loadXMLDoc("/poker/poker.xsl");
 xml = $.parseXML($('#poker').text());
 allCmdXml = loadXMLDoc("/webcmd.php");
 cmdXsl = loadXMLDoc("/poker/command.xsl");
-cmdXml = "<cmd>No command defined yet</cmd>";
-groupXml = "<group>" + cmdXml + "</group>";
 senderRow = null;
 globalVariable = {};
 
@@ -442,8 +466,22 @@ $(function() {
 		exportXml(new XMLSerializer().serializeToString(xml));
 	});
   
+  $("body").on('click', '.exportRow', function(){
+    var curRow = $(this).find('div.row:first'); 
+    var curRowPos = curRow.index();
+    var curGroup = $(xml).find("group").eq(curRowPos);
+    console.log("test");
+    console.log(curGroup);
+		exportXml(new XMLSerializer().serializeToString(curGroup[0]));
+	});
+  
   $("body").on('click', '.importPage', function(){
     importXml();
+  });
+  
+  $("body").on('click', '.importRow', function(){
+    var curRow = $(this).parents('div.row:first');
+    importXml(curRow);
   });
   
   $("body").on('click', '.orderRow', function(){ 
