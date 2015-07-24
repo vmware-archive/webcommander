@@ -64,7 +64,9 @@ THE SOFTWARE.
             </xsl:choose>
           </xsl:attribute>
         </i> . 
-        <i class="fa fa-play runRow" title="Run"></i>
+        <i class="fa fa-play runRow" title="Run"></i> . 
+        <i class="fa fa-file-text importRow" title="Import"></i> . 
+        <i class="fa fa-file-text-o exportRow" title="Export"></i>
       </div>
       <div class="rowData">
         <xsl:apply-templates />
