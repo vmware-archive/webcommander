@@ -122,7 +122,7 @@ function cleanPsParam($string) {
 	return "'" . str_replace($old, $new, $string) . "'";
 }
 
-function callPs1($cmd) {
+function callCmd($cmd) {
 	global $xmloutput, $codeArray;
 	exec($cmd,$result,$exitcode);
 	foreach ($result as $line) {
@@ -131,7 +131,7 @@ function callPs1($cmd) {
 	if ($exitcode != 0) {
 		$output = "<stdOutput><![CDATA[" . $output . "]]></stdOutput>";
 		$output .= "<customizedOutput> [";
-		$output .= date("Y-m-d H:i:s") . "] Fail - run Powershell script</customizedOutput>";
+		$output .= date("Y-m-d H:i:s") . "] Fail - run command</customizedOutput>";
 	}	
 	$xmloutput .= "<result>" . $output . "</result>";
 	if (strpos($output, "] Fail - ") === FALSE) {
@@ -169,7 +169,9 @@ if ( $command == ""){
 	$list = $thedocument->getElementsByTagName('command');
 	foreach ($list as $domElement){
 		$scriptName = $domElement->getElementsByTagName('script')->item(0)->textContent;
-		if (!file_exists("../powershell/" . $scriptName . ".ps1") and !file_exists("./" . $scriptName)) {
+		if (!file_exists("../powershell/" . $scriptName . ".ps1") 
+      and !file_exists("./" . $scriptName)
+      and !file_exists("../python/" . $scriptName)) {
 			#$thedocument->removeChild($domElement);
 			$domElement->setAttribute("hidden","1");
 		}
@@ -205,9 +207,15 @@ if ( $command == ""){
 		$params = $target->xpath("parameters/parameter");
 		$missParam = false;
 		$missFile = false;
-		$psPath = realpath('../powershell/');
-		chdir($psPath);
-		$cmd = "set runFromWeb=true & powershell .\\" . $scriptName . ".ps1";
+    if ( preg_match('/\.py$/',$scriptName) ) {
+      $pyPath = realpath('../python/');
+      chdir($pyPath);
+      $cmd = "python .\\" . $scriptName ;      
+    } else {
+      $psPath = realpath('../powershell/');
+      chdir($psPath);
+      $cmd = "set runFromWeb=true & powershell .\\" . $scriptName . ".ps1";
+    }
 		$url = "http://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . "/webcmd.php?command=" . $command;
 		foreach($params as $param){
 			$name = strtolower((string)$param["name"]);
@@ -245,9 +253,10 @@ if ( $command == ""){
 			missFileNotice();
 		} else {      
 			$cmd .= " <nul";
-			//$cmd .= " 2>&1";
+			$cmd .= " 2>&1";
 			//$xmloutput .= '<cmd><![CDATA[' . $cmd . ']]></cmd>';
-			callPs1($cmd);
+      //echo $cmd;
+			callCmd($cmd);
 		}
 		
 		//$xmloutput .= '<url><![CDATA[' . $url . ']]></url>';
