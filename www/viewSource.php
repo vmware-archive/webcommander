@@ -30,18 +30,22 @@ $output .= '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /
 $output .= '<title>webCommander Source Code Viewer</title>';
 $output .= '<script type="text/javascript" src="//agorbatchev.typepad.com/pub/sh/3_0_83/scripts/shCore.js"></script>';
 $output .= '<script type="text/javascript" src="//agorbatchev.typepad.com/pub/sh/3_0_83/scripts/shBrushPowerShell.js"></script>';
+$output .= '<script type="text/javascript" src="//agorbatchev.typepad.com/pub/sh/3_0_83/scripts/shBrushPython.js"></script>';
 $output .= '<link type="text/css" rel="stylesheet" href="//agorbatchev.typepad.com/pub/sh/3_0_83/styles/shCoreDefault.css"/>';
 $output .= '<script type="text/javascript">SyntaxHighlighter.all()</script>';
 $output .= '</head>';
 $output .= '<body style="background: white; font-family: Helvetica">';
-$output .= '<pre class="brush: powershell;">';
 
 $scriptName = $_REQUEST["scriptName"];
-
-if (!file_exists("../powershell/" . $scriptName . ".ps1")) {
-	$output .= "Could not find script " . $scriptName . ".ps1";
+if ( preg_match('/\.py$/',$scriptName) ) {
+  $output .= '<pre class="brush: python;">';
+  $output .= file_get_contents("../python/" . $scriptName);
+} elseif (file_exists("../powershell/" . $scriptName . ".ps1")) {
+  $output .= '<pre class="brush: powershell;">';
+  $output .= file_get_contents("../powershell/" . $scriptName . ".ps1");
 } else {
-	$output .= file_get_contents("../powershell/" . $scriptName . ".ps1");
+  $output .= '<pre class="brush: powershell;">';
+  $output .= "Could not find script " . $scriptName . ".ps1";
 }
 $output .= '</pre>';
 $output .= '</body>';

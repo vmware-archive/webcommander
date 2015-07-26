@@ -24,4 +24,5 @@ THE SOFTWARE.
 <?xml-stylesheet type="text/xsl" href="index.xsl" ?>
 <webcommander xmlns:xi="http://www.w3.org/2003/XInclude">
 	<xi:include href="../powershell/_def.xml" xpointer="xpointer(//command)" parse="xml" />
+  <xi:include href="../python/_def.xml" xpointer="xpointer(//command)" parse="xml" />
 </webcommander>
