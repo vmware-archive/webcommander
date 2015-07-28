@@ -71,7 +71,10 @@ THE SOFTWARE.
 	</xsl:template>
 	<xsl:template name="header">
 		<div id="logo">
-			<img src="images/logo-b.png" /> > web<span>Commander</span> > <a href="workflow.html" class="logo"><font face="courier">workflow</font></a>
+			<img src="images/logo-b.png" /> 
+			> web<span>Commander</span> 
+			> <a href="workflow.html" class="logo"><font face="courier">workflow</font></a> 
+			[ <a href="poker/poker.html" class="logo"><span>Poker</span></a> ]
 		</div>
 	</xsl:template>
 	<xsl:template name="content">

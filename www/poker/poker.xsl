@@ -28,6 +28,7 @@ THE SOFTWARE.
   <xsl:template match="supergroup">
     <div class="page">
       <div class="pageMenu">
+        <a href="/webcmd.php"><i class="fa fa-home" title="Home page"></i></a> . 
         <i class="fa fa-cog orderPage" title="Serial / Parallel"></i> .  
         <i class="fa fa-play runPage" title="Run"></i> . 
         <i class="fa fa-file-text importPage" title="Import"></i> . 
