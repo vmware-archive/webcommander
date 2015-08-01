@@ -31,6 +31,7 @@ $output .= '<title>webCommander Source Code Viewer</title>';
 $output .= '<script type="text/javascript" src="//agorbatchev.typepad.com/pub/sh/3_0_83/scripts/shCore.js"></script>';
 $output .= '<script type="text/javascript" src="//agorbatchev.typepad.com/pub/sh/3_0_83/scripts/shBrushPowerShell.js"></script>';
 $output .= '<script type="text/javascript" src="//agorbatchev.typepad.com/pub/sh/3_0_83/scripts/shBrushPython.js"></script>';
+$output .= '<script type="text/javascript" src="//agorbatchev.typepad.com/pub/sh/3_0_83/scripts/shBrushRuby.js"></script>';
 $output .= '<link type="text/css" rel="stylesheet" href="//agorbatchev.typepad.com/pub/sh/3_0_83/styles/shCoreDefault.css"/>';
 $output .= '<script type="text/javascript">SyntaxHighlighter.all()</script>';
 $output .= '</head>';
@@ -40,6 +41,9 @@ $scriptName = $_REQUEST["scriptName"];
 if ( preg_match('/\.py$/',$scriptName) ) {
   $output .= '<pre class="brush: python;">';
   $output .= file_get_contents("../python/" . $scriptName);
+} elseif ( preg_match('/\.rb$/',$scriptName) ) {
+  $output .= '<pre class="brush: ruby;">';
+  $output .= file_get_contents("../ruby/" . $scriptName);
 } elseif (file_exists("../powershell/" . $scriptName . ".ps1")) {
   $output .= '<pre class="brush: powershell;">';
   $output .= file_get_contents("../powershell/" . $scriptName . ".ps1");

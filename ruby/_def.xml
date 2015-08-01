@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<webcommander xmlns:xi="http://www.w3.org/2003/XInclude">
+  <command name="rubyExample" synopsis="Example Ruby command" developer="liuj@vmware.com">
+    <description>This is an example ruby command</description>
+    <functionalities>
+      <functionality>Ruby</functionality>
+    </functionalities>
+    <script>example.rb</script>
+    <parameters>
+      <parameter name="myParam" helpmessage="Example parameter" mandatory="1" />
+    </parameters>
+  </command>
+</webcommander>

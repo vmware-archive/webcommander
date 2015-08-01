@@ -171,7 +171,8 @@ if ( $command == ""){
 		$scriptName = $domElement->getElementsByTagName('script')->item(0)->textContent;
 		if (!file_exists("../powershell/" . $scriptName . ".ps1") 
       and !file_exists("./" . $scriptName)
-      and !file_exists("../python/" . $scriptName)) {
+      and !file_exists("../python/" . $scriptName)
+      and !file_exists("../ruby/" . $scriptName)) {
 			#$thedocument->removeChild($domElement);
 			$domElement->setAttribute("hidden","1");
 		}
@@ -207,10 +208,16 @@ if ( $command == ""){
 		$params = $target->xpath("parameters/parameter");
 		$missParam = false;
 		$missFile = false;
+    $paramSeparator = " -";
     if ( preg_match('/\.py$/',$scriptName) ) {
       $pyPath = realpath('../python/');
       chdir($pyPath);
       $cmd = "python .\\" . $scriptName ;      
+    } elseif ( preg_match('/\.rb$/',$scriptName) ) {
+      $rbPath = realpath('../ruby/');
+      chdir($rbPath);
+	    $cmd = "ruby .\\" . $scriptName ;
+      $paramSeparator = " --";
     } else {
       $psPath = realpath('../powershell/');
       chdir($psPath);
@@ -236,11 +243,11 @@ if ( $command == ""){
 					#$fileName = date("Ymd-his__") . $clientIp . "__" . $_FILES[$name]["name"];
 					$fileName = $folder . "/" . $_FILES[$name]["name"];
 					move_uploaded_file($_FILES[$name]["tmp_name"], $fileName);
-					$cmd .= " -" . $name . " '" . realpath($fileName) . "'"; 
+					$cmd .= $paramSeparator . $name . " '" . realpath($fileName) . "'"; 
 				}
 			}
 			if ($req[$name] != "") {
-				$cmd .= " -" . $name . " " . urlencode($req[$name]); 
+				$cmd .= $paramSeparator . $name . " " . urlencode($req[$name]); 
 				$url .= "&" . $name . "=" . urlencode($req[$name]);
 			}
 		}
