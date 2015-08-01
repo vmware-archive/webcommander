@@ -32,6 +32,7 @@ $output .= '<script type="text/javascript" src="//agorbatchev.typepad.com/pub/sh
 $output .= '<script type="text/javascript" src="//agorbatchev.typepad.com/pub/sh/3_0_83/scripts/shBrushPowerShell.js"></script>';
 $output .= '<script type="text/javascript" src="//agorbatchev.typepad.com/pub/sh/3_0_83/scripts/shBrushPython.js"></script>';
 $output .= '<script type="text/javascript" src="//agorbatchev.typepad.com/pub/sh/3_0_83/scripts/shBrushRuby.js"></script>';
+$output .= '<script type="text/javascript" src="//agorbatchev.typepad.com/pub/sh/3_0_83/scripts/shBrushPerl.js"></script>';
 $output .= '<link type="text/css" rel="stylesheet" href="//agorbatchev.typepad.com/pub/sh/3_0_83/styles/shCoreDefault.css"/>';
 $output .= '<script type="text/javascript">SyntaxHighlighter.all()</script>';
 $output .= '</head>';
@@ -44,6 +45,9 @@ if ( preg_match('/\.py$/',$scriptName) ) {
 } elseif ( preg_match('/\.rb$/',$scriptName) ) {
   $output .= '<pre class="brush: ruby;">';
   $output .= file_get_contents("../ruby/" . $scriptName);
+} elseif ( preg_match('/\.pl$/',$scriptName) ) {
+  $output .= '<pre class="brush: perl;">';
+  $output .= file_get_contents("../perl/" . $scriptName);
 } elseif (file_exists("../powershell/" . $scriptName . ".ps1")) {
   $output .= '<pre class="brush: powershell;">';
   $output .= file_get_contents("../powershell/" . $scriptName . ".ps1");
