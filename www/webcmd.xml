@@ -26,4 +26,5 @@ THE SOFTWARE.
   <xi:include href="../powershell/_def.xml" xpointer="xpointer(//command)" parse="xml" />
   <xi:include href="../python/_def.xml" xpointer="xpointer(//command)" parse="xml" />
   <xi:include href="../ruby/_def.xml" xpointer="xpointer(//command)" parse="xml" />
+  <xi:include href="../perl/_def.xml" xpointer="xpointer(//command)" parse="xml" />
 </webcommander>

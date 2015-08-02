@@ -172,7 +172,8 @@ if ( $command == ""){
 		if (!file_exists("../powershell/" . $scriptName . ".ps1") 
       and !file_exists("./" . $scriptName)
       and !file_exists("../python/" . $scriptName)
-      and !file_exists("../ruby/" . $scriptName)) {
+      and !file_exists("../ruby/" . $scriptName) 
+      and !file_exists("../perl/" . $scriptName)) {
 			#$thedocument->removeChild($domElement);
 			$domElement->setAttribute("hidden","1");
 		}
@@ -217,6 +218,11 @@ if ( $command == ""){
       $rbPath = realpath('../ruby/');
       chdir($rbPath);
 	    $cmd = "ruby .\\" . $scriptName ;
+      $paramSeparator = " --";
+    } elseif ( preg_match('/\.pl$/',$scriptName) ) {
+      $rbPath = realpath('../perl/');
+      chdir($rbPath);
+	    $cmd = "perl .\\" . $scriptName ;
       $paramSeparator = " --";
     } else {
       $psPath = realpath('../powershell/');
