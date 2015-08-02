@@ -21,7 +21,7 @@ WebCommander also provides 2 methods (workflow and poker) to run multiple comman
 
 WebCommander currently supports Powershell, Perl, Python and Ruby scripts. 
 The built-in Powershell scripts are mainly for automating VMware vSphere and Horizon View. 
-As for Perl, Python and Ruby, only 1 example script is provided respectively to illustrate how to add uses' own scripts into WebCommander. 
+As for Perl, Python and Ruby, only 1 example script is provided respectively to illustrate how to add users' own scripts into WebCommander. 
 
 Installation
 ============
