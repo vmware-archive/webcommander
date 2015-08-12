@@ -80,7 +80,7 @@ THE SOFTWARE.
 						<input type="file" id="{@name}" name="{@name}" size="60" />
 					</xsl:when>
 					<xsl:when test="@type = 'password'">
-						<input type="password" id="{@name}" name="{@name}" size="40" />
+						<input type="password" id="{@name}" name="{@name}" value="{@value}" size="40" />
 					</xsl:when>
 					<xsl:when test="@type = 'option'">
 						<select name="{@name}" id="{@name}">
