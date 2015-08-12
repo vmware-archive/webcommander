@@ -29,7 +29,19 @@ THE SOFTWARE.
     <div class="page">
       <div class="pageMenu">
         <a href="/webcmd.php"><i class="fa fa-home" title="Home page"></i></a> . 
-        <i class="fa fa-cog orderPage" title="Serial / Parallel"></i> .  
+        <i title="Serial / Parallel">
+          <xsl:attribute name="class">
+            <xsl:text>orderPage fa </xsl:text>
+            <xsl:choose>
+              <xsl:when test="@order='parallel'">
+                <xsl:text>fa-cogs </xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>fa-cog </xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </i> .        
         <i class="fa fa-play runPage" title="Run"></i> . 
         <i class="fa fa-file-text importPage" title="Import"></i> . 
         <i class="fa fa-file-text-o exportPage" title="Export"></i>
@@ -51,7 +63,19 @@ THE SOFTWARE.
       <div class="rowMenu">
         <i class="fa fa-plus-square addRow" title="Add"></i> . 
         <i class="fa fa-minus-square delRow" title="Delete"></i> . 
-        <i class="fa fa-cog orderRow" title="Serial / Parallel"></i> . 
+        <i title="Serial / Parallel">
+          <xsl:attribute name="class">
+            <xsl:text>orderRow fa </xsl:text>
+            <xsl:choose>
+              <xsl:when test="@order='parallel'">
+                <xsl:text>fa-cogs </xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>fa-cog </xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </i> . 
         <i title="Enable / Disable">
           <xsl:attribute name="class">
             <xsl:text>disable fa </xsl:text>
