@@ -47,7 +47,7 @@ function addRow(curRow, groupXml){
   if (typeof groupXml === "undefined") {
     groupXml = "<group><cmd>No command defined yet</cmd></group>";
   }
-  var row = $(transformXml($.parseXML(groupXml),xsl)).find("div.row");
+  var row = $(transformXml(groupXml,xsl)).find("div.row");
   if (curRow.length === 0) {
     $(xml).find("supergroup").append(groupXml);
     $(".pageData").append(row);
@@ -97,7 +97,7 @@ function importCard(curRow, cmdXml){
   var curRowPos = curRow.index();
   var curGroup = $(xml).find("group").eq(curRowPos);
   curGroup.append(cmdXml);
-  var card = $(transformXml($.parseXML(cmdXml),xsl)).find("div.card");
+  var card = $(transformXml(cmdXml,xsl)).find("div.card");
   $(curRow).find('.rowData').append(card);
   card.hide().show('slow');
 }
@@ -128,7 +128,6 @@ function drawCard(){
       else {
         $(xml).find("group").eq(newRowPos - 1).after(tempGroup);
       }
-      console.log(xml);
     }
   }).disableSelection();
   
@@ -174,14 +173,8 @@ function saveCard(theCard, theCmd) {
 		$(this).attr('value', fileVarName);
 	  }
 	});
-	if (selectCmdXml[0].xml){
-	  selectCmdXml = selectCmdXml[0].xml;
-	} 
-	else {
-	  selectCmdXml = selectCmdXml[0].outerHTML;
-	}	
 	theCmd.empty();
-	theCmd.append(selectCmdXml);
+	theCmd.append(selectCmdXml[0]);
 	theCard.find(".cmdDesc").text(selectCmd);
 	theCard.find(".execTime").text("0.0 seconds");
 }
@@ -289,7 +282,7 @@ function runCard(card, qName) {
     var returnCode = $(result).find('returnCode').text();
     var execTime = $(result).find('executiontime').text();
     cmd.find('command').children().detach();
-    cmd.find('command').append($(result).find("webcommander")[0].innerHTML);
+    cmd.find('command').append($(result).find("webcommander")[0].childNodes);
     if (returnCode === "4488") {
       card.removeClass("run pass fail").addClass("pass");
       if (typeof qName !== "undefined") {
@@ -344,7 +337,7 @@ function showCard(curCard) {
   });
   var curCmdXml = curCmd.find('command');
   if (curCmdXml.length != 0) {
-    $("#cmdDetail").replaceWith(transformXml($.parseXML(curCmdXml[0].outerHTML), cmdXsl));
+    $("#cmdDetail").replaceWith(transformXml(curCmdXml[0], cmdXsl));
     $("#cmdDetail").tabs();
     $(".cmdlist").find("option[value='" + curCmd.find("command").attr("name") + "']")
       .attr("selected","selected");
@@ -378,12 +371,12 @@ function importXml(toRow) {
         var newxml = $.parseXML($("#xmltext").val());
         if (typeof toRow === "undefined") {
           $(newxml).find("group").each(function(){
-            var grpXml = $(this)[0].outerHTML;
+            var grpXml = $(this)[0];
             addRow($(".row:last"), grpXml);
           });
         } else {
           $(newxml).find("cmd").each(function(){
-            var cmdXml = $(this)[0].outerHTML;
+            var cmdXml = $(this)[0];
             importCard(toRow, cmdXml);
           });
         }
@@ -427,13 +420,7 @@ $(function() {
 		var selectCmdXml = $(allCmdXml).find('command').filter(function() {
       return $(this).attr('name') == selectCmd;
     });
-    if (selectCmdXml[0].xml){
-      selectCmdXml = selectCmdXml[0].xml;
-    } 
-    else {
-      selectCmdXml = selectCmdXml[0].outerHTML;
-    }  
-    $("#cmdDetail").replaceWith(transformXml($.parseXML(selectCmdXml), cmdXsl));
+    $("#cmdDetail").replaceWith(transformXml(selectCmdXml[0], cmdXsl));
     $("#cmdDetail").tabs();
   });
   
@@ -470,8 +457,6 @@ $(function() {
     var curRow = $(this).find('div.row:first'); 
     var curRowPos = curRow.index();
     var curGroup = $(xml).find("group").eq(curRowPos);
-    console.log("test");
-    console.log(curGroup);
 		exportXml(new XMLSerializer().serializeToString(curGroup[0]));
 	});
   
@@ -499,7 +484,6 @@ $(function() {
     else {
       superGroup.attr("order", "serial");
     }
-    console.log(superGroup);
 	});
   
   $("body").on('click', '.disable', function(){ 
@@ -507,14 +491,12 @@ $(function() {
     var item = $(this).parent().parent();
     item.removeClass("run pass fail").toggleClass("disabled");
     if (item.hasClass("card")) {
-      console.log("iscard");
       var itemCardPos = item.index();
       var itemRowPos = item.parent().parent().index();
       var itemCmd = $(xml).find("group").eq(itemRowPos).find("cmd").eq(itemCardPos);
       itemCmd.attr("disabled", "true");
     } 
     else if (item.hasClass("row")) {
-      console.log("isrow");
       var itemRowPos = item.parent().parent().index();
       var itemCmd = $(xml).find("group").eq(itemRowPos);
       itemCmd.attr("disabled", "true");
