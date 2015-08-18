@@ -43,18 +43,26 @@ function transformXml(xml, xsl) {
 	return html;
 }
 
-function addRow(curRow, groupXml){
-  if (typeof groupXml === "undefined") {
-    groupXml = "<group><cmd>No command defined yet</cmd></group>";
-  }
+function addRow(curRow){ 
+  var groupXml = "<group><cmd>No command defined yet</cmd></group>";
+  var row = $(transformXml($.parseXML(groupXml),xsl)).find("div.row");
+  var curRowPos = curRow.index();
+  var curGroup = $(xml).find("group").eq(curRowPos);
+  curGroup.after($(groupXml)); 
+  curRow.after(row);
+  row.hide().show('slow');
+  drawCard();
+}
+
+function importRow(curRow, groupXml){ 
   var row = $(transformXml(groupXml,xsl)).find("div.row");
   if (curRow.length === 0) {
-    $(xml).find("supergroup").append(groupXml);
+    $(xml).find("supergroup").append($(groupXml));
     $(".pageData").append(row);
   } else {
     var curRowPos = curRow.index();
     var curGroup = $(xml).find("group").eq(curRowPos);
-    curGroup.after(groupXml); 
+    curGroup.after($(groupXml)); 
     curRow.after(row);
   }
   row.hide().show('slow');
@@ -86,7 +94,7 @@ function addCard(curCard){
   var curCardPos = curCard.index();
   var curRowPos = curCard.parent().parent().index();
   var curCmd = $(xml).find("group").eq(curRowPos).find("cmd").eq(curCardPos);
-  curCmd.after(cmdXml); 
+  curCmd.after($(cmdXml)); 
   var card = $(transformXml($.parseXML(cmdXml),xsl)).find("div.card");
   curCard.after(card);
   card.hide().show('slow');
@@ -346,6 +354,7 @@ function showCard(curCard) {
 }
 
 function exportXml(xmlstring) {
+  xmlstring = xmlstring.replace(/ xmlns=\"http:\/\/www.w3.org\/1999\/xhtml\"/gi, '');
   $( "#cmdDialog" ).html('<textarea id="xmltext" wrap="off">' + xmlstring + '</textarea>');
   $( "#cmdDialog" ).dialog({
     width:1024,
@@ -372,7 +381,7 @@ function importXml(toRow) {
         if (typeof toRow === "undefined") {
           $(newxml).find("group").each(function(){
             var grpXml = $(this)[0];
-            addRow($(".row:last"), grpXml);
+            importRow($(".row:last"), grpXml);
           });
         } else {
           $(newxml).find("cmd").each(function(){
