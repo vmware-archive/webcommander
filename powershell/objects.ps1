@@ -119,7 +119,7 @@ function newSshServer { ##Server supports SSH access
 	}
 	
 	$sshServer | add-member -MemberType ScriptMethod -value {
-        param($cmd, $outputCheck, $pattern)
+    param($cmd, $outputCheck, $pattern)
 		$cmd = $cmd -replace "`r`n","`n"
 		try {
 			$result = invoke-sshcommand -command $cmd -sshSession $this.sshSession -ea stop
@@ -148,7 +148,7 @@ function newSshServer { ##Server supports SSH access
 			writeCustomizedMsg "Fail - run SSH script"
 			writeStdout $result.error
 		}
-		if ($result.output) {writeStdout $result.output}
+		if ($result.output) {return $result.output}
 	} -name runCommand
 	
 	$sshServer | add-member -MemberType ScriptMethod -value {
