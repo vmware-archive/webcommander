@@ -131,7 +131,7 @@ if ($r -match "The update completed successfully") {
 	writeCustomizedMsg "Success - upgrade ESX"
 } else {
 	writeCustomizedMsg "Fail - upgrade ESX"
-	writeStdout($r)
+	write-host $r
 	try {
 		get-VMHost | set-vmhost -state connected
 	} catch {
