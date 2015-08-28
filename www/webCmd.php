@@ -233,6 +233,16 @@ if ( $command == ""){
 		foreach($params as $param){
 			$name = strtolower((string)$param["name"]);
 			$param->addAttribute("value", $req[$name]);
+      if ( $param["name"] == "isoImage" && $scriptName == "deploy\\deployWindowsVmSimple" ) {
+        $options = $param->addChild("options");
+        $isos = scandir("../bfi/iso_image/");
+        foreach($isos as $iso) {
+          if (strpos(strtolower($iso), '.iso') !== FALSE) {
+            $option = $options->addChild('option', $iso);
+            $option->addAttribute("value", $iso);
+          }
+        }
+      }
 			$xmloutput .= $param->asXML();
 			if ((string)$param["mandatory"] == "1" && $req[$name] == "" && $_FILES[$name] == "") {
 				$missParam = true;
