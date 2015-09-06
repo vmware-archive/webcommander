@@ -114,16 +114,18 @@ if ($records) {
 	writeCustomizedMsg "Success - find execution history"
 	
 	$stringBuilder = New-Object System.Text.StringBuilder
-	$null = $stringBuilder.append("<history>")
+	$null = $stringBuilder.append("<history><![CDATA[")
 
 	$records | % {
 		$path = $_.replace("$historyPath\","").split("\")
 		$seconds = $_.split("output-")[-1].replace(".xml","")
 		$time = $origin.AddSeconds($seconds)
-		$record = "<record><time>$time</time><user>$($path[0])</user><useraddr>$($path[1])</useraddr><cmdname>$($path[2])</cmdname><resultcode>$($path[3])</resultcode><filename>$($path[4])</filename></record>"
+    $url = '/history/' + ($path -join "/")
+    $record = "[ ""$time"", ""$($path[0])"", ""$($path[1])"", ""$($path[2])"", ""$($path[3])"", ""<a target='blank' href='$url'>$($path[4])</a>"" ]," 
 		$null = $stringBuilder.Append($record)
 	}
-	$null = $stringBuilder.append("</history>")
+  $null = $stringBuilder.remove($stringBuilder.length - 1 , 1)
+	$null = $stringBuilder.append("]]></history>")
 	write-output $stringBuilder.toString()
 } else {
 	writeCustomizedMsg "Fail - find execution history"
