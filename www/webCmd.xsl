@@ -144,8 +144,8 @@ THE SOFTWARE.
 			</td>
 			<td> 
 				<xsl:choose>
-					<xsl:when test="@type = 'uvsid'">
-						<xsl:value-of select="@value"/>
+					<xsl:when test="@type = 'time'">
+						<input type="date" id="{@name}" name="{@name}" value="{@value}" />
 					</xsl:when>
 					<xsl:when test="@type = 'textarea'">
 						<textarea id="{@name}" name="{@name}"><xsl:value-of select="@value"/></textarea>
@@ -154,7 +154,7 @@ THE SOFTWARE.
 						<input type="file" id="{@name}" name="{@name}" size="60" />
 					</xsl:when>
 					<xsl:when test="@type = 'password'">
-						<input type="password" id="{@name}" name="{@name}" size="40" />
+						<input type="password" id="{@name}" name="{@name}" value="{@value}" size="40" />
 					</xsl:when>
 					<xsl:when test="@type = 'option'">
 						<select name="{@name}" id="{@name}">
@@ -239,32 +239,24 @@ THE SOFTWARE.
 						<xsl:when test="name() = 'history'">
 							<hr class="separator"/>
 							<center><table id="hisTable">
-								<thead><tr><th>Number</th><th>Time</th><th>User</th><th>User Address</th><th>Command name</th><th>Result code</th><th>File</th></tr></thead>
-								<tbody>
-								<xsl:for-each select="record">
-									<xsl:sort select="time" order="descending" />
-									<tr>
-										<td><xsl:value-of select="position()" /></td>
-										<td><xsl:value-of select="time"/></td>
-										<td><xsl:value-of select="user"/></td>
-										<td><xsl:value-of select="useraddr" /></td>
-										<td><xsl:value-of select="cmdname"/></td>
-										<td><xsl:value-of select="resultcode"/></td>
-										<td>
-											<a target="_blank">
-												<xsl:attribute name="href">
-													<xsl:value-of select="concat('/history/', user, '/', useraddr, '/', cmdname, '/', resultcode, '/', filename)"/>
-												</xsl:attribute>
-												<xsl:value-of select="filename"/>
-											</a>
-										</td>
-									</tr>
-								</xsl:for-each>
-								</tbody>
 							</table></center>
 							<script>
+                var dataset = [<xsl:value-of select="text()" />];
+                console.log(dataset);
 								$(function(){
-									$('#hisTable').DataTable();
+									var t = $('#hisTable').dataTable({
+                    deferrender: true,
+                    data: dataset,
+                    "columns": [
+                      { title: "Time" },
+                      { title: "User" },
+                      { title: "Address" },
+                      { title: "Command" },
+                      { title: "Result" },
+                      { title: "Log" }
+                    ],
+                    "order": [[ 0, "desc" ]]
+                  });
 								});
 							</script>
 						</xsl:when>
