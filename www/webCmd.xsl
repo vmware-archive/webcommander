@@ -242,12 +242,12 @@ THE SOFTWARE.
 							</table></center>
 							<script>
                 var dataset = [<xsl:value-of select="text()" />];
-                console.log(dataset);
 								$(function(){
 									var t = $('#hisTable').dataTable({
-                    deferrender: true,
+                    bDeferRender: true,
                     data: dataset,
                     "columns": [
+                      { title: "Number" },
                       { title: "Time" },
                       { title: "User" },
                       { title: "Address" },
