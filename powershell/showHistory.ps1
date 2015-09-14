@@ -22,11 +22,13 @@ THE SOFTWARE.
 
 <#
 	.SYNOPSIS
-        Show command history
+    Show command history
 
 	.DESCRIPTION
-        This command displays webCommander commands' history.
+    This command displays webCommander commands' history.
 		The result could be filtered by conditions.
+    Owing to the limit of client side datatable, the maximum mumber of 
+    records to display is 50000.
 	
 	.Functionality
 		History
@@ -84,7 +86,7 @@ foreach ($paramKey in $psboundparameters.keys) {
 
 $scriptPath = split-path -parent $MyInvocation.MyCommand.Definition 
 $historyPath = $scriptPath.replace("powershell", "www\history")
-$records = [io.Directory]::EnumerateFiles($historyPath,"*.xml","AllDirectories")
+$records = [io.Directory]::EnumerateFiles($historyPath,"*.xml","AllDirectories") | Sort-Object {$_.SubString($_.IndexOf('output-'))} -desc
 [datetime]$origin = '1970-01-01 00:00:00'
 try {
 	if ($behindTime) {
@@ -115,13 +117,18 @@ if ($records) {
 	
 	$stringBuilder = New-Object System.Text.StringBuilder
 	$null = $stringBuilder.append("<history><![CDATA[")
+  
+  $total = ($records | measure-object).count
+  $i = 0
 
-	$records | % {
+	$records | select -first 50000 | % {
 		$path = $_.replace("$historyPath\","").split("\")
 		$seconds = $_.split("output-")[-1].replace(".xml","")
 		$time = $origin.AddSeconds($seconds)
     $url = '/history/' + ($path -join "/")
-    $record = "[ ""$time"", ""$($path[0])"", ""$($path[1])"", ""$($path[2])"", ""$($path[3])"", ""<a target='blank' href='$url'>$($path[4])</a>"" ]," 
+    $number = $total - $i
+    $i++
+    $record = "[ ""$number"", ""$time"", ""$($path[0])"", ""$($path[1])"", ""$($path[2])"", ""$($path[3])"", ""<a target='blank' href='$url'>$($path[4])</a>"" ]," 
 		$null = $stringBuilder.Append($record)
 	}
   $null = $stringBuilder.remove($stringBuilder.length - 1 , 1)
