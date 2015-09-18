@@ -182,7 +182,7 @@ function saveCard(theCard, theCmd) {
 	  }
 	});
 	theCmd.empty();
-	theCmd.append(selectCmdXml[0]);
+	theCmd.append(selectCmdXml[0].cloneNode(true));
 	theCard.find(".cmdDesc").text(selectCmd);
 	theCard.find(".execTime").text("0.0 seconds");
 }
