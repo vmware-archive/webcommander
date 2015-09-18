@@ -174,11 +174,11 @@ function saveCard(theCard, theCmd) {
 	selectCmdXml.find("parameter").each(function(){
 	  var field = $("#" + $(this).attr("name"));
 	  if (field.attr("type") != "file") {
-		$(this).attr('value', field.val());
+      $(this).attr('value', field.val());
 	  } else {
-		var fileVarName = 'f_' + curRowPos + '_' + curCardPos; 
-		globalVariable[fileVarName] = field[0].files[0];
-		$(this).attr('value', fileVarName);
+      var fileVarName = 'f_' + curRowPos + '_' + curCardPos; 
+      globalVariable[fileVarName] = field[0].files[0];
+      $(this).attr('value', fileVarName);
 	  }
 	});
 	theCmd.empty();
@@ -347,7 +347,23 @@ function showCard(curCard) {
   if (curCmdXml.length != 0) {
     $("#cmdDetail").replaceWith(transformXml(curCmdXml[0], cmdXsl));
     $("#cmdDetail").tabs();
-    $(".cmdlist").find("option[value='" + curCmd.find("command").attr("name") + "']")
+    if ($("#hisTable").length){
+      $('#hisTable').dataTable({
+        data: dataset,
+        bAutoWidth: false,
+        columns: [
+          { title: "Number" },
+          { title: "Time" },
+          { title: "User" },
+          { title: "Address" },
+          { title: "Command" },
+          { title: "Result" },
+          { title: "Log" }
+        ],
+        order: [[ 0, "desc" ]]
+      });
+    }
+    $( "#cmdDialog" ).find(".cmdlist").find("option[value='" + curCmd.find("command").attr("name") + "']")
       .attr("selected","selected");
   }
 	return false;
@@ -424,7 +440,7 @@ $(function() {
   $(".card").hide().show("slow");
   drawCard();
   
-  $("body").on('change', '.cmdlist', function(){ 
+  $("body").on('change', '.cmdlist', function(){
     var selectCmd = $(this).val();
 		var selectCmdXml = $(allCmdXml).find('command').filter(function() {
       return $(this).attr('name') == selectCmd;

@@ -161,33 +161,9 @@ THE SOFTWARE.
 						<xsl:when test="name() = 'history'">
 							<hr class="separator"/>
 							<center><table id="hisTable">
-								<thead><tr><th>Number</th><th>Time</th><th>User</th><th>User Address</th><th>Command name</th><th>Result code</th><th>File</th></tr></thead>
-								<tbody>
-								<xsl:for-each select="record">
-									<xsl:sort select="time" order="descending" />
-									<tr>
-										<td><xsl:value-of select="position()" /></td>
-										<td><xsl:value-of select="time"/></td>
-										<td><xsl:value-of select="user"/></td>
-										<td><xsl:value-of select="useraddr" /></td>
-										<td><xsl:value-of select="cmdname"/></td>
-										<td><xsl:value-of select="resultcode"/></td>
-										<td>
-											<a target="_blank">
-												<xsl:attribute name="href">
-													<xsl:value-of select="concat('/history/', user, '/', useraddr, '/', cmdname, '/', resultcode, '/', filename)"/>
-												</xsl:attribute>
-												<xsl:value-of select="filename"/>
-											</a>
-										</td>
-									</tr>
-								</xsl:for-each>
-								</tbody>
 							</table></center>
 							<script>
-								$(function(){
-									$('#hisTable').DataTable();
-								});
+                dataset = [<xsl:value-of select="text()" />];
 							</script>
 						</xsl:when>
 						<xsl:otherwise>
