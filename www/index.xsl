@@ -30,14 +30,14 @@ THE SOFTWARE.
 			<head>
 			<title>webCommander</title>
 				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-				<link href='//fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css' />
-				<link href="webCmd.css" rel="stylesheet" type="text/css" />
+				<link rel='stylesheet' href='//fonts.googleapis.com/css?family=Roboto+Condensed' />
+				<link rel="stylesheet" href="webCmd.css" />
 				<link rel="stylesheet" href="//code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
 				<link rel="stylesheet" href="//rawgit.com/daneden/animate.css/master/animate.css" />
 				<script src="//code.jquery.com/jquery-1.8.3.js"></script>
 				<script src="//code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 				<script src="webCmd.js"></script>
-				<script src="//www.bcone.com/theme/master/src/jquery.sidebar.js"></script>
+				<script src="//sideroad.secret.jp/js/jquery.sidebar.js"></script>
 				<script src="//rawgit.com/JoelSutherland/GitHub-jQuery-Repo-Widget/master/jquery.githubRepoWidget.min.js"></script>
 			</head>
 			<body>
