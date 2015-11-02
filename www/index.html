@@ -1,0 +1,38 @@
+<!-- Author: Jian Liu, whirls9@hotmail.com -->
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>webCommander</title>
+<link href='//fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' />
+<link href="//rawgit.com/9whirls/walnut/master/www/ui-min.css" rel="stylesheet" />
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" >
+<link href="//code.jquery.com/ui/1.11.4/themes/cupertino/jquery-ui.css" rel="stylesheet" />
+<link href="//cdn.datatables.net/1.10.4/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="//code.jquery.com/jquery-1.9.1.js"></script>
+<script src="//code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+<script src="//rawgit.com/copernicus365/jquery-ui-touch-punch/master/jquery.ui.touch-punch.js"></script>
+<script src="//rawgit.com/ilinsky/jquery-xpath/master/jquery.xpath.min.js"></script>
+<script src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
+<script src="//rawgit.com/9whirls/walnut/master/www/ui-min.js"></script>
+</head>
+<body>
+<div id="header">
+  <div id="logo">
+		<img src="images/logo-b.png" /> > <a href="#" class="logo">web<span>Commander</span></a>
+	</div>
+	<div id="execute" class="shadow">
+    <i id="rerun" class="fa fa-fw fa-refresh" title="Start / stop re-run"></i>
+    <i id="import" class="fa fa-fw fa-file-text" title="Import from JSON"></i>
+    <i id="export" class="fa fa-fw fa-file-text-o" title="Export to JSON"></i>
+    <i id="serial" class="fa fa-fw fa-cog" title="Run in serial"></i>
+    <i id="parallel" class="fa fa-fw fa-cogs" title="Run in parallel"></i>
+    <i id="toggleAll" class="fa fa-fw fa-toggle-down" title="Toggle display all commands"></i>
+    <i id="onOffAll" class="fa fa-fw fa-toggle-on" title="Enable / Disable all commands"></i>
+		<i id="autoDisable" class="fa fa-fw fa-check-square-o" title="Automatically disable passed commands"></i>
+	</div>
+</div>
+<div id="sortable"></div>
+</body>
+</html>
