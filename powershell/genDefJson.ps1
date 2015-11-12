@@ -102,7 +102,7 @@ function newCommand {
 				foreach ($v in $vv) {
 					$options += $v
 				}
-			} elseif ($name -match "(script|property|url|workflow|body)$") {
+			} elseif ($name -match "(property|url|workflow|body|command)") {
 				$type = "textarea"
 			} elseif (@("datastore", "portGroup", "vmName") -contains $name ) {
 				$type = "selectText"
