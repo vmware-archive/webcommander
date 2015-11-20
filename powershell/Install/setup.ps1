@@ -61,14 +61,10 @@ $download = {
 	)
 	$webClient = new-object system.net.webclient
 	if (!$webCommanderOnly) {
-		write-output "Downloading PowerCLI, WPI and Advanced Logging..."
-		$webClient.downloadfile('http://tsugliani.fr/VMware-PowerCLI-6.0.0-3205540.exe',
-			'C:\WebCommander\PowerCLI.exe')
+		write-output "Downloading WPI ..."
 		$webClient.downloadfile('http://go.microsoft.com/fwlink/?LinkId=255386',
 			'C:\WebCommander\wpilauncher.exe')
-		$webClient.downloadfile('http://download.microsoft.com/download/9/6/5/96594C39-9918-466C-AFE0-920737351987/AdvancedLogging64.msi',
-			'C:\WebCommander\AdvancedLogging64.msi')
-		write-output "`t PowerCLI, WPI and Advanced Logging downloaded successfully."
+		write-output "`t WPI downloaded successfully."
 	}
 	write-output "Downloading WebCommander package..."
 	$webClient.downloadfile($packageUrl, "C:\WebCommander\$packageName")
@@ -135,30 +131,6 @@ $installPhp = {
 	}
 }
 
-$installPowerCli = {
-	$test = get-pssnapin -name vmware.vimautomation.core -ea silentlyContinue
-	if (!$test) {
-		$cmd = "C:\WebCommander\PowerCLI.exe"
-		if (test-path $cmd) {
-			write-output "Installing PowerCLI..."
-			$cmdPara = " /s /v/qn"
-			$installprocess = [System.Diagnostics.Process]::Start($cmd, $cmdPara)
-			$installprocess.WaitForExit()
-			If ((0,3010) -notcontains $installprocess.ExitCode) {  
-				write-warning "`t Failed to install PowerCLI."
-				write-warning "`t Please install it manually, and run this script again."
-				exit
-			}
-			write-output "`t PowerCLI installed successfully."
-		} else {
-			write-warning "PowerCLI installer is not available."
-			write-warning "Please download and install PowerCLI manually."
-		}
-	} else {
-		write-output "PowerCLI is already installed."
-	}	
-}
-
 $extractWebCommander = {
 	write-output "Extracting WebCommander package..."
 	$shell = new-object -com shell.application
@@ -219,60 +191,6 @@ $configAuthentication = {
 	}
 }
 
-$installAdvancedLogging = {
-	$test = Get-WmiObject -Class Win32_Product | ? {$_.name -match "IIS Advanced Logging"}
-	if (!$test) {
-		write-output "Installing IIS Advanced Logging..."
-		#msiexec /i C:\WebCommander\AdvancedLogging64.msi /passive
-		$test = (Start-Process -FilePath "msiexec.exe" -ArgumentList `
-			"/i C:\WebCommander\AdvancedLogging64.msi /passive" -Wait -Passthru).ExitCode
-		#$test = Get-WmiObject -Class Win32_Product | ? {$_.name -match "IIS Advanced Logging"}
-		if ($test -ne 0) {
-			write-warning "`t Failed to install IIS Advanced Logging."
-			write-warning "`t Please install it manually, and run this script again."
-			exit
-		}
-		write-output "`t IIS Advanced Logging installed successfully."
-	} else {
-		write-output "IIS Advanced Logging is already installed."
-	}
-}
-
-$configAdvancedLogging = {
-	write-output "Configuring IIS Advanced Logging..."
-	$filter = "system.webServer/advancedLogging/server"
-	Set-WebConfigurationProperty -Filter system.webServer/httpLogging `
-		-PSPath machine/webroot/apphost -Name dontlog -Value true | out-null
-		
-	$definition = @(
-		@{id="url";sourceName="url";sourceType="ResponseHeader"},
-		@{id="user";sourceName="user";sourceType="ResponseHeader"},
-		@{id="return-code";sourceName="return-code";sourceType="ResponseHeader"}
-	)
-	$definition | Add-WebConfiguration "$filter/fields" | out-null
-	
-	Set-WebConfigurationProperty `
-		-Filter "$filter/logDefinitions/logDefinition[@baseFileName='%COMPUTERNAME%-Server']" `
-		-name enabled -value false | out-null
-	Add-WebConfiguration "$filter/logDefinitions" -location WebCommander -value `
-		@{baseFileName="WebCommander";enabled="true";logRollOption="Schedule";schedule="Weekly";publishLogEvent="false"}
-	
-	$filter += "/logDefinitions/logDefinition[@baseFileName='WebCommander']/selectedFields"
-	$definition = @(
-		@{defaultValue="";required="false";logHeaderName="date";id="Date-UTC"},
-		@{defaultValue="";required="false";logHeaderName="time";id="Time-UTC"},
-		@{defaultValue="";required="false";logHeaderName="";id="user"},
-		@{defaultValue="";required="false";logHeaderName="c-ip";id="Client-IP"},
-		@{defaultValue="";required="false";logHeaderName="cs(User-Agent)";id="User Agent"},
-		@{defaultValue="";required="false";logHeaderName="cs-method";id="Method"},
-		@{defaultValue="";required="false";logHeaderName="";id="url"},
-		@{defaultValue="";required="false";logHeaderName="";id="return-code"},
-		@{defaultValue="";required="false";logHeaderName="TimeTakenMS";id="Time Taken"}
-	)
-	$definition | Add-WebConfiguration "$filter" -Location WebCommander | out-null
-	write-output "`t IIS Advanced Logging configured successfully."
-}
-
 $editProfile = {
 	write-output "Changing x86 Powershell profile..."
 	$p = @"
@@ -281,7 +199,8 @@ add-pssnapin vmware* -ea SilentlyContinue
 `$env:defaultPassword = '$defaultPassword'
 "@
 	$p | set-content C:\windows\SysWOW64\WindowsPowerShell\v1.0\Profile.ps1
-	write-output "`t x86 Powershell profile changed successfully."
+  $p | set-content C:\windows\system32\WindowsPowerShell\v1.0\Profile.ps1
+	write-output "`t Powershell profile changed successfully."
 }
 
 $configWsman = {
@@ -290,7 +209,6 @@ $configWsman = {
 	cd \localhost\client
 	set-item Trustedhosts * -force
 	write-output "`t WSMAN settings changed successfully."
-	#restart-service winrm
 }
 
 try {
@@ -309,14 +227,11 @@ if ($website) {
 	& $download
 	& $installIis
 	& $installWpi
-	& $installPowerCli
 	& $installPhp
 	& $extractWebCommander
 	import-module webadministration
 	& $addWebCommanderSite
 	& $configAuthentication $authentication
-	& $installAdvancedLogging
-	& $configAdvancedLogging
 	& $editProfile
 	& $configWsman
 }
