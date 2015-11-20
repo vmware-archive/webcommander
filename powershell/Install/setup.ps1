@@ -62,10 +62,8 @@ $download = {
 	$webClient = new-object system.net.webclient
 	if (!$webCommanderOnly) {
 		write-output "Downloading PowerCLI, WPI and Advanced Logging..."
-		if (test-connection buildweb.eng.vmware.com -quiet) {
-			$webClient.downloadfile('http://build-squid.eng.vmware.com/build/mts/release/bora-1997510/publish/VMware-PowerCLI-5.8.0-1997510.exe',
-				'C:\WebCommander\PowerCLI.exe')
-		}
+		$webClient.downloadfile('http://tsugliani.fr/VMware-PowerCLI-6.0.0-3205540.exe',
+			'C:\WebCommander\PowerCLI.exe')
 		$webClient.downloadfile('http://go.microsoft.com/fwlink/?LinkId=255386',
 			'C:\WebCommander\wpilauncher.exe')
 		$webClient.downloadfile('http://download.microsoft.com/download/9/6/5/96594C39-9918-466C-AFE0-920737351987/AdvancedLogging64.msi',
@@ -88,7 +86,7 @@ $installIis = {
 		} elseif (get-command ServerManagerCmd -ea silentlycontinue) {
 			$installcmd = 'start-process "c:\windows\system32\ServerManagerCmd.exe" -argumentlist " -install web-server -a" -wait'
 		} else {
-            $installcmd = 'start-process "c:\windows\system32\PkgMgr.exe" -argumentlist " /iu:IIS-WebServerRole;IIS-Security;IIS-WindowsAuthentication" -wait'
+      $installcmd = 'start-process "c:\windows\system32\PkgMgr.exe" -argumentlist " /iu:IIS-WebServerRole;IIS-Security;IIS-WindowsAuthentication" -wait'
 		}
 		try {
 			invoke-expression $installcmd
@@ -176,7 +174,7 @@ $extractWebCommander = {
 }
 
 $addWebCommanderSite = {
-    import-module webadministration 
+  import-module webadministration 
 	try {
 		get-website | stop-website
 	} catch {
