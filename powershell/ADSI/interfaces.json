@@ -1,0 +1,57 @@
+{
+    "script":  "ADSI\\interfaces.ps1",
+    "description":  "This command handles ADSI actions",
+    "developer":  "whirls9@hotmail.com",
+    "functionalities":  [
+                            "AD"
+                        ],
+    "synopsis":  "ADSI",
+    "parameters":  [
+                       {
+                           "name":  "serverAddress",
+                           "helpmessage":  "IP or FQDN of the remote Windows machine",
+                           "mandatory":  1
+                       },
+                       {
+                           "name":  "port",
+                           "helpmessage":  "Port number, default is 389"
+                       },
+                       {
+                           "name":  "serverUser",
+                           "helpmessage":  "User name to connect to the remote Windows machine, in form of \u0027domain\\username\u0027",
+                           "mandatory":  1
+                       },
+                       {
+                           "name":  "serverPassword",
+                           "helpmessage":  "Password of the user",
+                           "type":  "password"
+                       },
+                       {
+                           "name":  "dn",
+                           "helpmessage":  "Distinguished name",
+                           "mandatory":  1
+                       },
+                       {
+                           "name":  "filter",
+                           "helpmessage":  "Filter"
+                       },
+                       {
+                           "name":  "property",
+                           "helpmessage":  "Property name or \u0027name=value\u0027 pairs. Each definition per line. \n\t\t\tIf value contains multiple items, separate them by comma.",
+                           "mandatory":  1,
+                           "type":  "textarea"
+                       },
+                       {
+                           "name":  "action",
+                           "helpmessage":  "Action, default is get",
+                           "options":  [
+                                           "get",
+                                           "clear",
+                                           "update",
+                                           "append",
+                                           "delete"
+                                       ],
+                           "type":  "option"
+                       }
+                   ]
+}

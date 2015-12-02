@@ -183,7 +183,6 @@ if ( $script == ""){
       chdir($psPath);
       $cmd = "set runFromWeb=true & c:\\windows\\sysnative\\windowspowershell\\v1.0\\powershell.exe -noninteractive .\\" . $script;
     }
-		$url = "http://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . "/webcmd.php?command=" . $command;
 		foreach($params as &$param){
 			$name = strtolower((string)$param["name"]);
       if ($req[$name]) { $param["value"] = $req[$name]; }
@@ -203,12 +202,13 @@ if ( $script == ""){
 				}
 			}
 			if ($req[$name] != "") {
-				$cmd .= $paramSeparator . $name . " " . urlencode($req[$name]); 
-				$url .= "&" . $name . "=" . urlencode($req[$name]);
+        $cmd .= $paramSeparator . $name . " " . urlencode($req[$name]); 
 			}
 		}
- 
-		header("url:" . $url);
+    if ($req["method"] != "") {
+      $cmd .= $paramSeparator . $req["method"];
+      $target["method"] = $req["method"];
+    }
 
 		if ($missParam) {
 			missParamNotice();

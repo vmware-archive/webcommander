@@ -3,6 +3,10 @@ $ErrorActionPreference = "stop"
 $WarningPreference = 0
 $runFromWeb = [boolean]$env:runFromWeb
 
+function addError {
+  addToResult @{"message"=$_.exception.message; "code"=$_.scriptstacktrace} "err"
+}
+
 function addSeparator {
   $output = @{"type" = "separator"}
   $global:result += $output
@@ -10,6 +14,9 @@ function addSeparator {
 
 function addToResult {
   param($data,$type="msg")
+  if ($type -eq "dataset") {
+    if ($data -isnot [system.array]) {$data = @($data)}
+  }
   $output = @{
     "type" = $type;
     "time" = get-date -format "yyyy-MM-dd HH:mm:ss";
@@ -18,8 +25,27 @@ function addToResult {
   $global:result += $output
 }
 
+function addToResult1 {
+  param(
+    [parameter(ValueFromPipeline=$True)]
+    $data,
+    
+    $type="msg"
+  )
+  begin{}
+  process {
+    $output = @{
+      "type" = $type;
+      "time" = get-date -format "yyyy-MM-dd HH:mm:ss";
+      "data" = $data
+    }
+    $global:result += $output
+  }
+  end{}
+}
+
 function endError {
-  addToResult @{"message"=$_.exception.message; "code"=$_.scriptstacktrace} "err"
+  addError
   endExec
 }
 
