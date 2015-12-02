@@ -85,7 +85,7 @@ function newRemoteWin {
 			#schtasks /delete /f /tn runScript | out-null
 			remove-item c:\temp\output*.txt -force -ea silentlycontinue
 			`$date = get-date '12/31/2014'.replace('2014',(get-date).year+1) -format (Get-ItemProperty -path 'HKCU:\Control Panel\International').sshortdate
-			schtasks /create /f /it /tn runScript /ru '$admin' /rp '$passwd' /rl HIGHEST /sc once /sd `$date /st 00:00:00 /tr 'c:\temp\script.bat > c:\temp\output$timeSuffix.txt' | out-null 
+			schtasks /create /f /it /tn runScript /ru '$($this.admin)' /rp '$($this.passwd)' /rl HIGHEST /sc once /sd `$date /st 00:00:00 /tr 'c:\temp\script.bat > c:\temp\output$timeSuffix.txt' | out-null 
 			schtasks /run /tn runScript | out-null
 		"
 		$this.executePsTxtRemote($cmd, "trigger interactive command in remote machine")
@@ -106,7 +106,7 @@ function newRemoteWin {
 		$cmd = "
 			'runscript task log' | out-file c:\temp\output$timeSuffix.txt
 			`$date = get-date '12/31/2014'.replace('2014',(get-date).year+1) -format (Get-ItemProperty -path 'HKCU:\Control Panel\International').sshortdate
-			schtasks /create /f /it /tn runScript /ru '$admin' /rp '$passwd' /rl HIGHEST /sc once /sd `$date ``
+			schtasks /create /f /it /tn runScript /ru '$($this.admin)' /rp '$($this.passwd)' /rl HIGHEST /sc once /sd `$date ``
 				/st 00:00:00 /tr 'powershell -windowstyle minimized -c ''powershell -c c:\temp\script.ps1 > ``
 				c:\temp\output$timeSuffix.txt 2>&1''' | out-null
 			schtasks /run /tn runScript | out-null
@@ -460,11 +460,11 @@ function newRemoteWin {
     $cmd = "
       set-executionpolicy unrestricted -force
       `$date = get-date '12/31/2014'.replace('2014',(get-date).year+1) -format (Get-ItemProperty -path 'HKCU:\Control Panel\International').sshortdate
-      schtasks /create /f /tn windowsupdate /ru '$admin' /rp '$passwd' /rl HIGHEST /sc once /sd `$date /st 00:00:00 /tr 'powershell c:\temp\wu.ps1 $updateserver $severity >>c:\temp\wu$timeSuffix.log'
+      schtasks /create /f /tn windowsupdate /ru '$($this.admin)' /rp '$($this.passwd)' /rl HIGHEST /sc once /sd `$date /st 00:00:00 /tr 'powershell c:\temp\wu.ps1 $updateserver $severity >>c:\temp\wu$timeSuffix.log' | out-null
     "
     $this.executePsTxtRemote($cmd, "create Windows update task in VM")
     do {
-      $cmd = "schtasks /run /tn windowsupdate"
+      $cmd = "schtasks /run /tn windowsupdate | out-null"
       $this.executePsTxtRemote($cmd, "trigger Windows update task in VM")
       $cmd = "
         start-sleep 10
