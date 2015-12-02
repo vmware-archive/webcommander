@@ -1,5 +1,5 @@
 <#
-Copyright (c) 2012-2014 VMware, Inc.
+Copyright (c) 2012-2015 VMware, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ THE SOFTWARE.
 		Workflow
 		
 	.NOTES
-		AUTHOR: Jerry Liu
+		AUTHOR: Jian Liu
 		EMAIL: liuj@vmware.com
 #>
 
@@ -129,7 +129,7 @@ function runCmd {
 	if ($cmd.disabled) {
 		addToResult "Info - skip disabled command"
 	} elseif ($cmd.script -eq "sleep") { 
-    $second = $cmd.parameters[0].value
+    $second = if ($cmd.second) { $cmd.second } else { $cmd.parameters[0].value }
 		$second = replaceVar "second" $second $definedVar
 		if ($second -lt 1){$second = 1}
 		elseif ($second -gt 3600) {$second = 3600}
@@ -144,7 +144,7 @@ function runCmd {
 		}
 		addToResult "Info - define global variables"
 	} else {
-		$hash = @{script=$cmd.script}
+		$hash = @{script=$cmd.script; method=$cmd.method}
     foreach ($param in $cmd.parameters){
       $value = replaceVar $param.name $param.value $definedVar
       $hash.add($param.name, $value)
@@ -206,7 +206,7 @@ if (!$allFlow) {
 addToResult "Info - Start workflow $name" 
 addSeparator
 
-$url = "http://localhost:1176/exec.php"
+$url = "http://localhost/exec.php"
 $existVar = get-variable -scope global
 $result = "Success"
 $i = 1

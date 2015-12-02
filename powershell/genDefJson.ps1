@@ -1,4 +1,26 @@
 ﻿<#
+Copyright (c) 2012-2015 VMware, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+#>
+
+<#
   .SYNOPSIS
     Generate command definition
 
@@ -6,20 +28,15 @@
     This command generates _def.json.
     It parses all powershell scripts to get information from comment
     based help and parameter attributes.
-    
-  .FUNCTIONALITY
-    JSON
 
   .NOTES
     AUTHOR: Jian Liu
     EMAIL: whirls9@hotmail.com
 #>
 
-foreach ($paramKey in $psboundparameters.keys) {
-	$oldValue = $psboundparameters.item($paramKey)
-	$newValue = [system.web.httputility]::urldecode("$oldValue")
-	set-variable -name $paramKey -value $newValue
-}
+param(
+  [switch]$forceUpdate
+)
 
 . .\utils.ps1
 
@@ -80,11 +97,13 @@ function newCommand {
 	if ($cmd.parameters.keys.count) {
 		foreach ($k in $cmd.parameters.keys) {
       $options = @()
+      $isSwitch = $cmd.parameters["$k"].SwitchParameter
 			$name = $cmd.parameters["$k"].name
 			if ($name -in $commonParam){continue}
 			$pAttr = $cmd.parameters["$k"].attributes | `
 				?{$_.TypeId.name -match "ParameterAttribute"}
 			$helpmsg = $pAttr.HelpMessage
+      if ($helpmsg -is [system.array]){$helpmsg = $helpmsg[0]}
 			$vsAttr = $cmd.parameters["$k"].attributes | `
 				?{$_.TypeId.name -match "ValidateSetAttribute"}
 			$vv = $vsAttr.validvalues
@@ -95,14 +114,16 @@ function newCommand {
         }
       }
       
-			if ($name -match "password$") {
+      if ($isSwitch) {
+        $type = "switch"
+			} elseif ($name -match "password$") {
 				$type = "password" 
 			} elseif ($vv) {
 				$type = "option"
 				foreach ($v in $vv) {
 					$options += $v
 				}
-			} elseif ($name -match "(property|url|workflow|body|command)") {
+			} elseif ($name -match "(text|property|url|workflow|body|command|list)") {
 				$type = "textarea"
 			} elseif (@("datastore", "portGroup", "vmName") -contains $name ) {
 				$type = "selectText"
@@ -133,6 +154,9 @@ function newCommand {
   if ($parametersets) { $command | add-member parametersets $parametersets}
   if ($parameters) { $command | add-member parameters $parameters}
   
+  $command | convertto-json -depth 5 | 
+  set-content ($cmd.definition -replace ".ps1", ".json")
+  
 	return $command
 }
 
@@ -143,7 +167,13 @@ gci $scriptPath\interfaces.ps1 -recurse | % {
 }
 $cmdSet = @()
 foreach ($cmd in $commands) {
-	$cmdSet += newCommand $cmd ($scriptPath + "\")
+  $def = $cmd.definition.replace('.ps1','.json')
+  if ((test-path $def) -and !$forceUpdate) {
+    addToResult "Info - find existing command definition file $def"
+    $cmdSet += (get-content $def) -join "`n" | convertfrom-json
+  } else {
+    $cmdSet += newCommand $cmd ($scriptPath + "\")
+  }
 }
 $cmdSet | convertto-json -depth 5 -compress | set-content "$scriptPath\..\www\_def.json"
 writeResult
