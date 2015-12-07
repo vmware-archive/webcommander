@@ -629,7 +629,10 @@
                        },
                        {
                            "name":  "timeout",
-                           "helpmessage":  "Pairing password timeout in term of seconds, \n      default is 86400"
+                           "helpmessage":  "Pairing password timeout in term of seconds, \n      default is 86400",
+                           "parametersets":  [
+                                                 "setPairingPassword"
+                                             ]
                        },
                        {
                            "name":  "setPairingPassword",

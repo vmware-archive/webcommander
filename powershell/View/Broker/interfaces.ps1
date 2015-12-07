@@ -455,6 +455,7 @@ Param (
 		"SQLSERVER",
 		"ORACLE"
 	)]
+  [string]
 		$dbType="SQLSERVER",
 	
 	[parameter(
@@ -544,6 +545,7 @@ Param (
 		$pairingPassword,
     
   [parameter(
+    parameterSetName="setPairingPassword",
 		HelpMessage="Pairing password timeout in term of seconds, 
       default is 86400"
 	)]
@@ -570,14 +572,15 @@ foreach ($paramKey in $psboundparameters.keys) {
 . .\windows\object.ps1
 . .\view\broker\object.ps1
 
-$broker = newBroker $ip $admin $password
+$broker = newBroker $serverAddress $serverUser $serverPassword
 $broker.initialize()
 
 switch ($pscmdlet.parameterSetName) {
   "getDesktopState" { 
     try {
-      invoke-command -scriptBlock $getDesktopState -session $broker.session `
-        -EA stop -argumentlist $poolId
+      $states = invoke-command -scriptBlock $get_DesktopState -session $broker.session `
+        -EA stop -argumentlist $poolId | select pool_id, name, user_displayname, state
+      addToResult $states "dataset"
     } catch {
       addToResult "Fail - get desktop state"
       endError
@@ -586,7 +589,7 @@ switch ($pscmdlet.parameterSetName) {
   }
   "setEventDB" { 
     try {
-      invoke-command -scriptBlock $setEventDB -session $broker.session `
+      invoke-command -scriptBlock $set_EventDB -session $broker.session `
         -EA stop -argumentlist $dbAddress, $dbType, $dbPort, $dbName, `
           $dbUser, $dbPassword, $tablePrefix
     } catch {
