@@ -10,8 +10,8 @@ function newSshServer {
 	$cred = new-object -typeName System.management.automation.pscredential -argumentList $user, (ConvertTo-SecureString $password -asPlainText -Force)
 	try {
 		get-sshtrustedhost | remove-sshtrustedhost
-		$sshSession = new-sshsession -computername $address -credential $cred -AcceptKey $true
-		$sftpSession = new-sftpsession -computername $address -credential $cred -AcceptKey $true
+		$sshSession = new-sshsession -computername $address -credential $cred -AcceptKey:$true
+		$sftpSession = new-sftpsession -computername $address -credential $cred -AcceptKey:$true
 	} catch {
 		addToResult "Fail - connect to SSH server $address"
 		endError

@@ -1,4 +1,4 @@
-$getDesktopState = {
+$get_DesktopState = {
 	Param ($poolId)
 	Add-PSSnapin -Name vmware* -ea SilentlyContinue | out-null
 	function GetDesktopVMState { 
@@ -25,7 +25,8 @@ $getDesktopState = {
 			} catch { 
 				$dirtyForNewSessions = $false
 			}
-			if (($vmState -eq "CLONING") -or ($vmState -eq "UNDEFINED") -or ($vmState -eq "PRE_PROVISIONED")) {
+			if (($vmState -eq "CLONING") -or ($vmState -eq "UNDEFINED") -or 
+        ($vmState -eq "PRE_PROVISIONED")) {
 				$stateString = "Provisioning";
 			} elseif ($vmState -eq "CLONINGERROR") {
 				$stateString = "ProvisionErr";
@@ -45,7 +46,8 @@ $getDesktopState = {
 				$stateString = "Error";
 			} elseif ($desktop_sessions.length -gt 0) {
 				$unassignedUserSession = $false
-				if (($pool.persistence -eq "Persistent") -and ($Desktop.user_sid.Length -le 0) -or ($Desktop.user_displayname -ne $desktop_sessions[0].Username)) {
+				if (($pool.persistence -eq "Persistent") -and ($Desktop.user_sid.Length -le 0) -or 
+          ($Desktop.user_displayname -ne $desktop_sessions[0].Username)) {
 					$unassignedUserSession = $true
 				}
 				if ($desktop_sessions[0].state -eq "CONNECTED") {
@@ -71,20 +73,20 @@ $getDesktopState = {
 			}
 			return $stateString;			
 		} else {
-			addError "Object is not a DesktopVM"
+			throw "Object is not a DesktopVM"
 		}
 	}
 	function addState{
 		param($pool)
-		$desktops = Get-DesktopVM -IsInPool $true -pool_id $pool.pool_id -ea SilentlyContinue |
-      select pool_id, name, user_displayname
+		$desktops = Get-DesktopVM -IsInPool $true -pool_id $pool.pool_id -ea SilentlyContinue
 		$sessions = (Get-RemoteSession -pool_id $pool.pool_id -ea SilentlyContinue)
+    $dt = @()
 		if ($desktops) {
 			foreach ($desktop in $desktops){
 				$state = GetDesktopVMState $desktop $pool $sessions
-				$desktop.state = $state
+				$dt += $desktop | add-member -name state -value $state -memberType noteproperty -passthru
 			}
-      return $desktops
+      return $dt
 		}
 	}	
 	$poolIdList = $poolId.split(",") | %{$_.trim()}
@@ -93,10 +95,10 @@ $getDesktopState = {
 	foreach ($p in $pools) {
 		$ds += addState($p)
 	}
-  addToResult $ds "dataset"
+  return $ds
 }
 
-$setEventDb = {
+$set_EventDb = {
 	Param (
 		$dbAddress, 
 		$dbType,
@@ -182,7 +184,7 @@ function newBroker {
 	Param($ip,$admin,$password)
 
 	$broker = newRemoteWin $ip $admin $password
-	
+
 	$broker | add-member -MemberType ScriptMethod -Value { ##initialize
 		$msg = "initialize broker"
 		$argList = @()
@@ -727,6 +729,6 @@ function newBroker {
 		"
 		$this.executePsTxtRemote($cmd, $msg)
 	} -Name importSettings
-	
+
 	return $broker	
 }
