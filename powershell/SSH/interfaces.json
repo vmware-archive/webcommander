@@ -7,8 +7,8 @@
                         ],
     "synopsis":  "SSH",
     "parametersets":  [
-                          "uploadFile",
-                          "runScript"
+                          "runScript",
+                          "uploadFile"
                       ],
     "parameters":  [
                        {

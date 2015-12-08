@@ -7,15 +7,15 @@
                         ],
     "synopsis":  "vSphere",
     "parametersets":  [
-                          "listPortGroup",
                           "listDatastore",
+                          "listPortGroup",
                           "listResourcePool",
                           "listVirtualMachine",
                           "listVmHost",
-                          "syncTime",
                           "mountNfsDatastore",
                           "removeNfsDatastore",
-                          "setInterVmPageSharing"
+                          "setInterVmPageSharing",
+                          "syncTime"
                       ],
     "parameters":  [
                        {

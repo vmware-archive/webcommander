@@ -7,32 +7,38 @@
                         ],
     "synopsis":  "Broker",
     "parametersets":  [
-                          "getDesktopState",
-                          "setPoolName",
-                          "setPoolID",
-                          "setPoolAutoRecovery",
-                          "setHTMLAccess",
-                          "logoffPool",
-                          "refreshPool",
-                          "recomposePool",
-                          "rebalancePool",
-                          "entitlePool",
-                          "removePool",
-                          "addLinkedClonePool",
                           "addComposer",
-                          "addTransferServer",
-                          "addManualPool",
-                          "addVirtualCenter",
                           "addComposerDomain",
                           "addLicense",
-                          "removeTransferServer",
+                          "addLinkedClonePool",
+                          "addManualPool",
+                          "addRdsAppPool",
+                          "addRdsDesktopPool",
+                          "addTransferServer",
+                          "addVirtualCenter",
+                          "deleteRdsAppPool",
+                          "deleteRdsDesktopPool",
+                          "entitlePool",
+                          "entitleRdsAppPool",
                           "exportSettings",
+                          "getDesktopState",
                           "importSettings",
+                          "logoffPool",
+                          "rebalancePool",
+                          "recomposePool",
+                          "refreshPool",
+                          "removePool",
+                          "removeTransferServer",
                           "setDirectConnect",
-                          "setMMRPolicy",
                           "setDirectPCoIP",
                           "setEventDB",
-                          "setPairingPassword"
+                          "setFarmHtmlAccess",
+                          "setHTMLAccess",
+                          "setMMRPolicy",
+                          "setPairingPassword",
+                          "setPoolAutoRecovery",
+                          "setPoolID",
+                          "setPoolName"
                       ],
     "parameters":  [
                        {
@@ -55,18 +61,23 @@
                            "helpmessage":  "Pool ID",
                            "mandatory":  1,
                            "parametersets":  [
-                                                 "getDesktopState",
-                                                 "setPoolName",
-                                                 "setPoolID",
-                                                 "setPoolAutoRecovery",
-                                                 "setHTMLAccess",
-                                                 "logoffPool",
-                                                 "refreshPool",
-                                                 "recomposePool",
-                                                 "rebalancePool",
+                                                 "addLinkedClonePool",
+                                                 "addRdsAppPool",
+                                                 "addRdsDesktopPool",
+                                                 "deleteRdsAppPool",
+                                                 "deleteRdsDesktopPool",
                                                  "entitlePool",
+                                                 "entitleRdsAppPool",
+                                                 "getDesktopState",
+                                                 "logoffPool",
+                                                 "rebalancePool",
+                                                 "recomposePool",
+                                                 "refreshPool",
                                                  "removePool",
-                                                 "addLinkedClonePool"
+                                                 "setHTMLAccess",
+                                                 "setPoolAutoRecovery",
+                                                 "setPoolID",
+                                                 "setPoolName"
                                              ]
                        },
                        {
@@ -83,11 +94,11 @@
                            "mandatory":  1,
                            "parametersets":  [
                                                  "addComposer",
-                                                 "addTransferServer",
-                                                 "addManualPool",
-                                                 "addVirtualCenter",
                                                  "addComposerDomain",
-                                                 "addLinkedClonePool"
+                                                 "addLinkedClonePool",
+                                                 "addManualPool",
+                                                 "addTransferServer",
+                                                 "addVirtualCenter"
                                              ]
                        },
                        {
@@ -96,8 +107,8 @@
                            "mandatory":  1,
                            "parametersets":  [
                                                  "addComposer",
-                                                 "addTransferServer",
                                                  "addManualPool",
+                                                 "addTransferServer",
                                                  "addVirtualCenter"
                                              ]
                        },
@@ -108,8 +119,8 @@
                            "type":  "password",
                            "parametersets":  [
                                                  "addComposer",
-                                                 "addTransferServer",
                                                  "addManualPool",
+                                                 "addTransferServer",
                                                  "addVirtualCenter"
                                              ]
                        },
@@ -225,7 +236,8 @@
                            "helpmessage":  "User name (in domain\\user format)",
                            "mandatory":  1,
                            "parametersets":  [
-                                                 "entitlePool"
+                                                 "entitlePool",
+                                                 "entitleRdsAppPool"
                                              ]
                        },
                        {
@@ -473,10 +485,11 @@
                            "type":  "option",
                            "parametersets":  [
                                                  "setDirectConnect",
-                                                 "setPoolAutoRecovery",
-                                                 "setMMRPolicy",
+                                                 "setDirectPCoIP",
+                                                 "setFarmHtmlAccess",
                                                  "setHTMLAccess",
-                                                 "setDirectPCoIP"
+                                                 "setMMRPolicy",
+                                                 "setPoolAutoRecovery"
                                              ]
                        },
                        {
@@ -640,6 +653,118 @@
                            "type":  "switch",
                            "parametersets":  [
                                                  "setPairingPassword"
+                                             ]
+                       },
+                       {
+                           "name":  "farmId",
+                           "helpmessage":  "Farm ID",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addFarm",
+                                                 "addFarmWithRdsServer",
+                                                 "addRdsAppPool",
+                                                 "addRdsDesktopPool",
+                                                 "addRdsServerToFarm",
+                                                 "removeRdsServerFromFarm",
+                                                 "setFarmHtmlAccess"
+                                             ]
+                       },
+                       {
+                           "name":  "addFarm",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addFarm"
+                                             ]
+                       },
+                       {
+                           "name":  "rdsServerDnsName",
+                           "helpmessage":  "RDS server FQDN",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addFarmWithRdsServer",
+                                                 "addRdsServerToFarm",
+                                                 "removeRdsServerFromFarm"
+                                             ]
+                       },
+                       {
+                           "name":  "addRdsServerToFarm",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addRdsServerToFarm"
+                                             ]
+                       },
+                       {
+                           "name":  "addFarmWithRdsServer",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addFarmWithRdsServer"
+                                             ]
+                       },
+                       {
+                           "name":  "execPath",
+                           "helpmessage":  "Application executable path",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addRdsAppPool"
+                                             ]
+                       },
+                       {
+                           "name":  "addRdsAppPool",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addRdsAppPool"
+                                             ]
+                       },
+                       {
+                           "name":  "addRdsDesktopPool",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addRdsDesktopPool"
+                                             ]
+                       },
+                       {
+                           "name":  "deleteRdsAppPool",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "deleteRdsAppPool"
+                                             ]
+                       },
+                       {
+                           "name":  "deleteRdsDesktopPool",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "deleteRdsDesktopPool"
+                                             ]
+                       },
+                       {
+                           "name":  "entitleRdsAppPool",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "entitleRdsAppPool"
+                                             ]
+                       },
+                       {
+                           "name":  "removeRdsServerFromFarm",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "removeRdsServerFromFarm"
+                                             ]
+                       },
+                       {
+                           "name":  "setFarmHtmlAccess",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "setFarmHtmlAccess"
                                              ]
                        }
                    ]

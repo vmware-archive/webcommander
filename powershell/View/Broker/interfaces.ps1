@@ -66,6 +66,11 @@ Param (
   [parameter(parameterSetName="setPoolAutoRecovery")]
   [parameter(parameterSetName="setPoolID")]
   [parameter(parameterSetName="setPoolName")]
+  [parameter(parameterSetName="addRdsAppPool")]
+  [parameter(parameterSetName="addRdsDesktopPool")]
+  [parameter(parameterSetName="deleteRdsAppPool")]
+  [parameter(parameterSetName="deleteRdsDesktopPool")]
+  [parameter(parameterSetName="entitleRdsAppPool")]
   [parameter(
     mandatory=$true,
     parameterSetName="getDesktopState",
@@ -202,7 +207,8 @@ Param (
   [Switch]
     $addLicense,
 ##################### Start entitlePool parameters #####################
-	[parameter(
+	[parameter(parameterSetName="entitleRdsAppPool")]
+  [parameter(
     parameterSetName="entitlePool",
 		Mandatory=$true,
 		HelpMessage="User name (in domain\user format)"
@@ -414,6 +420,7 @@ Param (
   [parameter(parameterSetName="setHTMLAccess")]
   [parameter(parameterSetName="setMMRPolicy")]
   [parameter(parameterSetName="setPoolAutoRecovery")]
+  [parameter(parameterSetName="setFarmHtmlAccess")]
   [parameter(
     parameterSetName="setDirectConnect",
     mandatory=$true,
@@ -557,7 +564,79 @@ Param (
     HelpMessage="Specify Security Server Pairing Password"
   )]
   [Switch]
-    $setPairingPassword
+    $setPairingPassword,
+##################### Start addFarm parameters #####################   
+  [parameter(parameterSetName="addRdsServerToFarm")]
+  [parameter(parameterSetName="addFarmWithRdsServer")]
+  [parameter(parameterSetName="addRdsAppPool")]
+  [parameter(parameterSetName="addRdsDesktopPool")]
+  [parameter(parameterSetName="removeRdsServerFromFarm")]
+  [parameter(parameterSetName="setFarmHtmlAccess")]
+  [parameter(
+    parameterSetName="addFarm",
+    mandatory=$true,
+		HelpMessage="Farm ID"
+	)]
+	[string]
+		$farmId,
+    
+  [parameter(parameterSetName="addFarm")]
+  [Switch]
+    $addFarm,
+##################### Start addRdsServerToFarm parameters #####################   
+  [parameter(parameterSetName="addFarmWithRdsServer")]
+  [parameter(parameterSetName="removeRdsServerFromFarm")]
+  [parameter(
+    parameterSetName="addRdsServerToFarm",
+    mandatory=$true,
+		HelpMessage="RDS server FQDN"
+	)]
+	[string]
+		$rdsServerDnsName,
+    
+  [parameter(parameterSetName="addRdsServerToFarm")]
+  [Switch]
+    $addRdsServerToFarm,
+##################### Start addFarmWithRdsServer parameters #####################     
+  [parameter(parameterSetName="addFarmWithRdsServer")]
+  [Switch]
+    $addFarmWithRdsServer,
+##################### Start addRdsAppPool parameters #####################   
+  [parameter(
+    parameterSetName="addRdsAppPool",
+    mandatory=$true,
+		HelpMessage="Application executable path"
+	)]
+	[string]
+		$execPath,
+    
+  [parameter(parameterSetName="addRdsAppPool")]
+  [Switch]
+    $addRdsAppPool,
+##################### Start addRdsDesktopPool parameters #####################     
+  [parameter(parameterSetName="addRdsDesktopPool")]
+  [Switch]
+    $addRdsDesktopPool,
+##################### Start deleteRdsAppPool parameters #####################     
+  [parameter(parameterSetName="deleteRdsAppPool")]
+  [Switch]
+    $deleteRdsAppPool,
+##################### Start deleteRdsDesktopPool parameters #####################     
+  [parameter(parameterSetName="deleteRdsDesktopPool")]
+  [Switch]
+    $deleteRdsDesktopPool,
+##################### Start entitleRdsAppPool parameters #####################     
+  [parameter(parameterSetName="entitleRdsAppPool")]
+  [Switch]
+    $entitleRdsAppPool,
+##################### Start removeRdsServerFromFarm parameters #####################     
+  [parameter(parameterSetName="removeRdsServerFromFarm")]
+  [Switch]
+    $removeRdsServerFromFarm,
+##################### Start setFarmHtmlAccess parameters #####################   
+  [parameter(parameterSetName="setFarmHtmlAccess")]
+  [Switch]
+    $setFarmHtmlAccess
 )
 
 foreach ($paramKey in $psboundparameters.keys) {
@@ -661,24 +740,19 @@ switch ($pscmdlet.parameterSetName) {
     $broker.exportSettings($filePath)
   }
   "setDirectConnect" {
-    $enable = [System.Convert]::ToBoolean("$enable")
-    $broker.setDirectConnect($enable)
+    $broker.setDirectConnect([bool]$enable)
   }
   "setDirectPCoIP" {
-    $enable = [System.Convert]::ToBoolean("$enable")
-    $broker.setDirectPCoIP($enable)
+    $broker.setDirectPCoIP([bool]$enable)
   }
   "setMMRPolicy" {
-    $enable = [System.Convert]::ToBoolean("$enable")
-    $broker.setMMRPolicy($enable)
+    $broker.setMMRPolicy([bool]$enable)
   }
   "setHTMLAccess" {
-    $enable = [System.Convert]::ToBoolean("$enable")
-    $broker.setHTMLAccess($poolId, $enable)
+    $broker.setHTMLAccess($poolId, [bool]$enable)
   }
   "setPoolAutoRecovery" {
-    $enable = [System.Convert]::ToBoolean("$enable")
-    $broker.setPoolAutoRecovery($poolId, $enable)
+    $broker.setPoolAutoRecovery($poolId, [bool]$enable)
   }
   "setPoolID" {
     $broker.setPoolId($poolId, $newId)
@@ -688,6 +762,39 @@ switch ($pscmdlet.parameterSetName) {
   }
   "setPairingPassword" {
     $broker.setPairingPassword($pairingPassword, $timeout)
+  }
+  "addFarm" {
+    $broker.addFarm($farmId)
+  }
+  "addRdsServerToFarm" {
+    $broker.addRdsServerToFarm($farmId, $rdsServerDnsName)
+  }
+  "addFarmWithRdsServer" {
+    $broker.addFarm($farmId)
+    $broker.addRdsServerToFarm($farmId, $rdsServerDnsName)
+  }
+  "addRdsAppPool" {
+    $broker.addRdsAppPool($farmId,$poolId, $execPath)
+  }
+  "addRdsDesktopPool" {
+    $broker.addRdsDesktopPool($farmId,$poolId)
+  }
+  "deleteRdsAppPool" {
+    $broker.deleteRdsAppPool($poolId)
+  }
+  "deleteRdsDesktopPool" {
+    $broker.deleteRdsDesktopPool($poolId)
+  }
+  "entitleRdsAppPool" {
+    $domain = $userName.split("\")[0]
+		$user = $userName.split("\")[1]
+		$broker.entitleRdsAppPool($user,$domain,$poolId)
+  }
+  "removeRdsServerFromFarm" {
+    $broker.removeRdsServerFromFarm($farmId, $rdsServerDnsName)
+  }
+  "setFarmHtmlAccess" {
+    $broker.setFarmHtmlAccess($farmId, [bool]$enable)
   }
 }
 writeResult

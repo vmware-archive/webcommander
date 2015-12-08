@@ -140,7 +140,7 @@ function newCommand {
       if ($options) { $parameter | add-member options $options }
       if ($pAttr.mandatory) { $parameter | add-member mandatory 1 }
       if ($type) { $parameter | add-member "type" $type }
-      if ($sets) { $parameter | add-member parametersets $sets }
+      if ($sets) { $parameter | add-member parametersets @($sets | sort) }
       $parameters += $parameter
 		}
 	}
@@ -151,7 +151,10 @@ function newCommand {
     synopsis = $synopsis
     functionalities = $functionalities
   }
-  if ($parametersets) { $command | add-member parametersets $parametersets}
+  if ($parametersets) { 
+    #$parametersets = $parametersets | get-unique
+    $command | add-member parametersets ($parametersets | select -uniq | sort)
+  }
   if ($parameters) { $command | add-member parameters $parameters}
   
   $command | convertto-json -depth 5 | 
