@@ -433,7 +433,7 @@ function newBroker {
 		$argList = @($farmId,$switch)
 		$cmd = {
 			$serverObject = [ADSI]("LDAP://localhost:389/cn=" + $args[0] + ",ou=Server Groups,dc=vdi,dc=vmware,dc=int")
-			if ($args[1] -eq "true") {
+			if ($args[1]) {
 				$spl = @("BLAST","PCOIP","RDP")
 			} else {
 				$spl = @("PCOIP","RDP")

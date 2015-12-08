@@ -7,18 +7,18 @@
                         ],
     "synopsis":  "Windows",
     "parametersets":  [
+                          "autoLogon",
                           "changeHostname",
-                          "enableRdp",
-                          "uploadFile",
-                          "readFile",
-                          "listApp",
-                          "restart",
-                          "shutdown",
                           "checkWindowsUpdate",
-                          "windowsUpdateSync",
-                          "windowsUpdate",
+                          "enableRdp",
+                          "listApp",
+                          "readFile",
+                          "restart",
                           "runScript",
-                          "autoLogon"
+                          "shutdown",
+                          "uploadFile",
+                          "windowsUpdate",
+                          "windowsUpdateSync"
                       ],
     "parameters":  [
                        {
@@ -148,8 +148,8 @@
                            "mandatory":  1,
                            "type":  "option",
                            "parametersets":  [
-                                                 "windowsUpdateSync",
-                                                 "windowsUpdate"
+                                                 "windowsUpdate",
+                                                 "windowsUpdateSync"
                                              ]
                        },
                        {
@@ -165,8 +165,8 @@
                            "mandatory":  1,
                            "type":  "option",
                            "parametersets":  [
-                                                 "windowsUpdateSync",
-                                                 "windowsUpdate"
+                                                 "windowsUpdate",
+                                                 "windowsUpdateSync"
                                              ]
                        },
                        {

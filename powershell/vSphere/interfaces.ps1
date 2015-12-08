@@ -197,7 +197,6 @@ switch ($pscmdlet.parameterSetName) {
   "removeNfsDatastore" {
     $serverList | % { $_.removeNfs($nfsDatastoreName) } 
   }"setInterVmPageSharing" {
-    if ($setInterVmPageSharing) {addToResult "got switch";endExec}
     $serverList | % { $_.setPageSharing([boolean]$enable) } 
   }
   

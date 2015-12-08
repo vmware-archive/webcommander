@@ -7,25 +7,25 @@
                         ],
     "synopsis":  "VM",
     "parametersets":  [
+                          "addHardDisk",
                           "answerQuestion",
                           "delete",
-                          "poweroff",
-                          "poweron",
-                          "suspend",
-                          "restart",
-                          "addHardDisk",
-                          "setPortGroup",
-                          "setMemorySize",
-                          "updateVmTools",
-                          "uploadFile",
-                          "runScript",
-                          "setVmx",
+                          "getIp",
                           "getVmx",
                           "listSnapshot",
+                          "poweroff",
+                          "poweron",
                           "removeSnapshot",
+                          "restart",
                           "restoreSnapshot",
+                          "runScript",
+                          "setMemorySize",
+                          "setPortGroup",
+                          "setVmx",
+                          "suspend",
                           "takeSnapshot",
-                          "getIp"
+                          "updateVmTools",
+                          "uploadFile"
                       ],
     "parameters":  [
                        {
@@ -198,8 +198,8 @@
                            "helpmessage":  "User of target VM (default is administrator)",
                            "mandatory":  1,
                            "parametersets":  [
-                                                 "uploadFile",
-                                                 "runScript"
+                                                 "runScript",
+                                                 "uploadFile"
                                              ]
                        },
                        {
@@ -208,8 +208,8 @@
                            "mandatory":  1,
                            "type":  "password",
                            "parametersets":  [
-                                                 "uploadFile",
-                                                 "runScript"
+                                                 "runScript",
+                                                 "uploadFile"
                                              ]
                        },
                        {

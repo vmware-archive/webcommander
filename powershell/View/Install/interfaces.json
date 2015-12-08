@@ -51,8 +51,7 @@
                        },
                        {
                            "name":  "silentInstallParam",
-                           "helpmessage":  "Customized parameters for silent install",
-                           "type":  "textarea"
+                           "helpmessage":  "Customized parameters for silent install"
                        }
                    ]
 }
