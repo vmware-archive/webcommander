@@ -1,6 +1,6 @@
 {
-    "script":  "vSphere\\Deploy\\Interfaces.ps1",
-    "description":  null,
+    "script":  "vSphere\\MakeVM\\Interfaces.ps1",
+    "description":  "Deploy Windows VM",
     "developer":  "whirls9@hotmail.com",
     "functionalities":  [
                             "vSphere"

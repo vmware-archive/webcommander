@@ -23,6 +23,9 @@ THE SOFTWARE.
 <#
 	.SYNOPSIS
 		MakeVM
+    
+  .DESCRIPTION
+		Deploy Windows VM
 
 	.FUNCTIONALITY
 		vSphere
