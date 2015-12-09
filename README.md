@@ -16,7 +16,9 @@ https://github.com/vmware/webcommander/wiki
 
 WebCommander wraps scripts into web services so that those scripts could be easily consumed by remote users or other programs. 
 Each script becomes a command that could be triggered by HTTP request. 
-The command output is XML with browser side transforming (XSLT) which is friendly to both programs and human users at the same time. 
+The command output is XML with browser side transforming (XSLT) which is friendly to both programs and human users at the same time.
+
+If you prefer JSON instead of XML, please pull code from Walnut branch where both command definition and output are JSON.
 
 WebCommander also provides 2 methods (workflow and poker) to run multiple commands together to fulfill more complex automation tasks.
 
