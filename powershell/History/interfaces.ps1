@@ -46,10 +46,10 @@ Param (
 		$userAddr,
 
 	[parameter(
-		HelpMessage="Command name"
+		HelpMessage="Script path"
 	)]
 	[string]
-		$cmdName,
+		$scriptPath,
 		
 	[parameter(
 		HelpMessage="Time in form of 'yyyy-mm-dd hh:mm:ss'. If defined, only records later than this time are selected"
@@ -70,17 +70,13 @@ Param (
 		$resultCode
 )
 
-foreach ($paramKey in $psboundparameters.keys) {
-	$oldValue = $psboundparameters.item($paramKey)
-	$newValue = [system.web.httputility]::urldecode("$oldValue")
-	set-variable -name $paramKey -value $newValue
-}
-
 . .\utils.ps1
 
-$scriptPath = split-path -parent $MyInvocation.MyCommand.Definition 
-$historyPath = $scriptPath.replace("powershell", "www")
-$records = [io.Directory]::EnumerateFiles($historyPath,"*.json","AllDirectories") | Sort-Object {$_.SubString($_.IndexOf('output-'))} -desc
+$psPath = split-path -parent (pwd).path
+$historyPath = "$psPath\www\history"
+$records = [io.Directory]::EnumerateFiles($historyPath,"*.json","AllDirectories") | `
+  Sort-Object {$_.SubString($_.IndexOf('output-'))} -desc | `
+  %{$_.replace("$historypath\","")}
 [datetime]$origin = '1970-01-01 00:00:00'
 try {
 	if ($behindTime) {
@@ -96,8 +92,8 @@ try {
 if ($resultCode) {
 	$records = $records | ?{$_.split("\")[-2] -match "$resultCode"}
 }
-if ($cmdName) {
-	$records = $records | ?{$_ -match "$cmdName"}
+if ($scriptPath) {
+	$records = $records | ?{$_ -match "$scriptPath"}
 }
 if ($userAddr) {
 	$records = $records | ?{$_.split("\")[1] -match "$userAddr"}
@@ -115,7 +111,7 @@ if ($records) {
   
   $history=@()
 	$records | select -first 50000 | % {
-    $script = [regex]::match($_, '(?<=\\(\d{1,3}.){4}\\).+(?=\\\d{4}\\)').value
+    $script = [regex]::match($_, '(?<=\\(\d{1,3}.){3}\d{1,3}\\).+(?=\\\d{4}\\)').value
 		$path = $_.replace("$historyPath\","").split("\")
 		$seconds = ($_ -split "output-")[-1].replace(".json","")
 		$time = $origin.AddSeconds($seconds).tostring()

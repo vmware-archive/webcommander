@@ -232,13 +232,14 @@ if ( $script == ""){
 		$target["time"] = date('Y-m-d H:i:s',$time);
 
 		//echo htmlspecialchars(json_encode($target), ENT_NOQUOTES);
-    echo json_encode($target);
-		if (!$missParam && $command != "showHistory") {
+    if (!$missParam && preg_match('/^History/',$script) == 0) {
+      $script = preg_replace('/https?:\/\//', '', $script);
 			$filename = '../www/history/' . $user . '/' . $userAddr . '/' . $script . '/' . $target["returncode"];
 			$filename .=  '/output-' . $time . '.json';
 			$dirname = dirname($filename);
 			if (!is_dir($dirname)) {mkdir($dirname, 0755, true);}
 			file_put_contents($filename, json_encode($target));
+      shell_exec("mongoimport.exe --db webcmd --collection history --file " . $filename);
 		}
 	}
 }
