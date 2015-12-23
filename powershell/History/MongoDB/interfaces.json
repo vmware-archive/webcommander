@@ -1,11 +1,11 @@
 {
-    "script":  "History\\interfaces.ps1",
+    "script":  "History\\MongoDB\\interfaces.ps1",
     "description":  "Search execution history",
     "developer":  "whirls9@hotmail.com",
     "functionalities":  [
 
                         ],
-    "synopsis":  "History",
+    "synopsis":  "History (MongoDB)",
     "parameters":  [
                        {
                            "name":  "user",
@@ -18,6 +18,10 @@
                        {
                            "name":  "scriptPath",
                            "helpmessage":  "Script path"
+                       },
+                       {
+                           "name":  "method",
+                           "helpmessage":  "Method"
                        },
                        {
                            "name":  "behindTime",
