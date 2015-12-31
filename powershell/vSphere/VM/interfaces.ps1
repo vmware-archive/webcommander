@@ -1,49 +1,71 @@
 <#
-	.SYNOPSIS
-		VM 
+Copyright (c) 2012-2015 VMware, Inc.
 
-	.DESCRIPTION
-		Virtual Machine
-		
-	.NOTES
-		AUTHOR: Jian Liu
-		EMAIL: whirls9@hotmail.com
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+#>
+
+<#
+  .SYNOPSIS
+    VM 
+
+  .DESCRIPTION
+    Virtual Machine
+    
+  .NOTES
+    AUTHOR: Jian Liu
+    EMAIL: whirls9@hotmail.com
 #>
 
 Param (
 ##################### Start general parameters #####################
-	[parameter(
-		Mandatory=$true,
-		HelpMessage="IP or FQDN of the ESX or VC server hosting the VM"
-	)]
-	[string]
-		$serverAddress, 
-	
-	[parameter(
-		HelpMessage="User name to connect to the server (default is root)"
-	)]
-	[string]
-		$serverUser="root", 
-	
-	[parameter(
-		HelpMessage="Password of the user"
-	)]
-	[string]
-		$serverPassword=$env:defaultPassword, 
-	
-	[parameter(
-		Mandatory=$true,
-		HelpMessage="Name of target VM. Support multiple values seperated by comma and also wildcard."
-	)]
-	[string]
-		$vmName, 
-##################### Start answerQuestion parameters #####################	
-	[parameter(
+  [parameter(
+    Mandatory=$true,
+    HelpMessage="IP or FQDN of the ESX or VC server hosting the VM"
+  )]
+  [string]
+    $serverAddress, 
+  
+  [parameter(
+    HelpMessage="User name to connect to the server (default is root)"
+  )]
+  [string]
+    $serverUser="root", 
+  
+  [parameter(
+    HelpMessage="Password of the user"
+  )]
+  [string]
+    $serverPassword=$env:defaultPassword, 
+  
+  [parameter(
+    Mandatory=$true,
+    HelpMessage="Name of target VM. Support multiple values seperated by comma and also wildcard."
+  )]
+  [string]
+    $vmName, 
+##################### Start answerQuestion parameters #####################  
+  [parameter(
     parameterSetName="answerQuestion",
-		HelpMessage="The answer for the question. Default is 'cancel'."
-	)]
-	[string]
-		$answer="cancel",
+    HelpMessage="The answer for the question. Default is 'cancel'."
+  )]
+  [string]
+    $answer="cancel",
     
   [parameter(
     parameterSetName="answerQuestion",
@@ -54,244 +76,236 @@ Param (
 ##################### Start delete parameters #####################    
   [parameter(
     parameterSetName="delete",
-		HelpMessage="Delete VM from disk"
-	)]
+    HelpMessage="Delete VM from disk"
+  )]
   [switch]
-		$delete,
+    $delete,
 ##################### Start poweroff parameters #####################    
   [parameter(
     parameterSetName="poweroff"
-	)]
+  )]
   [switch]
-		$poweroff,
+    $poweroff,
 ##################### Start poweroff parameters #####################    
   [parameter(
     parameterSetName="poweron"
-	)]
+  )]
   [switch]
-		$poweron,
+    $poweron,
 ##################### Start poweroff parameters #####################    
   [parameter(
     parameterSetName="suspend"
-	)]
+  )]
   [switch]
-		$suspend,
+    $suspend,
 ##################### Start poweroff parameters #####################    
   [parameter(
     parameterSetName="restart"
-	)]
+  )]
   [switch]
-		$restart,
+    $restart,
 ##################### Start addHardDisk parameters #####################    
   [parameter(
     parameterSetName="addHardDisk",
-		Mandatory=$true,
-		HelpMessage="Disk capacity in gigabytes (GB)"
-	)]
-	[string]
-		$capacityGb,
-	
-	[parameter(
+    Mandatory=$true,
+    HelpMessage="Disk capacity in gigabytes (GB)"
+  )]
+  [string]
+    $capacityGb,
+  
+  [parameter(
     parameterSetName="addHardDisk",
-		HelpMessage="Number of disks to add. Default is 1."
-	)]
-	[string]
-		$diskNumber="1",
-	
-	[parameter(
+    HelpMessage="Number of disks to add. Default is 1."
+  )]
+  [string]
+    $diskNumber="1",
+  
+  [parameter(
     parameterSetName="addHardDisk",
-		HelpMessage="Storage format. Default is Thin."
-	)]
-	[ValidateSet(
-		"Thin",
-		"Thick",
-		"EagarZeroedThick"
-	)]
-	[string]
-		$storageFormat="Thin",
-	
-	[parameter(
+    HelpMessage="Storage format. Default is Thin."
+  )]
+  [ValidateSet(
+    "Thin",
+    "Thick",
+    "EagarZeroedThick"
+  )]
+  [string]
+    $storageFormat="Thin",
+  
+  [parameter(
     parameterSetName="addHardDisk",
-		HelpMessage="Persistence mode, default is IndependentPersistent."
-	)]
-	[ValidateSet(
-		"IndependentPersistent",
-		"IndependentNonPersistent",
-		"Persistent"
-	)]
-	[string]
-		$persistence="IndependentPersistent",
+    HelpMessage="Persistence mode, default is IndependentPersistent."
+  )]
+  [ValidateSet(
+    "IndependentPersistent",
+    "IndependentNonPersistent",
+    "Persistent"
+  )]
+  [string]
+    $persistence="IndependentPersistent",
   
   [parameter(
     parameterSetName="addHardDisk"
-	)]
+  )]
   [switch]
-		$addHardDisk,
+    $addHardDisk,
 ##################### Start setPortGroup parameters #####################    
   [parameter(
     parameterSetName="setPortGroup",
-		Mandatory=$true,
-		HelpMessage="Name of the port group"
-	)]
-	[string]
-		$portGroup,
+    Mandatory=$true,
+    HelpMessage="Name of the port group"
+  )]
+  [string]
+    $portGroup,
   
   [parameter(
     parameterSetName="setPortGroup",
     helpMessage="Add VM network card into specified port group"
-	)]
+  )]
   [switch]
-		$setPortGroup,
+    $setPortGroup,
 ##################### Start setMemorySize parameters #####################    
   [parameter(
     parameterSetName="setMemorySize",
-		Mandatory=$true,
-		HelpMessage="Memory size in gigabytes (GB)"
-	)]
-	[string]
-		$memoryGb,
+    Mandatory=$true,
+    HelpMessage="Memory size in gigabytes (GB)"
+  )]
+  [string]
+    $memoryGb,
   
   [parameter(
     parameterSetName="setMemorySize"
-	)]
+  )]
   [switch]
-		$setMemorySize,
+    $setMemorySize,
 ##################### Start updateVmTools parameters #####################    
   [parameter(
     parameterSetName="updateVmTools"
-	)]
+  )]
   [switch]
-		$updateVmTools,
+    $updateVmTools,
 ##################### Start runScript parameters #####################
   [parameter(parameterSetName="runScript")]
   [parameter(parameterSetName="uploadFile")]
   [parameter(HelpMessage="User of target VM (default is administrator)")]
-	[string]	
-		$guestUser="administrator", 
-		
-	[parameter(parameterSetName="runScript")]
+  [string]  
+    $guestUser="administrator", 
+    
+  [parameter(parameterSetName="runScript")]
   [parameter(parameterSetName="uploadFile")]
   [parameter(HelpMessage="Password of guestUser")]
-	[string]	
-		$guestPassword=$env:defaultPassword, 
+  [string]  
+    $guestPassword=$env:defaultPassword, 
     
   [parameter(
     parameterSetName="runScript",
-		Mandatory=$true,
-		HelpMessage="Script text"
-	)]
-	[string]
-		$scriptText,
+    Mandatory=$true,
+    HelpMessage="Script text"
+  )]
+  [string]
+    $scriptText,
     
   [parameter(
     parameterSetName="runScript",
-		HelpMessage="Script type. Default is 'Bat'."
-	)]
-	[ValidateSet(
-		"Bat",
-		"Bash",
-		"Powershell"
-	)]
-		$scriptType="Bat",
+    HelpMessage="Script type. Default is 'Bat'."
+  )]
+  [ValidateSet(
+    "Bat",
+    "Bash",
+    "Powershell"
+  )]
+    $scriptType="Bat",
   
   [parameter(
     parameterSetName="runScript"
-	)]
+  )]
   [switch]
-		$runScript,
+    $runScript,
 ##################### Start uploadFile parameters #####################    
   [parameter(parameterSetName="uploadFile")]
   [parameter(
     parameterSetName="setVmx",
-		Mandatory=$true,
-		HelpMessage="select a file"
-	)]
-	[string]
-		$file,
-	
-	[parameter(
+    Mandatory=$true,
+    HelpMessage="select a file"
+  )]
+  [string]
+    $file,
+  
+  [parameter(
     parameterSetName="uploadFile",
-		Mandatory=$true,
-		HelpMessage="Destination path, such as c:\temp\"
-	)]
-	[string]
-		$destination,
+    Mandatory=$true,
+    HelpMessage="Destination path, such as c:\temp\"
+  )]
+  [string]
+    $destination,
   
   [parameter(
     parameterSetName="uploadFile",
     helpMessage="upload file to VM"
-	)]
+  )]
   [switch]
-		$uploadFile,
+    $uploadFile,
 ##################### Start getVmx parameters #####################    
   [parameter(
     parameterSetName="getVmx",
     helpMessage="get content of VMX file"
-	)]
+  )]
   [switch]
-		$getVmx,
+    $getVmx,
 ##################### Start setVmx parameters #####################    
   [parameter(
     parameterSetName="setVmx",
     helpMessage="set content of VMX file"
-	)]
+  )]
   [switch]
-		$setVmx,
+    $setVmx,
 ##################### Start listSnapshot parameters #####################    
   [parameter(
     parameterSetName="listSnapshot",
     helpMessage="List all snapshots of the VM"
-	)]
+  )]
   [switch]
-		$listSnapshot,
+    $listSnapshot,
 ##################### Start takeSnapshot parameters #####################    
   [parameter(parameterSetName="takeSnapshot")]
   [parameter(parameterSetName="restoreSnapshot")]
   [parameter(parameterSetName="removeSnapshot")]
   [parameter(helpMessage="Snapshot name")]
   [string]
-		$ssName,
+    $ssName,
   
   [parameter(
     parameterSetName="takeSnapshot",
     helpMessage="Snapshot description"
-	)]
+  )]
   [string]
-		$ssDescription,
+    $ssDescription,
     
   [parameter(
     parameterSetName="takeSnapshot"
-	)]
+  )]
   [switch]
-		$takeSnapshot,
+    $takeSnapshot,
 ##################### Start restoreSnapshot parameters #####################    
   [parameter(
     parameterSetName="restoreSnapshot"
-	)]
+  )]
   [switch]
-		$restoreSnapshot,
+    $restoreSnapshot,
 ##################### Start removeSnapshot parameters #####################    
   [parameter(
     parameterSetName="removeSnapshot"
-	)]
+  )]
   [switch]
-		$removeSnapshot,
+    $removeSnapshot,
 ##################### Start getIp parameters #####################    
   [parameter(
     parameterSetName="getIp",
     helpMessage="Get VM IP address"
-	)]
+  )]
   [switch]
-		$getIp
+    $getIp
 )
-
-foreach ($paramKey in $psboundparameters.keys) {
-  $oldValue = $psboundparameters.item($paramKey)
-  if ($oldValue.gettype().name -eq "String") {
-    $newValue = [system.web.httputility]::urldecode("$oldValue")
-    set-variable -name $paramKey -value $newValue
-  }
-}
 
 . .\utils.ps1
 . .\vsphere\object.ps1
@@ -381,7 +395,7 @@ switch ($pscmdlet.parameterSetName) {
       } catch {
         addToResult "Fail - restart VM $($_.name)"
         addError
-      }	
+      }  
     }
   }
   "setPortGroup" {
@@ -428,7 +442,7 @@ switch ($pscmdlet.parameterSetName) {
   }
   "suspend" {
     $vivmList | % { 
-      try {	
+      try {  
         Suspend-VM -vm $_ -confirm:$false -EA stop
         addToResult "Success - suspend VM $($_.name)"
       } catch {
@@ -478,20 +492,20 @@ switch ($pscmdlet.parameterSetName) {
       $vm = newVm $server $_.name
       $vm.stop()
       Get-FloppyDrive -VM $vm.vivm | Set-FloppyDrive -NoMedia -Confirm:$False
-			Get-CDDrive -VM $vm.vivm | Set-CDDrive -NoMedia -Confirm:$False   
-			$vm.takeSnapshot($ssName,$ssDescription)
+      Get-CDDrive -VM $vm.vivm | Set-CDDrive -NoMedia -Confirm:$False   
+      $vm.takeSnapshot($ssName,$ssDescription)
     } 
   }
   "restoreSnapshot" {
     $vivmList | % { 
       $vm = newVm $server $_.name   
-			$vm.restoreSnapshot($ssName)
+      $vm.restoreSnapshot($ssName)
     } 
   }
   "removeSnapshot" {
     $vivmList | % { 
       $vm = newVm $server $_.name 
-			$vm.removeSnapshot($ssName)
+      $vm.removeSnapshot($ssName)
     } 
   }
   "getIp" {

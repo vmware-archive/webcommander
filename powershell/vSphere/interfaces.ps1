@@ -1,35 +1,57 @@
 ﻿<#
-	.SYNOPSIS
-		vSphere 
+Copyright (c) 2012-2015 VMware, Inc.
 
-	.DESCRIPTION
-		ESXi and vCenter
-		
-	.NOTES
-		AUTHOR: Jian Liu
-		EMAIL: whirls9@hotmail.com
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+#>
+
+<#
+  .SYNOPSIS
+    vSphere 
+
+  .DESCRIPTION
+    ESXi and vCenter
+    
+  .NOTES
+    AUTHOR: Jian Liu
+    EMAIL: whirls9@hotmail.com
 #>
 
 Param (
 ##################### Start general parameters #####################
-	[parameter(
-		Mandatory=$true,
-		HelpMessage="IP or FQDN of ESX or VC server. Support multiple values seperated by comma."
-	)]
-	[string]
-		$serverAddress, 
-	
-	[parameter(
-		HelpMessage="User name to connect to the server (default is root)"
-	)]
-	[string]
-		$serverUser="root", 
-	
-	[parameter(
-		HelpMessage="Password of the user"
-	)]
-	[string]
-		$serverPassword=$env:defaultPassword,  
+  [parameter(
+    Mandatory=$true,
+    HelpMessage="IP or FQDN of ESX or VC server. Support multiple values seperated by comma."
+  )]
+  [string]
+    $serverAddress, 
+  
+  [parameter(
+    HelpMessage="User name to connect to the server (default is root)"
+  )]
+  [string]
+    $serverUser="root", 
+  
+  [parameter(
+    HelpMessage="Password of the user"
+  )]
+  [string]
+    $serverPassword=$env:defaultPassword,  
 ##################### Start listPortGroup parameters #####################  
   [parameter(
     parameterSetName="listPortGroup",
@@ -68,22 +90,22 @@ Param (
 ##################### Start syncTime parameters #####################   
   [parameter(
     parameterSetName="syncTime",
-		Mandatory=$true,
-		HelpMessage="IP or FQDN of the NTP server"
-	)]
-	[string]
-		$ntpServerAddress,
+    Mandatory=$true,
+    HelpMessage="IP or FQDN of the NTP server"
+  )]
+  [string]
+    $ntpServerAddress,
     
   [parameter(
     parameterSetName="syncTime",
-		HelpMessage="Whether or not to sync time on VM"
-	)]
+    HelpMessage="Whether or not to sync time on VM"
+  )]
   [ValidateSet(
-		"false",
-		"true"
-	)]
-	[string]
-		$includeVm="false",
+    "false",
+    "true"
+  )]
+  [string]
+    $includeVm="false",
    
   [parameter(
     parameterSetName="syncTime",
@@ -91,24 +113,24 @@ Param (
   )]
   [Switch]
     $syncTime,
-##################### Start mountNfsDatastore parameters #####################	
-	[parameter(
+##################### Start mountNfsDatastore parameters #####################  
+  [parameter(
     parameterSetName="mountNfsDatastore",
-		Mandatory=$true,
-		HelpMessage="NFS stores to mount in form of 'datastore name : NFS host : path'. Support multiple values. Each entry per line."
-	)]
-	[string]
-		$datastoreList,
-		
-	[parameter(
+    Mandatory=$true,
+    HelpMessage="NFS stores to mount in form of 'datastore name : NFS host : path'. Support multiple values. Each entry per line."
+  )]
+  [string]
+    $datastoreList,
+    
+  [parameter(
     parameterSetName="mountNfsDatastore",
-		HelpMessage="Mount NFS read only"
-	)]
-	[ValidateSet(
-		"false",
-		"true"
-	)]
-		$readOnly="false",
+    HelpMessage="Mount NFS read only"
+  )]
+  [ValidateSet(
+    "false",
+    "true"
+  )]
+    $readOnly="false",
     
   [parameter(
     parameterSetName="mountNfsDatastore",
@@ -121,7 +143,7 @@ Param (
     parameterSetName="removeNfsDatastore",
     Mandatory=$true,
     HelpMessage="Name of NFS datastore to remove"
-	)]
+  )]
   [string]
     $nfsDatastoreName,
     
@@ -135,14 +157,14 @@ Param (
   [parameter(
     parameterSetName="setInterVmPageSharing",
     Mandatory=$true,
-		HelpMessage="Enable inter-vm transparent page sharing"
-	)]
-	[ValidateSet(
-		"false",
-		"true"
-	)]
-	[string]
-		$enable,
+    HelpMessage="Enable inter-vm transparent page sharing"
+  )]
+  [ValidateSet(
+    "false",
+    "true"
+  )]
+  [string]
+    $enable,
     
   [parameter(
     parameterSetName="setInterVmPageSharing",
@@ -151,14 +173,6 @@ Param (
   [Switch]
     $setInterVmPageSharing
 )
-
-foreach ($paramKey in $psboundparameters.keys) {
-  $oldValue = $psboundparameters.item($paramKey)
-  if ($oldValue.gettype().name -eq "String") {
-    $newValue = [system.web.httputility]::urldecode("$oldValue")
-    set-variable -name $paramKey -value $newValue
-  }
-}
 
 . .\utils.ps1
 . .\vsphere\object.ps1
