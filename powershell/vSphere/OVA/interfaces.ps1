@@ -21,120 +21,112 @@ THE SOFTWARE.
 #>
 
 <#
-	.SYNOPSIS
+  .SYNOPSIS
     Deploy
 
-	.DESCRIPTION
+  .DESCRIPTION
     This command deploys an OVA to ESX or VC.
-		
-	.FUNCTIONALITY
-		OVA
-	
-	.NOTES
-		AUTHOR: Jerry Liu
-		EMAIL: liuj@vmware.com
+    
+  .FUNCTIONALITY
+    OVA
+  
+  .NOTES
+    AUTHOR: Jerry Liu
+    EMAIL: liuj@vmware.com
 #>
 
 Param (
 ##################### Start general parameters #####################
-	[parameter(
-		HelpMessage="IP or FQDN of ESX or VC server to which the OVA will be deployed"
-	)]
-	[string]
+  [parameter(
+    HelpMessage="IP or FQDN of ESX or VC server to which the OVA will be deployed"
+  )]
+  [string]
     $serverAddress, 
-	
-	[parameter(
-		HelpMessage="User name to connect to the server (default is root)"
-	)]
-	[string]
-		$serverUser="root",
-		
-	[parameter(
-		HelpMessage="Password of the user"
-	)]
-	[string]
-		$serverPassword=$env:defaultPassword,
-		
-	[parameter(
-		HelpMessage="Name of datastore to which the OVA will be deployed"
-	)]
-	[string]
-		$datastore, 
-	
-	[parameter(
-		HelpMessage="Storage format"
-	)]
-	[ValidateSet(
-		"Thin",
-		"Thick",
-		"EagarZeroedThick"
-	)]
-	[string]
-		$storageFormat="Thin",
-		
-	[parameter(
-		HelpMessage="Name of Virtual Machine Port Group to which the OVA will connect"
-	)]
-	[string]
-		$portGroup,
-		
-	[parameter(
-		HelpMessage="Advanced properties, such as --prop:vami.hostname=myvmname"
-	)]
-	[string]
-		$advancedProperty, 
-		
-	[parameter(
-		Mandatory=$true,
-		HelpMessage="URL of the OVA"
-	)]
-	[string]
-		$ovaUrl, 
-		
-	[parameter(
-		Mandatory=$true,
-		HelpMessage="Name of the VM to be deployed"
-	)]
-	[string]
-		$vmName,
+  
+  [parameter(
+    HelpMessage="User name to connect to the server (default is root)"
+  )]
+  [string]
+    $serverUser="root",
+    
+  [parameter(
+    HelpMessage="Password of the user"
+  )]
+  [string]
+    $serverPassword=$env:defaultPassword,
+    
+  [parameter(
+    HelpMessage="Name of datastore to which the OVA will be deployed"
+  )]
+  [string]
+    $datastore, 
+  
+  [parameter(
+    HelpMessage="Storage format"
+  )]
+  [ValidateSet(
+    "Thin",
+    "Thick",
+    "EagarZeroedThick"
+  )]
+  [string]
+    $storageFormat="Thin",
+    
+  [parameter(
+    HelpMessage="Name of Virtual Machine Port Group to which the OVA will connect"
+  )]
+  [string]
+    $portGroup,
+    
+  [parameter(
+    HelpMessage="Advanced properties, such as --prop:vami.hostname=myvmname"
+  )]
+  [string]
+    $advancedProperty, 
+    
+  [parameter(
+    Mandatory=$true,
+    HelpMessage="URL of the OVA"
+  )]
+  [string]
+    $ovaUrl, 
+    
+  [parameter(
+    Mandatory=$true,
+    HelpMessage="Name of the VM to be deployed"
+  )]
+  [string]
+    $vmName,
 ##################### Start deployToEsx parameters #####################
   [parameter(parameterSetName="deployToEsx")]
   [Switch]
     $deployToEsx,
 ##################### Start deployToVc parameters #####################
   [parameter(
-		parameterSetName="deployToVc",
-		HelpMessage="Name of datacenter to which the OVA will be deployed"
-	)]
-	[string]
-		$datacenter,
+    parameterSetName="deployToVc",
+    HelpMessage="Name of datacenter to which the OVA will be deployed"
+  )]
+  [string]
+    $datacenter,
     
   [parameter(
     parameterSetName="deployToVc",
-		HelpMessage="Name of cluster to which the OVA will be deployed"
-	)]
-	[string]	
-		$cluster, 
-		
-	[parameter(
+    HelpMessage="Name of cluster to which the OVA will be deployed"
+  )]
+  [string]  
+    $cluster, 
+    
+  [parameter(
     parameterSetName="deployToVc",
-		HelpMessage="Name of ESX host to which the OVA will be deployed"
-	)]
-	[string]	
-		$esxHost, 
+    HelpMessage="Name of ESX host to which the OVA will be deployed"
+  )]
+  [string]  
+    $esxHost, 
     
   [parameter(parameterSetName="deployToVc")]
   [Switch]
     $deployToVc
 )
-
-foreach ($paramKey in $psboundparameters.keys) {
-  $oldValue = $psboundparameters.item($paramKey)
-  if ($oldValue.gettype().name -eq "String") {
-    $newValue = [system.web.httputility]::urldecode("$oldValue")
-    set-variable -name $paramKey -value $newValue
-  }
-}
 
 . .\utils.ps1
 . .\vsphere\object.ps1
@@ -211,3 +203,4 @@ switch ($pscmdlet.parameterSetName) {
     } 
   }
 }
+writeResult

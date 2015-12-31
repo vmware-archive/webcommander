@@ -1,6 +1,6 @@
 function newServer {
   
-	Param(
+  Param(
     [parameter(ValueFromPipeline=$True)]
     $address, 
     
@@ -8,11 +8,11 @@ function newServer {
     $password
   )
 
-	begin {
+  begin {
     add-pssnapin vmware.vimautomation.core -ea silentlycontinue
   }
   
-	process {
+  process {
     try {
       $viserver = connect-VIServer $address -user $user -password $password -NotDefault
       addToResult "Success - connect to server $address"
@@ -164,7 +164,7 @@ function newServer {
         } catch {
           addToResult "Fail - set page sharing for vmhost $($h.name)"
           endError
-        }	
+        }  
       }
     } -name setPageSharing
     

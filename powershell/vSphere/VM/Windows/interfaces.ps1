@@ -1,5 +1,5 @@
 ﻿<#
-Copyright (c) 2012-2014 VMware, Inc.
+Copyright (c) 2012-2015 VMware, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,79 +21,71 @@ THE SOFTWARE.
 #>
 
 <#
-	.SYNOPSIS
-		Windows VM
+  .SYNOPSIS
+    Windows VM
 
-	.DESCRIPTION
-		Windows Virtual Machine
-		
-	.FUNCTIONALITY
-		VM
-		
-	.NOTES
-		AUTHOR: Jerry Liu
-		EMAIL: liuj@vmware.com
+  .DESCRIPTION
+    Windows Virtual Machine
+    
+  .FUNCTIONALITY
+    VM
+    
+  .NOTES
+    AUTHOR: Jerry Liu
+    EMAIL: liuj@vmware.com
 #>
 
 Param (
 ##################### Start general parameters #####################
-	[parameter(
-		HelpMessage="IP or FQDN of the ESX or VC server hosting the VM"
-	)]
-	[string]
-		$serverAddress, 
-	
-	[parameter(
-		HelpMessage="User name to connect to the server (default is root)"
-	)]
-	[string]
-		$serverUser="root", 
-	
-	[parameter(
-		HelpMessage="Password of the user"
-	)]
-	[string]
-		$serverPassword=$env:defaultPassword, 
-	
-	[parameter(
-		Mandatory=$true,
-		HelpMessage="Name of target VM. Support multiple values seperated by comma."
-	)]
-	[string]
-		$vmName, 
-	
-	[parameter(
-		HelpMessage="User of target machine (default is administrator)"
-	)]
-	[string]	
-		$guestUser="administrator", 
-		
-	[parameter(
-		HelpMessage="Password of guestUser"
-	)]
-	[string]	
-		$guestPassword=$env:defaultPassword,
+  [parameter(
+    HelpMessage="IP or FQDN of the ESX or VC server hosting the VM"
+  )]
+  [string]
+    $serverAddress, 
+  
+  [parameter(
+    HelpMessage="User name to connect to the server (default is root)"
+  )]
+  [string]
+    $serverUser="root", 
+  
+  [parameter(
+    HelpMessage="Password of the user"
+  )]
+  [string]
+    $serverPassword=$env:defaultPassword, 
+  
+  [parameter(
+    Mandatory=$true,
+    HelpMessage="Name of target VM. Support multiple values seperated by comma."
+  )]
+  [string]
+    $vmName, 
+  
+  [parameter(
+    HelpMessage="User of target machine (default is administrator)"
+  )]
+  [string]  
+    $guestUser="administrator", 
+    
+  [parameter(
+    HelpMessage="Password of guestUser"
+  )]
+  [string]  
+    $guestPassword=$env:defaultPassword,
 ##################### Start enablePsRemoting parameters #####################
   [parameter(
     parameterSetName="enablePsRemoting"
-	)]
+  )]
   [switch]
-		$enablePsRemoting,
+    $enablePsRemoting,
 ##################### Start renewIp parameters #####################
   [parameter(
     parameterSetName="renewIp"
-	)]
+  )]
   [switch]
-		$renewIp
+    $renewIp
 )
-
-foreach ($paramKey in $psboundparameters.keys) {
-  $oldValue = $psboundparameters.item($paramKey)
-  if ($oldValue.gettype().name -eq "String") {
-    $newValue = [system.web.httputility]::urldecode("$oldValue")
-    set-variable -name $paramKey -value $newValue
-  }
-}
 
 . .\utils.ps1
 . .\vsphere\object.ps1

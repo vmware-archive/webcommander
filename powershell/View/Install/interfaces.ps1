@@ -21,46 +21,46 @@ THE SOFTWARE.
 #>
 
 <#
-	.SYNOPSIS
-		Install on Windows
+  .SYNOPSIS
+    Install on Windows
 
-	.DESCRIPTION
-		This command installs View components on remote Windows machine.
+  .DESCRIPTION
+    This command installs View components on remote Windows machine.
     
   .FUNCTIONALITY
     View
-		
-	.NOTES
-		AUTHOR: Jian Liu
-		EMAIL: liuj@vmware.com
+    
+  .NOTES
+    AUTHOR: Jian Liu
+    EMAIL: liuj@vmware.com
 #>
 
 Param (
-	[parameter(
-		Mandatory=$true,
-		HelpMessage="IP / FQDN of target Windows machine"
-	)]
-	[string]
-		$winAddress, 
-	
-	[parameter(
-		HelpMessage="User of target Windows machine (default is administrator)"
-	)]
-	[string]	
-		$winUser="administrator", 
-		
-	[parameter(
-		HelpMessage="Password of winUser"
-	)]
-	[string]	
-		$winPassword=$env:defaultPassword,
+  [parameter(
+    Mandatory=$true,
+    HelpMessage="IP / FQDN of target Windows machine"
+  )]
+  [string]
+    $winAddress, 
+  
+  [parameter(
+    HelpMessage="User of target Windows machine (default is administrator)"
+  )]
+  [string]  
+    $winUser="administrator", 
     
-	[parameter(
+  [parameter(
+    HelpMessage="Password of winUser"
+  )]
+  [string]  
+    $winPassword=$env:defaultPassword,
+    
+  [parameter(
     mandatory=$true,
-		HelpMessage="Type of the View component to install"
-	)]
+    HelpMessage="Type of the View component to install"
+  )]
   [ValidateSet(
-		"blast",
+    "blast",
     "agent",
     "agent-ts",
     "agent-unmanaged",
@@ -69,36 +69,30 @@ Param (
     "broker-replica",
     "broker-security",
     "broker-transfer",
-		"other"
-	)]
-	[string]
+    "other"
+  )]
+  [string]
     $type, 
-	
+  
   [parameter(
     mandatory=$true,
-		HelpMessage="URL to the installer file"
-	)]
+    HelpMessage="URL to the installer file"
+  )]
   [string]
     $installerUrl,
   
   [parameter(
-		HelpMessage="IP of standard broker"
-	)]
+    HelpMessage="IP of standard broker"
+  )]
   [string]
     $stdBrokerIp,
   
   [parameter(
-		HelpMessage="Customized parameters for silent install"
-	)]
+    HelpMessage="Customized parameters for silent install"
+  )]
   [string]
     $silentInstallParam
 )
-
-foreach ($paramKey in $psboundparameters.keys) {
-	$oldValue = $psboundparameters.item($paramKey)
-	$newValue = [system.web.httputility]::urldecode("$oldValue")
-	set-variable -name $paramKey -value $newValue
-}
 
 . .\utils.ps1
 . .\Windows\object.ps1
@@ -207,3 +201,4 @@ if ($type -notmatch "broker") {
   }
   $remoteWin.executePsRemote($cmd, $argList, $msg)
 }
+writeResult

@@ -31,12 +31,12 @@
                            "name":  "guestId",
                            "helpmessage":  "Guest OS ID",
                            "options":  [
+                                           "windows8Server64Guest",
+                                           "windows8_64Guest",
+                                           "windows8Guest",
                                            "windows7_64Guest",
                                            "windows7Guest",
                                            "windows7Server64Guest",
-                                           "windows8_64Guest",
-                                           "windows8Guest",
-                                           "windows8Server64Guest",
                                            "winLonghorn64Guest",
                                            "winLonghornGuest",
                                            "winNetBusinessGuest",
@@ -83,9 +83,9 @@
                            "name":  "diskFormat",
                            "helpmessage":  "Storage format",
                            "options":  [
-                                           "EagerZeroedThick",
+                                           "Thin",
                                            "Thick",
-                                           "Thin"
+                                           "EagerZeroedThick"
                                        ],
                            "type":  "option"
                        },
@@ -120,11 +120,11 @@
                            "name":  "language",
                            "helpmessage":  "Language of the selected ISO",
                            "options":  [
-                                           "de-DE",
                                            "en-US",
-                                           "fr-FR",
+                                           "de-DE",
                                            "ja-JP",
-                                           "zh-CN"
+                                           "zh-CN",
+                                           "fr-FR"
                                        ],
                            "type":  "option"
                        },

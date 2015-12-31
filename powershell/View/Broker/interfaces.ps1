@@ -21,39 +21,39 @@ THE SOFTWARE.
 #>
 
 <#
-	.SYNOPSIS
-		Broker 
+  .SYNOPSIS
+    Broker 
 
-	.DESCRIPTION
-		View Broker configuration
+  .DESCRIPTION
+    View Broker configuration
     
   .FUNCTIONALITY
-		View
-		
-	.NOTES
-		AUTHOR: Jian Liu
-		EMAIL: whirls9@hotmail.com
+    View
+    
+  .NOTES
+    AUTHOR: Jian Liu
+    EMAIL: whirls9@hotmail.com
 #>
 
 Param (
 ##################### Start general parameters #####################
-	[parameter(
-		Mandatory=$true,
-		HelpMessage="IP or FQDN of broker server"
-	)]
-	[string]
-		$serverAddress, 
-	
-	[parameter(
+  [parameter(
     Mandatory=$true,
-		HelpMessage="User name of broker administrator"
-	)]
-	[string]
-		$serverUser, 
-	
-	[parameter(HelpMessage="Password of broker administrator")]
-	[string]
-		$serverPassword=$env:defaultPassword,  
+    HelpMessage="IP or FQDN of broker server"
+  )]
+  [string]
+    $serverAddress, 
+  
+  [parameter(
+    Mandatory=$true,
+    HelpMessage="User name of broker administrator"
+  )]
+  [string]
+    $serverUser, 
+  
+  [parameter(HelpMessage="Password of broker administrator")]
+  [string]
+    $serverPassword=$env:defaultPassword,  
 ##################### Start getDesktopState parameters #####################  
   [parameter(parameterSetName="addLinkedClonePool")]
   [parameter(parameterSetName="removePool")]  
@@ -74,10 +74,10 @@ Param (
   [parameter(
     mandatory=$true,
     parameterSetName="getDesktopState",
-		HelpMessage="Pool ID"
-	)]
-	[string]
-		$poolId,
+    HelpMessage="Pool ID"
+  )]
+  [string]
+    $poolId,
   
   [parameter(
     parameterSetName="getDesktopState",
@@ -93,61 +93,61 @@ Param (
   [parameter(parameterSetName="addTransferServer")]
   [parameter(
     parameterSetName="addComposer",
-		Mandatory=$true,
-		HelpMessage="IP / FQDN of VC server"
-	)]
-	[string]
-		$vcAddress, 
-	
-	[parameter(parameterSetName="addVirtualCenter")]
+    Mandatory=$true,
+    HelpMessage="IP / FQDN of VC server"
+  )]
+  [string]
+    $vcAddress, 
+  
+  [parameter(parameterSetName="addVirtualCenter")]
   [parameter(parameterSetName="addManualPool")]
   [parameter(parameterSetName="addTransferServer")]
   [parameter(
     parameterSetName="addComposer",
-		HelpMessage="User name to connect to VC server (default is administrator)"
-	)]
-	[string]	
-		$vcUser="administrator", 
-	
-	[parameter(parameterSetName="addVirtualCenter")]
+    HelpMessage="User name to connect to VC server (default is administrator)"
+  )]
+  [string]  
+    $vcUser="administrator", 
+  
+  [parameter(parameterSetName="addVirtualCenter")]
   [parameter(parameterSetName="addManualPool")]
   [parameter(parameterSetName="addTransferServer")]
   [parameter(
     parameterSetName="addComposer",
-		HelpMessage="Password of vcUser"
-	)]
-	[string]	
-		$vcPassword=$env:defaultPassword,  
-	
-	[parameter(
+    HelpMessage="Password of vcUser"
+  )]
+  [string]  
+    $vcPassword=$env:defaultPassword,  
+  
+  [parameter(
     parameterSetName="addComposer",
-		Mandatory=$true,
-		HelpMessage="IP / FQDN of composer server"
-	)]
-	[string]
-		$composerAddress, 
-	
-	[parameter(
+    Mandatory=$true,
+    HelpMessage="IP / FQDN of composer server"
+  )]
+  [string]
+    $composerAddress, 
+  
+  [parameter(
     parameterSetName="addComposer",
-		HelpMessage="User name to connect to composer server (default is 
+    HelpMessage="User name to connect to composer server (default is 
       local\administrator)"
-	)]
-	[string]	
-		$composerUser="administrator", 
-	
-	[parameter(
+  )]
+  [string]  
+    $composerUser="administrator", 
+  
+  [parameter(
     parameterSetName="addComposer",
-		HelpMessage="Password of composerUser"
-	)]
-	[string]	
-		$composerPassword=$env:defaultPassword, 
-	
-	[parameter(
+    HelpMessage="Password of composerUser"
+  )]
+  [string]  
+    $composerPassword=$env:defaultPassword, 
+  
+  [parameter(
     parameterSetName="addComposer",
-		HelpMessage="Composer port number, default is 18443"
-	)]
-	[string]
-		$port="18443",
+    HelpMessage="Composer port number, default is 18443"
+  )]
+  [string]
+    $port="18443",
     
   [parameter(parameterSetName="addComposer")]
   [Switch]
@@ -156,25 +156,25 @@ Param (
   [parameter(parameterSetName="addLinkedClonePool")]
   [parameter(
     parameterSetName="addComposerDomain",
-		Mandatory=$true,
-		HelpMessage="Composer domain name"
-	)]
-	[string]
-		$domainName, 
-	
-	[parameter(
+    Mandatory=$true,
+    HelpMessage="Composer domain name"
+  )]
+  [string]
+    $domainName, 
+  
+  [parameter(
     parameterSetName="addComposerDomain",
-		HelpMessage="User of composer domain (default is administrator)"
-	)]
-	[string]
-		$domainUser="administrator", 
-	
-	[parameter(
+    HelpMessage="User of composer domain (default is administrator)"
+  )]
+  [string]
+    $domainUser="administrator", 
+  
+  [parameter(
     parameterSetName="addComposerDomain",
-		HelpMessage="Password of domainUser"
-	)]
-	[string]	
-		$domainPassword=$env:defaultPassword,
+    HelpMessage="Password of domainUser"
+  )]
+  [string]  
+    $domainPassword=$env:defaultPassword,
     
   [parameter(parameterSetName="addComposerDomain")]
   [Switch]
@@ -182,14 +182,14 @@ Param (
 ##################### Start addVirtualCenter parameters #####################
   [parameter(
     parameterSetName="addVirtualCenter",
-		Mandatory=$true,
-		HelpMessage="Whether to use compopser if installed on VC"
-	)]
-	[ValidateSet(
-		"false",
-		"true"
-	)]
-		$useComposer,  
+    Mandatory=$true,
+    HelpMessage="Whether to use compopser if installed on VC"
+  )]
+  [ValidateSet(
+    "false",
+    "true"
+  )]
+    $useComposer,  
   
   [parameter(parameterSetName="addVirtualCenter")]
   [Switch]
@@ -197,132 +197,132 @@ Param (
 ##################### Start addLicense parameters #####################
   [parameter(
     parameterSetName="addLicense",
-		Mandatory=$true,
-		HelpMessage="License key"
-	)]
-	[string]
-		$license,
+    Mandatory=$true,
+    HelpMessage="License key"
+  )]
+  [string]
+    $license,
     
   [parameter(parameterSetName="addLicense")]
   [Switch]
     $addLicense,
 ##################### Start entitlePool parameters #####################
-	[parameter(parameterSetName="entitleRdsAppPool")]
+  [parameter(parameterSetName="entitleRdsAppPool")]
   [parameter(
     parameterSetName="entitlePool",
-		Mandatory=$true,
-		HelpMessage="User name (in domain\user format)"
-	)]
-	[string]
-		$userName,
+    Mandatory=$true,
+    HelpMessage="User name (in domain\user format)"
+  )]
+  [string]
+    $userName,
    
   [parameter(parameterSetName="entitlePool")]
   [Switch]
     $entitlePool,
-##################### Start addLinkedClonePool parameters #####################	
-	[parameter(
-    parameterSetName="addLinkedClonePool",
-		HelpMessage="Name prefix, default is 'poolID-'"
-	)]
-	[string]
-		$namePrefix,
-		
-	[parameter(parameterSetName="recomposePool")]
+##################### Start addLinkedClonePool parameters #####################  
   [parameter(
     parameterSetName="addLinkedClonePool",
-		Mandatory=$true,
-		HelpMessage="Path to a virtual machine to be used as the parent VM 
+    HelpMessage="Name prefix, default is 'poolID-'"
+  )]
+  [string]
+    $namePrefix,
+    
+  [parameter(parameterSetName="recomposePool")]
+  [parameter(
+    parameterSetName="addLinkedClonePool",
+    Mandatory=$true,
+    HelpMessage="Path to a virtual machine to be used as the parent VM 
       for this desktop pool."
-	)]
-	[string]
-		$parentVmPath, 
-	
-	[parameter(parameterSetName="recomposePool")]
+  )]
+  [string]
+    $parentVmPath, 
+  
+  [parameter(parameterSetName="recomposePool")]
   [parameter(
     parameterSetName="addLinkedClonePool",
-		Mandatory=$true,
-		HelpMessage="Path to the snapshot that is to be used as the image 
+    Mandatory=$true,
+    HelpMessage="Path to the snapshot that is to be used as the image 
       for this pool, i.e. /clean or /clean/test0"
-	)]
-	[string]
-		$parentSnapshotPath, 
-	
-	[parameter(
+  )]
+  [string]
+    $parentSnapshotPath, 
+  
+  [parameter(
     parameterSetName="addLinkedClonePool",
-		Mandatory=$true,
-		HelpMessage="Specify a location for this new directory as a vCenter 
+    Mandatory=$true,
+    HelpMessage="Specify a location for this new directory as a vCenter 
       folder path."
-	)]
-	[string]
-		$vmFolderPath, 
-		
-	[parameter(
+  )]
+  [string]
+    $vmFolderPath, 
+    
+  [parameter(
     parameterSetName="addLinkedClonePool",
-		Mandatory=$true,
-		HelpMessage="Path to a resource pool to be used for this desktop pool."
-	)]
-	[string]
-		$resourcePoolPath, 
-	
-	[parameter(
+    Mandatory=$true,
+    HelpMessage="Path to a resource pool to be used for this desktop pool."
+  )]
+  [string]
+    $resourcePoolPath, 
+  
+  [parameter(
     parameterSetName="addLinkedClonePool",
-		Mandatory=$true,
-		HelpMessage="List of datastore specs for storage of desktop VMs and 
+    Mandatory=$true,
+    HelpMessage="List of datastore specs for storage of desktop VMs and 
       data disks, separated by semicolons using the format: 
       '[Overcommit,usage]/path/to/datastore'"
-	)]
-	[string]
-		$datastoreSpecs,
-	
-	[parameter(
-    parameterSetName="addLinkedClonePool",
-		HelpMessage="Data disk letter, default is 'U'"
-	)]
-	[string]
-		$dataDiskLetter="U", 
-	
-	[parameter(
-    parameterSetName="addLinkedClonePool",
-		HelpMessage="Data disk size, default is 2048"
-	)]
-	[string]
-		$dataDiskSize=2048, 
-	
-	[parameter(
-    parameterSetName="addLinkedClonePool",
-		HelpMessage="Temp disk size, default is 1024"
-	)]
-	[string]
-		$tempDiskSize=1024,
-	
-	[parameter(
-    parameterSetName="addLinkedClonePool",
-		Mandatory=$true,
-		HelpMessage="Minimum number of desktops to be provisioned in this pool."
-	)]
-	[string]
-		$min, 
-	
-	[parameter(
-    parameterSetName="addLinkedClonePool",
-		Mandatory=$true,
-		HelpMessage="Maximum number of desktops to be provisioned in this pool."
-	)]
-	[string]
-		$max, 
-	
-	[parameter(parameterSetName="addManualPool")]
+  )]
+  [string]
+    $datastoreSpecs,
+  
   [parameter(
     parameterSetName="addLinkedClonePool",
-		Mandatory=$true,
-		HelpMessage="Pool type"
-	)]
-	[ValidateSet(
-		"Persistent",
-		"NonPersistent"
-	)]
-	[string]
-		$poolType="Persistent",
+    HelpMessage="Data disk letter, default is 'U'"
+  )]
+  [string]
+    $dataDiskLetter="U", 
+  
+  [parameter(
+    parameterSetName="addLinkedClonePool",
+    HelpMessage="Data disk size, default is 2048"
+  )]
+  [string]
+    $dataDiskSize=2048, 
+  
+  [parameter(
+    parameterSetName="addLinkedClonePool",
+    HelpMessage="Temp disk size, default is 1024"
+  )]
+  [string]
+    $tempDiskSize=1024,
+  
+  [parameter(
+    parameterSetName="addLinkedClonePool",
+    Mandatory=$true,
+    HelpMessage="Minimum number of desktops to be provisioned in this pool."
+  )]
+  [string]
+    $min, 
+  
+  [parameter(
+    parameterSetName="addLinkedClonePool",
+    Mandatory=$true,
+    HelpMessage="Maximum number of desktops to be provisioned in this pool."
+  )]
+  [string]
+    $max, 
+  
+  [parameter(parameterSetName="addManualPool")]
+  [parameter(
+    parameterSetName="addLinkedClonePool",
+    Mandatory=$true,
+    HelpMessage="Pool type"
+  )]
+  [ValidateSet(
+    "Persistent",
+    "NonPersistent"
+  )]
+  [string]
+    $poolType="Persistent",
     
   [parameter(parameterSetName="addLinkedClonePool")]
   [Switch]
@@ -333,7 +333,7 @@ Param (
     Mandatory=$true,
     HelpMessage="Agent virtual machine name in the vCenter inventory. 
       Support multiple values seperated by comma."
-	)]
+  )]
   [string]
     $agentVmName,
     
@@ -344,11 +344,11 @@ Param (
   [parameter(parameterSetName="removeTransferServer")]
   [parameter(
     parameterSetName="addTransferServer",
-		Mandatory=$true,
-		HelpMessage="Transfer server virtual machine name in the vCenter inventory"
-	)]
-	[string]
-		$tsVmName,
+    Mandatory=$true,
+    HelpMessage="Transfer server virtual machine name in the vCenter inventory"
+  )]
+  [string]
+    $tsVmName,
     
   [parameter(parameterSetName="addTransferServer")]
   [Switch]
@@ -360,13 +360,13 @@ Param (
 ##################### Start removePool parameters #####################   
   [parameter(
     parameterSetName="removePool",
-		HelpMessage="Whether to remove VM from disk. Default is false"
-	)]
-	[ValidateSet(
-		"false",
-		"true"
-	)]
-		$rmFromDisk="false",
+    HelpMessage="Whether to remove VM from disk. Default is false"
+  )]
+  [ValidateSet(
+    "false",
+    "true"
+  )]
+    $rmFromDisk="false",
     
   [parameter(parameterSetName="removePool")]
   [Switch]
@@ -403,10 +403,10 @@ Param (
   [parameter(parameterSetName="importSettings")]
   [parameter(
     parameterSetName="exportSettings",
-		HelpMessage="Path to the broker settings file, default is c:\temp\broker.ldif"
-	)]
-	[string]
-		$filePath="c:\temp\broker.ldif",
+    HelpMessage="Path to the broker settings file, default is c:\temp\broker.ldif"
+  )]
+  [string]
+    $filePath="c:\temp\broker.ldif",
   
   [parameter(parameterSetName="exportSettings")]
   [Switch]
@@ -424,13 +424,13 @@ Param (
   [parameter(
     parameterSetName="setDirectConnect",
     mandatory=$true,
-		HelpMessage="Select true to enable or false to disable"
-	)]
-	[ValidateSet(
-		"false",
-		"true"
-	)]
-		$enable,
+    HelpMessage="Select true to enable or false to disable"
+  )]
+  [ValidateSet(
+    "false",
+    "true"
+  )]
+    $enable,
     
   [parameter(
     parameterSetName="setDirectConnect",
@@ -448,60 +448,60 @@ Param (
 ##################### Start setEventDB parameters #####################
   [parameter(
     parameterSetName="setEventDB",
-		Mandatory=$true,
-		HelpMessage="IP / FQDN of database server"
-	)]
-	[string]
-		$dbAddress, 
-	
-	[parameter(
-    parameterSetName="setEventDB",
-		HelpMessage="Database server type, default is SQLSERVER"
-	)]
-	[ValidateSet(
-		"SQLSERVER",
-		"ORACLE"
-	)]
+    Mandatory=$true,
+    HelpMessage="IP / FQDN of database server"
+  )]
   [string]
-		$dbType="SQLSERVER",
-	
-	[parameter(
+    $dbAddress, 
+  
+  [parameter(
     parameterSetName="setEventDB",
-		HelpMessage="Port, default is 1433"
-	)]
-	[string]
-		$dbPort="1433",
-	
-	[parameter(
+    HelpMessage="Database server type, default is SQLSERVER"
+  )]
+  [ValidateSet(
+    "SQLSERVER",
+    "ORACLE"
+  )]
+  [string]
+    $dbType="SQLSERVER",
+  
+  [parameter(
     parameterSetName="setEventDB",
-		Mandatory=$true,
-		HelpMessage="Database name"
-	)]
-	[string]
-		$dbName,
-	
-	[parameter(
+    HelpMessage="Port, default is 1433"
+  )]
+  [string]
+    $dbPort="1433",
+  
+  [parameter(
     parameterSetName="setEventDB",
-		HelpMessage="Database user name, default is administrator"
-	)]
-	[string]
-		$dbUser="administrator",
-	
-	[parameter(
+    Mandatory=$true,
+    HelpMessage="Database name"
+  )]
+  [string]
+    $dbName,
+  
+  [parameter(
     parameterSetName="setEventDB",
-		Mandatory=$true,
-		HelpMessage="Password of dbUser"
-	)]
-	[string]
-		$dbPassword=$env:defaultPassword,
-	
-	[parameter(
+    HelpMessage="Database user name, default is administrator"
+  )]
+  [string]
+    $dbUser="administrator",
+  
+  [parameter(
     parameterSetName="setEventDB",
-		Mandatory=$true,
-		HelpMessage="Table prefix"
-	)]
-	[string]
-		$tablePrefix,
+    Mandatory=$true,
+    HelpMessage="Password of dbUser"
+  )]
+  [string]
+    $dbPassword=$env:defaultPassword,
+  
+  [parameter(
+    parameterSetName="setEventDB",
+    Mandatory=$true,
+    HelpMessage="Table prefix"
+  )]
+  [string]
+    $tablePrefix,
   
   [parameter(parameterSetName="setEventDB")]
   [Switch]
@@ -523,9 +523,9 @@ Param (
     parameterSetName="setPoolID",
     mandatory=$true,
     helpMessage="New pool ID"
-	)]
-	[string]
-		$newId,
+  )]
+  [string]
+    $newId,
     
   [parameter(parameterSetName="setPoolID")]
   [Switch]
@@ -535,9 +535,9 @@ Param (
     parameterSetName="setPoolName",
     mandatory=$true,
     helpmessage="Pool name"
-	)]
-	[string]
-		$poolName,
+  )]
+  [string]
+    $poolName,
     
   [parameter(parameterSetName="setPoolName")]
   [Switch]
@@ -546,18 +546,18 @@ Param (
   [parameter(
     parameterSetName="setPairingPassword",
     mandatory=$true,
-		HelpMessage="Pairing password, default is 111111"
-	)]
-	[string]
-		$pairingPassword,
+    HelpMessage="Pairing password, default is 111111"
+  )]
+  [string]
+    $pairingPassword,
     
   [parameter(
     parameterSetName="setPairingPassword",
-		HelpMessage="Pairing password timeout in term of seconds, 
+    HelpMessage="Pairing password timeout in term of seconds, 
       default is 86400"
-	)]
-	[int]	
-		$timeout=86400,
+  )]
+  [int]  
+    $timeout=86400,
     
   [parameter(
     parameterSetName="setPairingPassword",
@@ -575,10 +575,10 @@ Param (
   [parameter(
     parameterSetName="addFarm",
     mandatory=$true,
-		HelpMessage="Farm ID"
-	)]
-	[string]
-		$farmId,
+    HelpMessage="Farm ID"
+  )]
+  [string]
+    $farmId,
     
   [parameter(parameterSetName="addFarm")]
   [Switch]
@@ -589,10 +589,10 @@ Param (
   [parameter(
     parameterSetName="addRdsServerToFarm",
     mandatory=$true,
-		HelpMessage="RDS server FQDN"
-	)]
-	[string]
-		$rdsServerDnsName,
+    HelpMessage="RDS server FQDN"
+  )]
+  [string]
+    $rdsServerDnsName,
     
   [parameter(parameterSetName="addRdsServerToFarm")]
   [Switch]
@@ -605,10 +605,10 @@ Param (
   [parameter(
     parameterSetName="addRdsAppPool",
     mandatory=$true,
-		HelpMessage="Application executable path"
-	)]
-	[string]
-		$execPath,
+    HelpMessage="Application executable path"
+  )]
+  [string]
+    $execPath,
     
   [parameter(parameterSetName="addRdsAppPool")]
   [Switch]
@@ -638,14 +638,6 @@ Param (
   [Switch]
     $setFarmHtmlAccess
 )
-
-foreach ($paramKey in $psboundparameters.keys) {
-  $oldValue = $psboundparameters.item($paramKey)
-  if ($oldValue.gettype().name -eq "String") {
-    $newValue = [system.web.httputility]::urldecode("$oldValue")
-    set-variable -name $paramKey -value $newValue
-  }
-}
 
 . .\utils.ps1
 . .\windows\object.ps1
@@ -694,8 +686,8 @@ switch ($pscmdlet.parameterSetName) {
   }
   "entitlePool" {
     $domain = $userName.split("\")[0]
-		$user = $userName.split("\")[1]
-		$broker.entitlePool($poolId, $user, $domain)
+    $user = $userName.split("\")[1]
+    $broker.entitlePool($poolId, $user, $domain)
   }
   "addLinkedClonePool" {
     if (!$namePrefix) {$namePrefix = $poolId + "-"}
@@ -787,8 +779,8 @@ switch ($pscmdlet.parameterSetName) {
   }
   "entitleRdsAppPool" {
     $domain = $userName.split("\")[0]
-		$user = $userName.split("\")[1]
-		$broker.entitleRdsAppPool($user,$domain,$poolId)
+    $user = $userName.split("\")[1]
+    $broker.entitleRdsAppPool($user,$domain,$poolId)
   }
   "removeRdsServerFromFarm" {
     $broker.removeRdsServerFromFarm($farmId, $rdsServerDnsName)
