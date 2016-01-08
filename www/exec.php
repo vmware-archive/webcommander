@@ -159,7 +159,12 @@ function searchCommand($allCommands, $script) {
 $src = json_decode(file_get_contents("../sources.json"), true);
 $commands = array();
 foreach($src as $name=>$url) {
-  $cmds = json_decode(file_get_contents($url), true);
+  $def = file_get_contents($url);
+  if ($def === false) { 
+    continue;
+  } else {
+    $cmds = json_decode($def, true);
+  }
   foreach ($cmds as &$cmd) {
     $cmd['synopsis'] = $cmd['synopsis'] . ' ( ' . $name . ' )';
   }

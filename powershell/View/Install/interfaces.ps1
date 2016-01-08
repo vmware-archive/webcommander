@@ -21,46 +21,46 @@ THE SOFTWARE.
 #>
 
 <#
-  .SYNOPSIS
-    Install on Windows
+	.SYNOPSIS
+		Install on Windows
 
-  .DESCRIPTION
-    This command installs View components on remote Windows machine.
+	.DESCRIPTION
+		This command installs View components on remote Windows machine.
     
   .FUNCTIONALITY
     View
-    
-  .NOTES
-    AUTHOR: Jian Liu
-    EMAIL: liuj@vmware.com
+		
+	.NOTES
+		AUTHOR: Jian Liu
+		EMAIL: liuj@vmware.com
 #>
 
 Param (
-  [parameter(
-    Mandatory=$true,
-    HelpMessage="IP / FQDN of target Windows machine"
-  )]
-  [string]
-    $winAddress, 
-  
-  [parameter(
-    HelpMessage="User of target Windows machine (default is administrator)"
-  )]
-  [string]  
-    $winUser="administrator", 
+	[parameter(
+		Mandatory=$true,
+		HelpMessage="IP / FQDN of target Windows machine"
+	)]
+	[string]
+		$winAddress, 
+	
+	[parameter(
+		HelpMessage="User of target Windows machine (default is administrator)"
+	)]
+	[string]	
+		$winUser="administrator", 
+		
+	[parameter(
+		HelpMessage="Password of winUser"
+	)]
+	[string]	
+		$winPassword=$env:defaultPassword,
     
-  [parameter(
-    HelpMessage="Password of winUser"
-  )]
-  [string]  
-    $winPassword=$env:defaultPassword,
-    
-  [parameter(
+	[parameter(
     mandatory=$true,
-    HelpMessage="Type of the View component to install"
-  )]
+		HelpMessage="Type of the View component to install"
+	)]
   [ValidateSet(
-    "blast",
+		"blast",
     "agent",
     "agent-ts",
     "agent-unmanaged",
@@ -69,43 +69,45 @@ Param (
     "broker-replica",
     "broker-security",
     "broker-transfer",
-    "other"
-  )]
-  [string]
+		"other"
+	)]
+	[string]
     $type, 
-  
+	
   [parameter(
     mandatory=$true,
-    HelpMessage="URL to the installer file"
-  )]
+		HelpMessage="URL to the installer file"
+	)]
   [string]
     $installerUrl,
   
   [parameter(
-    HelpMessage="IP of standard broker"
-  )]
+		HelpMessage="IP of standard broker"
+	)]
   [string]
     $stdBrokerIp,
   
   [parameter(
-    HelpMessage="Customized parameters for silent install"
-  )]
+		HelpMessage="Customized parameters for silent install"
+	)]
   [string]
     $silentInstallParam
 )
 
 . .\utils.ps1
-. .\Windows\object.ps1
+$web = new-object net.webclient
+iex $web.downloadstring('http://bit.ly/1Je9cuh') # windows\object.ps1
 
 $remoteWin = newRemoteWin $winAddress $winUser $winPassword
 $installer = ($installerUrl.split("/"))[-1]
-$cmd = "
+$cmd = {
   new-item c:\temp -type directory -force | out-null
-  `$wc = new-object system.net.webclient;
-  `$wc.downloadfile('$installerUrl', 'c:\temp\$installer');
-  get-item 'c:\temp\$installer' -ea Stop | out-null
-"
-$remoteWin.executePsTxtRemote($cmd, "download file $installer", "1200")
+  $wc = new-object system.net.webclient;
+  $wc.downloadfile("$using:installerUrl", "c:\temp\$using:installer");
+  get-item "c:\temp\$using:installer" -ea Stop | out-null
+}
+
+$remoteWin.executePsRemote($cmd, $null, "download file $installer", "1200")
 #$remoteWin.sendFile("..\postinstall\instDrv.exe","c:\temp\instDrv.exe")
 
 if ($silentInstallParam) {
@@ -159,32 +161,33 @@ if (("broker","broker-replica") -contains $type) {
     remove-item -path "$env:temp\vminst*.log" -force -ea silentlyContinue
     remove-item -path "$env:temp\vmmsi*.log" -force -ea silentlyContinue
     $date = get-date '12/31/2014'.replace('2014',(get-date).year+1) -format (Get-ItemProperty -path 'HKCU:\Control Panel\International').sshortdate
-    schtasks /f /create /tn installView /ru $args[0] /rp $args[1] /rl HIGHEST /sc once /sd $date /st 00:00:00 /tr $args[2]
-    schtasks /run /tn installView
-    netsh advfirewall firewall set rule name="Remote Scheduled Tasks Management (RPC)" new profile=any remoteip=any enable=yes
-    netsh advfirewall firewall set rule name="Remote Scheduled Tasks Management (RPC-EPMAP)" new profile=any remoteip=any enable=yes
+    schtasks /f /create /tn installView /ru $args[0] /rp $args[1] /rl HIGHEST /sc once /sd $date /st 00:00:00 /tr $args[2] | out-null
+    schtasks /run /tn installView | out-null
+    netsh advfirewall firewall set rule name="Remote Scheduled Tasks Management (RPC)" new profile=any remoteip=any enable=yes | out-null
+    netsh advfirewall firewall set rule name="Remote Scheduled Tasks Management (RPC-EPMAP)" new profile=any remoteip=any enable=yes | out-null
   }
   start-sleep 30
   $remoteWin.executePsRemote($cmd, $argList, "trigger broker installation task")
   $remoteWin.waitForTaskComplete("installView", 2400)
   $cmd = {
-    schtasks /delete /f /tn installView;
+    schtasks /delete /f /tn installView | out-null
     $log = get-content "$env:temp\vmmsi*.log"
     $result = $log | select-string "installation operation completed successfully"
     if (!$result) {throw "installation failed, please check $env:temp\vmmsi.log."}
   }
   $remoteWin.executePsRemote($cmd, $null, "install $installer")
 } else {
-  $cmd = "    
+  $cmd = {    
     #start-process c:\temp\instDrv.exe
-    `$installprocess = [System.Diagnostics.Process]::Start('c:\temp\$installer', '$cmdPara')
-    `$installprocess.WaitForExit()
+    $installprocess = [System.Diagnostics.Process]::Start("c:\temp\$using:installer", "$using:cmdPara")
+    $installprocess.WaitForExit()
     #stop-process -name instDrv
-    If ((0,3010) -notcontains `$installprocess.ExitCode) {    
-        throw ('Fail to install $installer. Exit code:' + `$installprocess.ExitCode)
+    If ((0,3010) -notcontains $installprocess.ExitCode) {    
+        throw ("Fail to install $using:installer. Exit code:" + $installprocess.ExitCode)
     }
-  "
-  $remoteWin.executePsTxtRemote($cmd, "install $installer", 2400)
+  }
+
+  $remoteWin.executePsRemote($cmd, $null, "install $installer")
 }
 
 if ($type -notmatch "broker") {
@@ -193,12 +196,13 @@ if ($type -notmatch "broker") {
   $msg = "enable telnet server"
   $argList = @()
   $cmd = {
-    Import-Module servermanager 
-    Add-WindowsFeature Telnet-Server 
-    Set-Service TlntSvr -StartupType Automatic -Status Running 
-    tlntadmn config maxconn = 100 
-    tlntadmn config timeout = 24:00:00
+    Import-Module servermanager | out-null
+    Add-WindowsFeature Telnet-Server | out-null
+    Set-Service TlntSvr -StartupType Automatic -Status Running | out-null
+    tlntadmn config maxconn = 100 | out-null
+    tlntadmn config timeout = 24:00:00 | out-null
   }
   $remoteWin.executePsRemote($cmd, $argList, $msg)
 }
+
 writeResult
