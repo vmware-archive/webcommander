@@ -15,18 +15,26 @@ WebCommander wraps scripts into web services so that those scripts could be easi
 Each script becomes a command that could be triggered by HTTP request. 
 
 There are two parallel branches of this project, master and walnut. Compared to master, walnut has the following advantages:
+
 1. Command definition and output are JSON instead of XML
+
 2. Commands, sharing most parameters in common, are turned into methods of a single command. This removes duplicated parameter definitions, and organizes commands in an object oriented way. 
+
 3. Unified GUI of individual command and workflow
+
 4. Changes (add,delete,update) to commands are effective during workflow execution    
+
 5. Users could save workflow on server
+
 6. Could execute commands located on cloud without storing them locally on webcommander server
+
 7. Execution history are stored in MongoDB
 
 Installation
 ============
 
 To deploy webcommander on Windows 2008 or 2012, please follow the instructions at wiki https://github.com/vmware/webcommander/wiki/Installation-and-configuration-guide
+
 For non server Windows (vista and newer), checkout source code from walnut branch and open www folder from WebMatrix (https://www.microsoft.com/web/webmatrix/)
 
 Contribution
