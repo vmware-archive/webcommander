@@ -1,5 +1,6 @@
 $web = new-object net.webclient
-iex $web.downloadstring('http://bit.ly/1NOWEIH') # utils.ps1
+# iex $web.downloadstring('http://bit.ly/1NOWEIH') # utils.ps1
+. .\utils.ps1
 
 $script = $args[0]
 if (test-path ".\$script") {
@@ -27,9 +28,7 @@ for ( $i = 1; $i -lt $args.count; $i++ ) {
 
 try {
   Set-Item -Path function:script:theFunction -Value $c
-  $params = $params -join " "
-  $output = iex "theFunction $params" | out-string
-  if ($output) { addToResult $output "raw" }
+  iex "theFunction $params"
 } catch {
   addToResult "Fail - execute $script"
   endError
