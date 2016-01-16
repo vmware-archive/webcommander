@@ -175,7 +175,7 @@ THE SOFTWARE.
 		<div id="footer" class="fbg">
 		    <div class="col github-widget" data-repo="vmware/webcommander"></div>
 			<div class="col">
-				<a class="twitter-timeline" height="200" href="https://twitter.com/search?q=webcommander" data-border-color="#959595" data-theme="dark" data-widget-id="507213777024995329">Tweets about "webcommander"</a>
+				<a class="twitter-timeline" height="200" href="https://twitter.com/9whirls/lists/webcommander" data-widget-id="688402101987180544">Tweets from https://twitter.com/9whirls/lists/webcommander</a>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 			</div>
 			<div class="col">
