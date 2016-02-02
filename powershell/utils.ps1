@@ -76,7 +76,7 @@ function getFileList {
 function writeResult {
   if ($runFromWeb) {
     try {
-      convertto-json @($global:result) -depth 3 -compress | out-host
+      convertto-json @($global:result) -depth 3 -compress | write-verbose -verbose
     } catch {
       $global:result 
       [Environment]::exit("1")
