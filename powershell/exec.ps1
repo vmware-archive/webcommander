@@ -28,7 +28,8 @@ for ( $i = 1; $i -lt $args.count; $i++ ) {
 
 try {
   Set-Item -Path function:script:theFunction -Value $c
-  iex "theFunction $params"
+  $output = iex "theFunction $params" -verbose 4>&1
+  $output.message
 } catch {
   addToResult "Fail - execute $script"
   endError
