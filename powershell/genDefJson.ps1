@@ -129,6 +129,8 @@ function newCommand {
         $type = "selectText"
       } elseif ($name -match "file$") {
         $type = "file"
+      } elseif ($name -match "time$") {
+        $type = "time"
       } else {
         $type = $null
       }
