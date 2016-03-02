@@ -140,7 +140,7 @@ function newCommand {
         helpmessage = $helpmsg
       }
       if ($options) { $parameter | add-member options $options }
-      if ($pAttr.mandatory) { $parameter | add-member mandatory 1 }
+      if ($pAttr.mandatory | Select -Unique) { $parameter | add-member mandatory 1 }
       if ($type) { $parameter | add-member "type" $type }
       if ($sets) { $parameter | add-member parametersets @($sets | sort) }
       $parameters += $parameter
