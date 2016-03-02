@@ -25,59 +25,39 @@ function addToResult {
   $global:result += $output
 }
 
-function addToResult1 {
-  param(
-    [parameter(ValueFromPipeline=$True)]
-    $data,
-    
-    $type="msg"
-  )
-  begin{}
-  process {
-    $output = @{
-      "type" = $type;
-      "time" = get-date -format "yyyy-MM-dd HH:mm:ss";
-      "data" = $data
-    }
-    $global:result += $output
-  }
-  end{}
-}
-
 function endError {
   addError
-  endExec 1
+  endExec
 }
 
 function endExec {
-  param($code=0)
   writeResult
-  if ($runFromWeb) { [Environment]::exit("$code") }
-  else { exit $code }
+  if ($runFromWeb) { [Environment]::exit("0") }
+  else { exit }
 }
 
 function getFileList {
-  param($fileUrl)
-  $files = @()
-  $fileList = @($fileUrl.split("`n") | %{$_.trim()})
-  $wc = new-object system.net.webclient;  
-  $fileList | % {
-    if (test-path $_) {
-      $files += $_
-    } elseif (invoke-webrequest $_) {
-      $fileName = ($_.split("/"))[-1]
-      $path = resolve-path "..\www\upload"
-      $wc.downloadfile($_, "$path\$fileName")
-      $files += "$path\$fileName"
-    }
-  }
-  return $files
+	param($fileUrl)
+	$files = @()
+	$fileList = @($fileUrl.split("`n") | %{$_.trim()})
+	$wc = new-object system.net.webclient;	
+	$fileList | % {
+		if (test-path $_) {
+			$files += $_
+		} elseif (invoke-webrequest $_) {
+			$fileName = ($_.split("/"))[-1]
+			$path = resolve-path "..\www\upload"
+			$wc.downloadfile($_, "$path\$fileName")
+			$files += "$path\$fileName"
+		}
+	}
+	return $files
 }
 
 function writeResult {
   if ($runFromWeb) {
     try {
-      convertto-json @($global:result) -depth 3 -compress | write-verbose -verbose
+      convertto-json @($global:result) -depth 3 | write-verbose -verbose
     } catch {
       $global:result 
       [Environment]::exit("1")
