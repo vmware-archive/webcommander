@@ -28,9 +28,9 @@ for ( $i = 1; $i -lt $args.count; $i++ ) {
 
 try {
   Set-Item -Path function:script:theFunction -Value $c
-  $output = iex "theFunction $params" -verbose 4>&1
+  $output = iex "theFunction $params"
   $output.message
 } catch {
-  addToResult "Fail - execute $script"
+  addToResult "Fail - run Powershell script $script"
   endError
 }

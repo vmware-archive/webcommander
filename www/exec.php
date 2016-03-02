@@ -112,32 +112,25 @@ function missScriptNotice($script) {
 function callCmd($cmd) {
   global $target, $codeArray; 
   exec($cmd,$result,$exitcode);
-  if ($exitcode != 0) {
-    header("return-code:4445");
-    $result = implode(" ",str_replace("VERBOSE: ","",$result));
-    $target["output"] = json_decode($result);
-    $target["returncode"] = 4445;  
-  }  else {
-    $result = $result[0];
-    $target["output"] = json_decode($result);
-    if (strpos($result, "Fail - ") === FALSE) {
-      header("return-code:4488");
-      $target["returncode"] = 4488; 
-    } else {
-      $isKnown = false;
-      while ($errType = current($codeArray)){
-        if (strpos($result, $errType) > 0){
-          header("return-code:" . key($codeArray));
-          $target["returncode"] = key($codeArray);
-          $isKnown = true;
-          break;
-        }
-        next($codeArray);
+  $result = implode(" ",str_replace("VERBOSE: ","",$result));
+  $target["output"] = json_decode($result);
+  if (strpos($result, "Fail - ") === FALSE) {
+    header("return-code:4488");
+    $target["returncode"] = 4488; 
+  } else {
+    $isKnown = false;
+    while ($errType = current($codeArray)){
+      if (strpos($result, $errType) > 0){
+        header("return-code:" . key($codeArray));
+        $target["returncode"] = key($codeArray);
+        $isKnown = true;
+        break;
       }
-      if ($isKnown === false) {
-        header("return-code:4444");
-        $target["returncode"] = 4444;
-      }
+      next($codeArray);
+    }
+    if ($isKnown === false) {
+      header("return-code:4444");
+      $target["returncode"] = 4444;
     }
   }
 }
