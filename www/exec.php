@@ -114,13 +114,8 @@ function callCmd($cmd) {
   exec($cmd,$result,$exitcode);
   if ($exitcode != 0) {
     header("return-code:4445");
-    $content = "Fail - run command";
-    $error = array("time" => date("Y-m-d H:i:s"), 
-      "data" => $content,
-      "type" => "msg");
-    $stdout = array("data" => implode("\n",$result),
-      "type" => "raw");
-    $target["output"] = array($error,$stdout);
+    $result = implode(" ",str_replace("VERBOSE: ","",$result));
+    $target["output"] = json_decode($result);
     $target["returncode"] = 4445;  
   }  else {
     $result = $result[0];
