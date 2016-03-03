@@ -159,7 +159,7 @@ function newCommand {
   }
   if ($parameters) { $command | add-member parameters $parameters}
   
-  $command | convertto-json -depth 5 | 
+  $command | convertto-json -depth 5 -compress | 
   set-content ($cmd.definition -replace ".ps1", ".json")
   
   return $command
