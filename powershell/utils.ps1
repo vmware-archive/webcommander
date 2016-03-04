@@ -37,21 +37,21 @@ function endExec {
 }
 
 function getFileList {
-	param($fileUrl)
-	$files = @()
-	$fileList = @($fileUrl.split("`n") | %{$_.trim()})
-	$wc = new-object system.net.webclient;	
-	$fileList | % {
-		if (test-path $_) {
-			$files += $_
-		} elseif (invoke-webrequest $_) {
-			$fileName = ($_.split("/"))[-1]
-			$path = resolve-path "..\www\upload"
-			$wc.downloadfile($_, "$path\$fileName")
-			$files += "$path\$fileName"
-		}
-	}
-	return $files
+  param($fileUrl)
+  $files = @()
+  $fileList = @($fileUrl.split("`n") | %{$_.trim()})
+  $wc = new-object system.net.webclient;  
+  $fileList | % {
+    if (test-path $_) {
+      $files += $_
+    } elseif (invoke-webrequest $_) {
+      $fileName = ($_.split("/"))[-1]
+      $path = resolve-path "..\www\upload"
+      $wc.downloadfile($_, "$path\$fileName")
+      $files += "$path\$fileName"
+    }
+  }
+  return $files
 }
 
 function writeResult {
