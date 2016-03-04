@@ -112,8 +112,16 @@ function missScriptNotice($script) {
 function callCmd($cmd) {
   global $target, $codeArray; 
   exec($cmd,$result,$exitcode);
-  $result = implode(" ",str_replace("VERBOSE: ","",$result));
+  
+  $verbose = preg_grep("/^VERBOSE: /", $result);
+  $pos = key($verbose);
+  if ($pos != 0) {
+    $target["rawoutput"] = array_slice($result,0,$pos);
+  }
+  $result = array_slice($result,$pos);
+  $result = implode("",str_replace("VERBOSE: ","",$result));
   $target["output"] = json_decode($result);
+  
   if (strpos($result, "Fail - ") === FALSE) {
     header("return-code:4488");
     $target["returncode"] = 4488; 
