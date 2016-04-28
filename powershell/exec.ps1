@@ -1,5 +1,3 @@
-$web = new-object net.webclient
-# iex $web.downloadstring('http://bit.ly/1NOWEIH') # utils.ps1
 . .\utils.ps1
 
 $script = $args[0]
@@ -28,9 +26,10 @@ for ( $i = 1; $i -lt $args.count; $i++ ) {
 
 try {
   Set-Item -Path function:script:theFunction -Value $c
-  $output = iex "theFunction $params"
-  $output.message
+  iex "theFunction $params"
+  addToResult "Success - run Powershell script $script"
 } catch {
   addToResult "Fail - run Powershell script $script"
-  endError
+  addError
 }
+writeResult -verbose 4>&1

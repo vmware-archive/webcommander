@@ -520,4 +520,3 @@ switch ($pscmdlet.parameterSetName) {
     } 
   }
 }
-writeResult
