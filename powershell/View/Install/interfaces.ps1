@@ -204,5 +204,3 @@ if ($type -notmatch "broker") {
   }
   $remoteWin.executePsRemote($cmd, $argList, $msg)
 }
-
-writeResult

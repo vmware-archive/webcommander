@@ -790,4 +790,3 @@ switch ($pscmdlet.parameterSetName) {
     $broker.setFarmHtmlAccess($farmId, [bool]$enable)
   }
 }
-writeResult

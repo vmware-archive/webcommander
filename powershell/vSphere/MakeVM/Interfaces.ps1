@@ -349,4 +349,3 @@ GenerateAnswerFile $GuestID $VMName $GuestName $serverAddress $ProductKey $Image
 MakeVm $GuestID $VMName $serverAddress $datastore $isoname $DiskMB $MemMB $Cpu $Ver $vmspec
 disconnect-VIServer -Server * -Force -Confirm:$false | out-null
 addToResult "Success - VM has been created and started."
-writeResult
