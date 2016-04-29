@@ -5,6 +5,7 @@ if (test-path ".\$script") {
   $c = get-content $script -raw
 } else {
   try {
+    $web = new-object net.webclient
     $c = $web.downloadstring($script)
   } catch {
     addToResult "Fail - read $script"
