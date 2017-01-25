@@ -1,0 +1,771 @@
+{
+    "script":  "View\\Broker\\interfaces.ps1",
+    "description":  "View Broker configuration",
+    "developer":  "whirls9@hotmail.com",
+    "functionalities":  [
+                            "View"
+                        ],
+    "synopsis":  "Broker",
+    "parametersets":  [
+                          "addComposer",
+                          "addComposerDomain",
+                          "addLicense",
+                          "addLinkedClonePool",
+                          "addManualPool",
+                          "addRdsAppPool",
+                          "addRdsDesktopPool",
+                          "addTransferServer",
+                          "addVirtualCenter",
+                          "deleteRdsAppPool",
+                          "deleteRdsDesktopPool",
+                          "entitlePool",
+                          "entitleRdsAppPool",
+                          "exportSettings",
+                          "getDesktopState",
+                          "importSettings",
+                          "logoffPool",
+                          "rebalancePool",
+                          "recomposePool",
+                          "refreshPool",
+                          "removePool",
+                          "removeTransferServer",
+                          "setDirectConnect",
+                          "setDirectPCoIP",
+                          "setEventDB",
+                          "setFarmHtmlAccess",
+                          "setHTMLAccess",
+                          "setMMRPolicy",
+                          "setPairingPassword",
+                          "setPoolAutoRecovery",
+                          "setPoolID",
+                          "setPoolName"
+                      ],
+    "parameters":  [
+                       {
+                           "name":  "serverAddress",
+                           "helpmessage":  "IP or FQDN of broker server",
+                           "mandatory":  1
+                       },
+                       {
+                           "name":  "serverUser",
+                           "helpmessage":  "User name of broker administrator",
+                           "mandatory":  1
+                       },
+                       {
+                           "name":  "serverPassword",
+                           "helpmessage":  "Password of broker administrator",
+                           "type":  "password"
+                       },
+                       {
+                           "name":  "poolId",
+                           "helpmessage":  "Pool ID",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addLinkedClonePool",
+                                                 "addRdsAppPool",
+                                                 "addRdsDesktopPool",
+                                                 "deleteRdsAppPool",
+                                                 "deleteRdsDesktopPool",
+                                                 "entitlePool",
+                                                 "entitleRdsAppPool",
+                                                 "getDesktopState",
+                                                 "logoffPool",
+                                                 "rebalancePool",
+                                                 "recomposePool",
+                                                 "refreshPool",
+                                                 "removePool",
+                                                 "setHTMLAccess",
+                                                 "setPoolAutoRecovery",
+                                                 "setPoolID",
+                                                 "setPoolName"
+                                             ]
+                       },
+                       {
+                           "name":  "getDesktopState",
+                           "helpmessage":  "This command get states of desktops in pools",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "getDesktopState"
+                                             ]
+                       },
+                       {
+                           "name":  "vcAddress",
+                           "helpmessage":  "IP / FQDN of VC server",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addComposer",
+                                                 "addComposerDomain",
+                                                 "addLinkedClonePool",
+                                                 "addManualPool",
+                                                 "addTransferServer",
+                                                 "addVirtualCenter"
+                                             ]
+                       },
+                       {
+                           "name":  "vcUser",
+                           "helpmessage":  "User name to connect to VC server (default is administrator)",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addComposer",
+                                                 "addManualPool",
+                                                 "addTransferServer",
+                                                 "addVirtualCenter"
+                                             ]
+                       },
+                       {
+                           "name":  "vcPassword",
+                           "helpmessage":  "Password of vcUser",
+                           "mandatory":  1,
+                           "type":  "password",
+                           "parametersets":  [
+                                                 "addComposer",
+                                                 "addManualPool",
+                                                 "addTransferServer",
+                                                 "addVirtualCenter"
+                                             ]
+                       },
+                       {
+                           "name":  "composerAddress",
+                           "helpmessage":  "IP / FQDN of composer server",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addComposer"
+                                             ]
+                       },
+                       {
+                           "name":  "composerUser",
+                           "helpmessage":  "User name to connect to composer server (default is \n      local\\administrator)",
+                           "parametersets":  [
+                                                 "addComposer"
+                                             ]
+                       },
+                       {
+                           "name":  "composerPassword",
+                           "helpmessage":  "Password of composerUser",
+                           "type":  "password",
+                           "parametersets":  [
+                                                 "addComposer"
+                                             ]
+                       },
+                       {
+                           "name":  "port",
+                           "helpmessage":  "Composer port number, default is 18443",
+                           "parametersets":  [
+                                                 "addComposer"
+                                             ]
+                       },
+                       {
+                           "name":  "addComposer",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addComposer"
+                                             ]
+                       },
+                       {
+                           "name":  "domainName",
+                           "helpmessage":  "Composer domain name",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addComposerDomain",
+                                                 "addLinkedClonePool"
+                                             ]
+                       },
+                       {
+                           "name":  "domainUser",
+                           "helpmessage":  "User of composer domain (default is administrator)",
+                           "parametersets":  [
+                                                 "addComposerDomain"
+                                             ]
+                       },
+                       {
+                           "name":  "domainPassword",
+                           "helpmessage":  "Password of domainUser",
+                           "type":  "password",
+                           "parametersets":  [
+                                                 "addComposerDomain"
+                                             ]
+                       },
+                       {
+                           "name":  "addComposerDomain",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addComposerDomain"
+                                             ]
+                       },
+                       {
+                           "name":  "useComposer",
+                           "helpmessage":  "Whether to use compopser if installed on VC",
+                           "options":  [
+                                           "false",
+                                           "true"
+                                       ],
+                           "mandatory":  1,
+                           "type":  "option",
+                           "parametersets":  [
+                                                 "addVirtualCenter"
+                                             ]
+                       },
+                       {
+                           "name":  "addVirtualCenter",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addVirtualCenter"
+                                             ]
+                       },
+                       {
+                           "name":  "license",
+                           "helpmessage":  "License key",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addLicense"
+                                             ]
+                       },
+                       {
+                           "name":  "addLicense",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addLicense"
+                                             ]
+                       },
+                       {
+                           "name":  "userName",
+                           "helpmessage":  "User name (in domain\\user format)",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "entitlePool",
+                                                 "entitleRdsAppPool"
+                                             ]
+                       },
+                       {
+                           "name":  "entitlePool",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "entitlePool"
+                                             ]
+                       },
+                       {
+                           "name":  "namePrefix",
+                           "helpmessage":  "Name prefix, default is \u0027poolID-\u0027",
+                           "parametersets":  [
+                                                 "addLinkedClonePool"
+                                             ]
+                       },
+                       {
+                           "name":  "parentVmPath",
+                           "helpmessage":  "Path to a virtual machine to be used as the parent VM \n      for this desktop pool.",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addLinkedClonePool",
+                                                 "recomposePool"
+                                             ]
+                       },
+                       {
+                           "name":  "parentSnapshotPath",
+                           "helpmessage":  "Path to the snapshot that is to be used as the image \n      for this pool, i.e. /clean or /clean/test0",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addLinkedClonePool",
+                                                 "recomposePool"
+                                             ]
+                       },
+                       {
+                           "name":  "vmFolderPath",
+                           "helpmessage":  "Specify a location for this new directory as a vCenter \n      folder path.",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addLinkedClonePool"
+                                             ]
+                       },
+                       {
+                           "name":  "resourcePoolPath",
+                           "helpmessage":  "Path to a resource pool to be used for this desktop pool.",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addLinkedClonePool"
+                                             ]
+                       },
+                       {
+                           "name":  "datastoreSpecs",
+                           "helpmessage":  "List of datastore specs for storage of desktop VMs and \n      data disks, separated by semicolons using the format: \n      \u0027[Overcommit,usage]/path/to/datastore\u0027",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addLinkedClonePool"
+                                             ]
+                       },
+                       {
+                           "name":  "dataDiskLetter",
+                           "helpmessage":  "Data disk letter, default is \u0027U\u0027",
+                           "parametersets":  [
+                                                 "addLinkedClonePool"
+                                             ]
+                       },
+                       {
+                           "name":  "dataDiskSize",
+                           "helpmessage":  "Data disk size, default is 2048",
+                           "parametersets":  [
+                                                 "addLinkedClonePool"
+                                             ]
+                       },
+                       {
+                           "name":  "tempDiskSize",
+                           "helpmessage":  "Temp disk size, default is 1024",
+                           "parametersets":  [
+                                                 "addLinkedClonePool"
+                                             ]
+                       },
+                       {
+                           "name":  "min",
+                           "helpmessage":  "Minimum number of desktops to be provisioned in this pool.",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addLinkedClonePool"
+                                             ]
+                       },
+                       {
+                           "name":  "max",
+                           "helpmessage":  "Maximum number of desktops to be provisioned in this pool.",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addLinkedClonePool"
+                                             ]
+                       },
+                       {
+                           "name":  "poolType",
+                           "helpmessage":  "Pool type",
+                           "options":  [
+                                           "Persistent",
+                                           "NonPersistent"
+                                       ],
+                           "mandatory":  1,
+                           "type":  "option",
+                           "parametersets":  [
+                                                 "addLinkedClonePool",
+                                                 "addManualPool"
+                                             ]
+                       },
+                       {
+                           "name":  "addLinkedClonePool",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addLinkedClonePool"
+                                             ]
+                       },
+                       {
+                           "name":  "agentVmName",
+                           "helpmessage":  "Agent virtual machine name in the vCenter inventory. \n      Support multiple values seperated by comma.",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addManualPool"
+                                             ]
+                       },
+                       {
+                           "name":  "addManualPool",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addManualPool"
+                                             ]
+                       },
+                       {
+                           "name":  "tsVmName",
+                           "helpmessage":  "Transfer server virtual machine name in the vCenter inventory",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addTransferServer",
+                                                 "removeTransferServer"
+                                             ]
+                       },
+                       {
+                           "name":  "addTransferServer",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addTransferServer"
+                                             ]
+                       },
+                       {
+                           "name":  "removeTransferServer",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "removeTransferServer"
+                                             ]
+                       },
+                       {
+                           "name":  "rmFromDisk",
+                           "helpmessage":  "Whether to remove VM from disk. Default is false",
+                           "options":  [
+                                           "false",
+                                           "true"
+                                       ],
+                           "type":  "option",
+                           "parametersets":  [
+                                                 "removePool"
+                                             ]
+                       },
+                       {
+                           "name":  "removePool",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "removePool"
+                                             ]
+                       },
+                       {
+                           "name":  "rebalancePool",
+                           "helpmessage":  "Rebalance linked clone pool",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "rebalancePool"
+                                             ]
+                       },
+                       {
+                           "name":  "recomposePool",
+                           "helpmessage":  "Recompose linked clone pool",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "recomposePool"
+                                             ]
+                       },
+                       {
+                           "name":  "refreshPool",
+                           "helpmessage":  "Refresh linked clone pool",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "refreshPool"
+                                             ]
+                       },
+                       {
+                           "name":  "logoffPool",
+                           "helpmessage":  "Send session logoff message to all desktops in a pool",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "logoffPool"
+                                             ]
+                       },
+                       {
+                           "name":  "filePath",
+                           "helpmessage":  "Path to the broker settings file, default is c:\\temp\\broker.ldif",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "exportSettings",
+                                                 "importSettings"
+                                             ]
+                       },
+                       {
+                           "name":  "exportSettings",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "exportSettings"
+                                             ]
+                       },
+                       {
+                           "name":  "importSettings",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "importSettings"
+                                             ]
+                       },
+                       {
+                           "name":  "enable",
+                           "helpmessage":  "Select true to enable or false to disable",
+                           "options":  [
+                                           "false",
+                                           "true"
+                                       ],
+                           "mandatory":  1,
+                           "type":  "option",
+                           "parametersets":  [
+                                                 "setDirectConnect",
+                                                 "setDirectPCoIP",
+                                                 "setFarmHtmlAccess",
+                                                 "setHTMLAccess",
+                                                 "setMMRPolicy",
+                                                 "setPoolAutoRecovery"
+                                             ]
+                       },
+                       {
+                           "name":  "setDirectConnect",
+                           "helpmessage":  "Connect to desktop directly or via security tunnel",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "setDirectConnect"
+                                             ]
+                       },
+                       {
+                           "name":  "setDirectPCoIP",
+                           "helpmessage":  "Configure direct PCoIP connection",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "setDirectPCoIP"
+                                             ]
+                       },
+                       {
+                           "name":  "dbAddress",
+                           "helpmessage":  "IP / FQDN of database server",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "setEventDB"
+                                             ]
+                       },
+                       {
+                           "name":  "dbType",
+                           "helpmessage":  "Database server type, default is SQLSERVER",
+                           "options":  [
+                                           "SQLSERVER",
+                                           "ORACLE"
+                                       ],
+                           "type":  "option",
+                           "parametersets":  [
+                                                 "setEventDB"
+                                             ]
+                       },
+                       {
+                           "name":  "dbPort",
+                           "helpmessage":  "Port, default is 1433",
+                           "parametersets":  [
+                                                 "setEventDB"
+                                             ]
+                       },
+                       {
+                           "name":  "dbName",
+                           "helpmessage":  "Database name",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "setEventDB"
+                                             ]
+                       },
+                       {
+                           "name":  "dbUser",
+                           "helpmessage":  "Database user name, default is administrator",
+                           "parametersets":  [
+                                                 "setEventDB"
+                                             ]
+                       },
+                       {
+                           "name":  "dbPassword",
+                           "helpmessage":  "Password of dbUser",
+                           "mandatory":  1,
+                           "type":  "password",
+                           "parametersets":  [
+                                                 "setEventDB"
+                                             ]
+                       },
+                       {
+                           "name":  "tablePrefix",
+                           "helpmessage":  "Table prefix",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "setEventDB"
+                                             ]
+                       },
+                       {
+                           "name":  "setEventDB",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "setEventDB"
+                                             ]
+                       },
+                       {
+                           "name":  "setHTMLAccess",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "setHTMLAccess"
+                                             ]
+                       },
+                       {
+                           "name":  "setMMRPolicy",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "setMMRPolicy"
+                                             ]
+                       },
+                       {
+                           "name":  "setPoolAutoRecovery",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "setPoolAutoRecovery"
+                                             ]
+                       },
+                       {
+                           "name":  "newId",
+                           "helpmessage":  "New pool ID",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "setPoolID"
+                                             ]
+                       },
+                       {
+                           "name":  "setPoolID",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "setPoolID"
+                                             ]
+                       },
+                       {
+                           "name":  "poolName",
+                           "helpmessage":  "Pool name",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "setPoolName"
+                                             ]
+                       },
+                       {
+                           "name":  "setPoolName",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "setPoolName"
+                                             ]
+                       },
+                       {
+                           "name":  "pairingPassword",
+                           "helpmessage":  "Pairing password, default is 111111",
+                           "mandatory":  1,
+                           "type":  "password",
+                           "parametersets":  [
+                                                 "setPairingPassword"
+                                             ]
+                       },
+                       {
+                           "name":  "timeout",
+                           "helpmessage":  "Pairing password timeout in term of seconds, \n      default is 86400",
+                           "parametersets":  [
+                                                 "setPairingPassword"
+                                             ]
+                       },
+                       {
+                           "name":  "setPairingPassword",
+                           "helpmessage":  "Specify Security Server Pairing Password",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "setPairingPassword"
+                                             ]
+                       },
+                       {
+                           "name":  "farmId",
+                           "helpmessage":  "Farm ID",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addFarm",
+                                                 "addFarmWithRdsServer",
+                                                 "addRdsAppPool",
+                                                 "addRdsDesktopPool",
+                                                 "addRdsServerToFarm",
+                                                 "removeRdsServerFromFarm",
+                                                 "setFarmHtmlAccess"
+                                             ]
+                       },
+                       {
+                           "name":  "addFarm",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addFarm"
+                                             ]
+                       },
+                       {
+                           "name":  "rdsServerDnsName",
+                           "helpmessage":  "RDS server FQDN",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addFarmWithRdsServer",
+                                                 "addRdsServerToFarm",
+                                                 "removeRdsServerFromFarm"
+                                             ]
+                       },
+                       {
+                           "name":  "addRdsServerToFarm",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addRdsServerToFarm"
+                                             ]
+                       },
+                       {
+                           "name":  "addFarmWithRdsServer",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addFarmWithRdsServer"
+                                             ]
+                       },
+                       {
+                           "name":  "execPath",
+                           "helpmessage":  "Application executable path",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addRdsAppPool"
+                                             ]
+                       },
+                       {
+                           "name":  "addRdsAppPool",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addRdsAppPool"
+                                             ]
+                       },
+                       {
+                           "name":  "addRdsDesktopPool",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addRdsDesktopPool"
+                                             ]
+                       },
+                       {
+                           "name":  "deleteRdsAppPool",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "deleteRdsAppPool"
+                                             ]
+                       },
+                       {
+                           "name":  "deleteRdsDesktopPool",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "deleteRdsDesktopPool"
+                                             ]
+                       },
+                       {
+                           "name":  "entitleRdsAppPool",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "entitleRdsAppPool"
+                                             ]
+                       },
+                       {
+                           "name":  "removeRdsServerFromFarm",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "removeRdsServerFromFarm"
+                                             ]
+                       },
+                       {
+                           "name":  "setFarmHtmlAccess",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "setFarmHtmlAccess"
+                                             ]
+                       }
+                   ]
+}

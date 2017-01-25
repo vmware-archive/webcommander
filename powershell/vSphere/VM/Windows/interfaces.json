@@ -1,0 +1,59 @@
+{
+    "script":  "vSphere\\VM\\Windows\\interfaces.ps1",
+    "description":  "Windows Virtual Machine",
+    "developer":  "liuj@vmware.com",
+    "functionalities":  [
+                            "VM"
+                        ],
+    "synopsis":  "Windows VM",
+    "parametersets":  [
+                          "enablePsRemoting",
+                          "renewIp"
+                      ],
+    "parameters":  [
+                       {
+                           "name":  "serverAddress",
+                           "helpmessage":  "IP or FQDN of the ESX or VC server hosting the VM"
+                       },
+                       {
+                           "name":  "serverUser",
+                           "helpmessage":  "User name to connect to the server (default is root)"
+                       },
+                       {
+                           "name":  "serverPassword",
+                           "helpmessage":  "Password of the user",
+                           "type":  "password"
+                       },
+                       {
+                           "name":  "vmName",
+                           "helpmessage":  "Name of target VM. Support multiple values seperated by comma.",
+                           "mandatory":  1,
+                           "type":  "selectText"
+                       },
+                       {
+                           "name":  "guestUser",
+                           "helpmessage":  "User of target machine (default is administrator)"
+                       },
+                       {
+                           "name":  "guestPassword",
+                           "helpmessage":  "Password of guestUser",
+                           "type":  "password"
+                       },
+                       {
+                           "name":  "enablePsRemoting",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "enablePsRemoting"
+                                             ]
+                       },
+                       {
+                           "name":  "renewIp",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "renewIp"
+                                             ]
+                       }
+                   ]
+}

@@ -1,0 +1,176 @@
+<!-- Author: Jian Liu, whirls9@hotmail.com -->
+
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-filter/0.5.14/angular-filter.min.js"></script>
+<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body ng-app="webcmd" ng-controller="mainCtrl">
+
+<nav class="w3-sidenav w3-black w3-card-2 w3-animate-left" style="display:none" id="cmdSidenav">
+  <a href="javascript:void(0)" onclick="w3_close()" class="w3-closenav w3-xlarge w3-indigo">Command List &times;</a>
+  <div ng-repeat="(key, value) in cmdlist | groupBy: 'repository'"
+    class="w3-accordion-click">
+    <button ng-click="showRepo('repo-' + key)" class="w3-btn-block w3-left-align w3-blue w3-large">
+      {{ key | uppercase }} <i class="fa fa-caret-down"></i>
+    </button>
+    <div id="repo-{{key}}" class="w3-accordion-content w3-lightblue">
+      <a ng-repeat="cmd in value" href="#" ng-click="selectCmd(cmd.script)">{{cmd.synopsis}}</a>
+    </div>
+  </div>
+</nav>
+  
+<div id="main">
+  <header class="w3-indigo w3-container">
+    <div class="w3-padding w3-padding w3-xxxlarge">
+      <i class="fa fa-list-alt w3-animate-fading" onclick="w3_open()" id="openNav"></i> 
+      <i class="w3-wide w3-right"> webCommander <span class="w3-text-red">J</span></i>
+    </div>
+  </header>
+  
+  <div ng-if="!theCmd" class="w3-container w3-padding">
+    <p>
+      <b class="w3-text-blue">webCommander</b> was initially developed to run on Windows with IIS and PHP.
+      Since Microsoft has made Powershell work also on Linux and OSX, so should webCommander.
+    </p>
+    <p>
+      In this new implementation, IIS and PHP are subsituted by NodeJS. 
+      Meanwhile, UI part is completely rewritten with AngularJS.
+      To emphasize the great usage of Javascript and distinguish this new version from the original,
+      it's named as <b class="w3-text-blue">webCommander J</b>.
+    </p>
+    <p>
+      To start, click <i class="fa fa-list-alt"></i> above at the top left corner 
+      and then select a command to run from the list.
+    </p>
+    <p>
+      Please note that VMware PowerCLI doesn't support Linux or OSX so far. 
+      So those built-in sample commands related won't work either.
+      This tech preview is mainly for functions of web server and UI.
+      Samples of cross platform powershell scripts will be added later.
+    </p>
+  </div>
+
+  <div ng-if="theCmd" class="w3-container w3-padding" id="center">
+    <p><b class="w3-text-blue">Command Description:</b><br/> {{theCmd.description}}</p>
+    <ul class="w3-navbar w3-black">
+      <li><a href="javascript:void(0)" class="tablink w3-red" ng-click="openTab($event, 'Parameters');">Parameters</a></li>
+      <li><a href="javascript:void(0)" class="tablink" ng-click="openTab($event, 'Result');">Result</a></li>
+      <li><a href="javascript:void(0)" class="tablink" ng-click="openTab($event, 'API');">REST API</a></li>
+      <li class="w3-right" ng-switch="cmdState">
+        <a ng-switch-when="running" href="javascript:void(0)"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></a>
+        <a ng-switch-default href="javascript:void(0)" ng-click="runCmd()"><i class="fa fa-play" aria-hidden="true"></i></a>
+      </li>
+    </ul>
+
+    <div id="Parameters" class="w3-container w3-border cmd-tab w3-padding">
+      <div class="w3-card-8 w3-margin">
+        <div class="w3-large w3-container w3-red">Parameters:</div>
+        <div class="w3-padding">
+          <div ng-include src="'param-template.html'" ng-repeat="p in theCmd.parameters | filter: {parametersets: '!'}">  
+          </div>
+        </div>
+      </div>
+      
+      <div ng-if="theCmd.parametersets" class="w3-card-8 w3-margin">
+        <div class="w3-large w3-container w3-red">Method:</div>
+        <div class="w3-padding">
+          <select class="w3-select" ng-model="apiData.method" ng-options="p for p in theCmd.parametersets">
+          </select>
+        </div>
+      </div>
+      
+      <div ng-if="(theCmd.parameters | filter: {parametersets: apiData.method} | filter: {name: '!' + apiData.method}).length"
+        class="w3-card-8 w3-margin">
+        <div class="w3-large w3-container w3-red">Method specific parameters:</div>
+        <div class="w3-padding">
+          <div ng-include src="'param-template.html'" 
+            ng-repeat="p in theCmd.parameters | filter: {parametersets: apiData.method} | filter: {name: '!' + apiData.method}">  
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="Result" class="w3-container w3-border cmd-tab" style="display:none">
+      <textarea class="w3-input" rows="12">{{result | json}}</textarea> 
+    </div>
+
+    <div id="API" class="w3-container w3-border cmd-tab" style="display:none">
+      <p>POST the JSON data below to "/run-cmd".</p>
+      <textarea class="w3-input" rows="12">{{apiData | json}}</textarea>
+    </div>
+  
+  </div>
+
+  <footer class="w3-container w3-blue">
+    <h5 class="w3-wide">Tech preview version</h5>
+    <p>
+      For any question or suggestion, please use 
+      <a href="https://github.com/vmware/webcommander/issues" target="_blank">github</a> to raise an issue.
+    </p>
+  </footer>
+
+</div>
+
+
+<script>
+var app = angular.module('webcmd', ['angular.filter']);
+app.controller('mainCtrl', function($scope, $http, $filter) {
+  $scope.apiData = {};
+  $http.get("list-cmd")
+  .then(function(response) {
+    $scope.cmdlist = response.data;
+  });
+  $scope.selectCmd = function(script) {
+    $scope.theCmd = $filter('filter')($scope.cmdlist, {"script": script})[0];
+    $scope.apiData = {};
+    $scope.apiData.script = script;
+  }
+  $scope.runCmd = function() {
+    $scope.cmdState = "running";
+    $http.post('run-cmd', $scope.apiData)
+    .then(function(response) {
+      $scope.result = response.data;
+      $scope.cmdState = "finished"
+    });
+  }
+  $scope.showRepo = function(id) {
+    var x = document.getElementById(id);
+    if (x.className.indexOf("w3-show") == -1) {
+      x.className += " w3-show";
+    } else { 
+      x.className = x.className.replace(" w3-show", "");
+    }
+  }
+  $scope.openTab = function (evt, tabName) {
+    var i, x, tablinks;
+    x = document.getElementsByClassName("cmd-tab");
+    for (i = 0; i < x.length; i++) {
+      x[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablink");
+    for (i = 0; i < x.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" w3-red", "");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " w3-red";
+  }
+});
+function w3_open() {
+  document.getElementById("main").style.marginLeft = "25%";
+  document.getElementById("cmdSidenav").style.width = "25%";
+  document.getElementById("cmdSidenav").style.display = "block";
+  document.getElementById("openNav").style.display = 'none';
+}
+function w3_close() {
+  document.getElementById("main").style.marginLeft = "0%";
+  document.getElementById("cmdSidenav").style.display = "none";
+  document.getElementById("openNav").style.display = "inline-block";
+}
+</script>
+
+</body>
+</html>

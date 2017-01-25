@@ -1,0 +1,170 @@
+{
+    "script":  "vSphere\\interfaces.ps1",
+    "description":  "ESXi and vCenter",
+    "developer":  "whirls9@hotmail.com",
+    "functionalities":  [
+
+                        ],
+    "synopsis":  "vSphere",
+    "parametersets":  [
+                          "listDatastore",
+                          "listPortGroup",
+                          "listResourcePool",
+                          "listVirtualMachine",
+                          "listVmHost",
+                          "mountNfsDatastore",
+                          "removeNfsDatastore",
+                          "setInterVmPageSharing",
+                          "syncTime"
+                      ],
+    "parameters":  [
+                       {
+                           "name":  "serverAddress",
+                           "helpmessage":  "IP or FQDN of ESX or VC server. Support multiple values seperated by comma.",
+                           "mandatory":  1
+                       },
+                       {
+                           "name":  "serverUser",
+                           "helpmessage":  "User name to connect to the server (default is root)"
+                       },
+                       {
+                           "name":  "serverPassword",
+                           "helpmessage":  "Password of the user",
+                           "type":  "password"
+                       },
+                       {
+                           "name":  "listPortGroup",
+                           "helpmessage":  "This method lists port groups on VC or ESX",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "listPortGroup"
+                                             ]
+                       },
+                       {
+                           "name":  "listDatastore",
+                           "helpmessage":  "This method lists data stores on VC or ESX",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "listDatastore"
+                                             ]
+                       },
+                       {
+                           "name":  "listResourcePool",
+                           "helpmessage":  "This method lists data stores on VC or ESX",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "listResourcePool"
+                                             ]
+                       },
+                       {
+                           "name":  "listVirtualMachine",
+                           "helpmessage":  "This method lists virtual machines on VC or ESX",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "listVirtualMachine"
+                                             ]
+                       },
+                       {
+                           "name":  "listVmHost",
+                           "helpmessage":  "This method lists VM hosts on VC or ESX",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "listVmHost"
+                                             ]
+                       },
+                       {
+                           "name":  "ntpServerAddress",
+                           "helpmessage":  "IP or FQDN of the NTP server",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "syncTime"
+                                             ]
+                       },
+                       {
+                           "name":  "includeVm",
+                           "helpmessage":  "Whether or not to sync time on VM",
+                           "options":  [
+                                           "false",
+                                           "true"
+                                       ],
+                           "type":  "option",
+                           "parametersets":  [
+                                                 "syncTime"
+                                             ]
+                       },
+                       {
+                           "name":  "syncTime",
+                           "helpmessage":  "This method synchronizes ESXi time to NTP and VM time to host",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "syncTime"
+                                             ]
+                       },
+                       {
+                           "name":  "datastoreList",
+                           "helpmessage":  "NFS stores to mount in form of \u0027datastore name : NFS host : path\u0027. Support multiple values. Each entry per line.",
+                           "mandatory":  1,
+                           "type":  "textarea",
+                           "parametersets":  [
+                                                 "mountNfsDatastore"
+                                             ]
+                       },
+                       {
+                           "name":  "readOnly",
+                           "helpmessage":  "Mount NFS read only",
+                           "options":  [
+                                           "false",
+                                           "true"
+                                       ],
+                           "type":  "option",
+                           "parametersets":  [
+                                                 "mountNfsDatastore"
+                                             ]
+                       },
+                       {
+                           "name":  "mountNfsDatastore",
+                           "helpmessage":  "This method mounts NFS shared storage onto ESX",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "mountNfsDatastore"
+                                             ]
+                       },
+                       {
+                           "name":  "nfsDatastoreName",
+                           "helpmessage":  "Name of NFS datastore to remove",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "removeNfsDatastore"
+                                             ]
+                       },
+                       {
+                           "name":  "removeNfsDatastore",
+                           "helpmessage":  "This method removes NFS shared storage from ESX",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "removeNfsDatastore"
+                                             ]
+                       },
+                       {
+                           "name":  "enable",
+                           "helpmessage":  "Enable inter-vm transparent page sharing",
+                           "options":  [
+                                           "false",
+                                           "true"
+                                       ],
+                           "mandatory":  1,
+                           "type":  "option",
+                           "parametersets":  [
+                                                 "setInterVmPageSharing"
+                                             ]
+                       },
+                       {
+                           "name":  "setInterVmPageSharing",
+                           "helpmessage":  "This method sets inter-VM transparent page sharing on ESX or vCenter server.",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "setInterVmPageSharing"
+                                             ]
+                       }
+                   ]
+}

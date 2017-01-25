@@ -1,0 +1,12 @@
+<label>
+  <div class="w3-bold"> {{p.name}} </div>
+  <div class="w3-tiny w3-right-align"> {{p.helpmessage}} </div>
+</label>
+<span ng-switch="p.type">
+  <input ng-switch-when="password" class="w3-input" type="password" ng-model="apiData.parameters[p.name]" />
+  <textarea ng-switch-when="textarea" class="w3-input" ng-model="apiData.parameters[p.name]"></textarea>
+  <select ng-switch-when="option" class="w3-select" 
+    ng-model="apiData.parameters[p.name]" ng-options="o for o in p.options">
+  </select>
+  <input ng-switch-default class="w3-input" type="text" ng-model="apiData.parameters[p.name]" />
+</span>

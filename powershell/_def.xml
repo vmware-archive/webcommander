@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<webcommander xmlns:xi="http://www.w3.org/2003/XInclude">
-  <command name="genDefXml" synopsis="Generate command definition" developer="liuj@vmware.com">
-    <description>This command generates _def.xml.
-It parses all powershell scripts to get information from comment
-based help and parameter attributes.</description>
-    <script>genDefXml</script>
-  </command>
-</webcommander>

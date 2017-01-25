@@ -1,39 +1,31 @@
-Video Tutorials
-===============
-
-1. How to execute an individual command http://youtu.be/CREkoloCOmk
-2. Workflow basics http://youtu.be/ZJtU36kM2YY
-3. Workflow variable http://youtu.be/i6z_HKgeiqY
-4. Workflow template http://youtu.be/adXa6AHJaB8
-5. Run workflow as command http://youtu.be/DAm70VO62VY
-6. Save workflow on server http://youtu.be/_aEZhzk_Q2Y
-
 Introduction
 ============
 
-!!! PLEASE NOTE THAT ADVANCED INFORMATIONS ARE PROVIDED IN WIKI !!!
-https://github.com/vmware/webcommander/wiki
+J branch is the Javascript implementation of webCommander server.
 
-WebCommander wraps scripts into web services so that those scripts could be easily consumed by remote users or other programs. 
-Each script becomes a command that could be triggered by HTTP request. 
-The command output is XML with browser side transforming (XSLT) which is friendly to both programs and human users at the same time.
+NodeJS is adopted for web server so that webCommander could run
+on Windows, Linux and OSX.
 
-If you prefer JSON instead of XML, please pull code from Walnut branch where both command definition and output are JSON.
+AngularJS is adopted for client UI so that webCommander has better
+support for more types of browsers including mobile ones.
 
-WebCommander also provides 2 methods (workflow and poker) to run multiple commands together to fulfill more complex automation tasks.
-
-WebCommander currently supports Powershell, Perl, Python and Ruby scripts. 
-The built-in Powershell scripts are mainly for automating VMware vSphere and Horizon View. 
-As for Perl, Python and Ruby, only 1 example script is provided respectively to illustrate how to add users' own scripts into WebCommander. 
+Sample Powershell scripts included may not work on Linux or
+OSX currently. Cross platform support will be added later.
 
 Installation
 ============
 
-To install and config WebCommander, simply download the Powershell script below.
-https://github.com/vmware/webcommander/blob/master/powershell/Install/setup.ps1
-Then run it on a Windows 2012 or 2008 server where Powershell 4.0 has already been installed.
-Please note that this script also supports upgrading WebCommander with new source codes.
-A more detailed guide for manual install and configuration is provided in wiki https://github.com/vmware/webcommander/wiki/Installation-and-configuration-guide
+1. Download code from J branch
+2. cd into code folder and run the commands below:
+   npm install
+   node server.js
+3. Open browser and navigate to http://localhost:8080/default.html
+
+REST API
+========
+
+1. GET /list-cmd
+2. POST /run-cmd
 
 Contribution
 ============

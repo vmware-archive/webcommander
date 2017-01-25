@@ -1,0 +1,102 @@
+{
+    "script":  "vSphere\\OVA\\interfaces.ps1",
+    "description":  "This command deploys an OVA to ESX or VC.",
+    "developer":  "liuj@vmware.com",
+    "functionalities":  [
+                            "OVA"
+                        ],
+    "synopsis":  "Deploy",
+    "parametersets":  [
+                          "deployToEsx",
+                          "deployToVc"
+                      ],
+    "parameters":  [
+                       {
+                           "name":  "serverAddress",
+                           "helpmessage":  "IP or FQDN of ESX or VC server to which the OVA will be deployed"
+                       },
+                       {
+                           "name":  "serverUser",
+                           "helpmessage":  "User name to connect to the server (default is root)"
+                       },
+                       {
+                           "name":  "serverPassword",
+                           "helpmessage":  "Password of the user",
+                           "type":  "password"
+                       },
+                       {
+                           "name":  "datastore",
+                           "helpmessage":  "Name of datastore to which the OVA will be deployed",
+                           "type":  "selectText"
+                       },
+                       {
+                           "name":  "storageFormat",
+                           "helpmessage":  "Storage format",
+                           "options":  [
+                                           "Thin",
+                                           "Thick",
+                                           "EagarZeroedThick"
+                                       ],
+                           "type":  "option"
+                       },
+                       {
+                           "name":  "portGroup",
+                           "helpmessage":  "Name of Virtual Machine Port Group to which the OVA will connect",
+                           "type":  "selectText"
+                       },
+                       {
+                           "name":  "advancedProperty",
+                           "helpmessage":  "Advanced properties, such as --prop:vami.hostname=myvmname",
+                           "type":  "textarea"
+                       },
+                       {
+                           "name":  "ovaUrl",
+                           "helpmessage":  "URL of the OVA",
+                           "mandatory":  1,
+                           "type":  "textarea"
+                       },
+                       {
+                           "name":  "vmName",
+                           "helpmessage":  "Name of the VM to be deployed",
+                           "mandatory":  1,
+                           "type":  "selectText"
+                       },
+                       {
+                           "name":  "deployToEsx",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "deployToEsx"
+                                             ]
+                       },
+                       {
+                           "name":  "datacenter",
+                           "helpmessage":  "Name of datacenter to which the OVA will be deployed",
+                           "parametersets":  [
+                                                 "deployToVc"
+                                             ]
+                       },
+                       {
+                           "name":  "cluster",
+                           "helpmessage":  "Name of cluster to which the OVA will be deployed",
+                           "parametersets":  [
+                                                 "deployToVc"
+                                             ]
+                       },
+                       {
+                           "name":  "esxHost",
+                           "helpmessage":  "Name of ESX host to which the OVA will be deployed",
+                           "parametersets":  [
+                                                 "deployToVc"
+                                             ]
+                       },
+                       {
+                           "name":  "deployToVc",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "deployToVc"
+                                             ]
+                       }
+                   ]
+}

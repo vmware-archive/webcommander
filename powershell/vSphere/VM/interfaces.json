@@ -1,0 +1,345 @@
+{
+    "script":  "vSphere\\VM\\interfaces.ps1",
+    "description":  "Virtual Machine",
+    "developer":  "whirls9@hotmail.com",
+    "functionalities":  [
+
+                        ],
+    "synopsis":  "VM",
+    "parametersets":  [
+                          "addHardDisk",
+                          "answerQuestion",
+                          "delete",
+                          "getIp",
+                          "getVmx",
+                          "listSnapshot",
+                          "poweroff",
+                          "poweron",
+                          "removeSnapshot",
+                          "restart",
+                          "restoreSnapshot",
+                          "runScript",
+                          "setMemorySize",
+                          "setPortGroup",
+                          "setVmx",
+                          "suspend",
+                          "takeSnapshot",
+                          "updateVmTools",
+                          "uploadFile"
+                      ],
+    "parameters":  [
+                       {
+                           "name":  "serverAddress",
+                           "helpmessage":  "IP or FQDN of the ESX or VC server hosting the VM",
+                           "mandatory":  1
+                       },
+                       {
+                           "name":  "serverUser",
+                           "helpmessage":  "User name to connect to the server (default is root)"
+                       },
+                       {
+                           "name":  "serverPassword",
+                           "helpmessage":  "Password of the user",
+                           "type":  "password"
+                       },
+                       {
+                           "name":  "vmName",
+                           "helpmessage":  "Name of target VM. Support multiple values seperated by comma and also wildcard.",
+                           "mandatory":  1,
+                           "type":  "selectText"
+                       },
+                       {
+                           "name":  "answer",
+                           "helpmessage":  "The answer for the question. Default is \u0027cancel\u0027.",
+                           "parametersets":  [
+                                                 "answerQuestion"
+                                             ]
+                       },
+                       {
+                           "name":  "answerQuestion",
+                           "helpmessage":  "Answer VM question",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "answerQuestion"
+                                             ]
+                       },
+                       {
+                           "name":  "delete",
+                           "helpmessage":  "Delete VM from disk",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "delete"
+                                             ]
+                       },
+                       {
+                           "name":  "poweroff",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "poweroff"
+                                             ]
+                       },
+                       {
+                           "name":  "poweron",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "poweron"
+                                             ]
+                       },
+                       {
+                           "name":  "suspend",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "suspend"
+                                             ]
+                       },
+                       {
+                           "name":  "restart",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "restart"
+                                             ]
+                       },
+                       {
+                           "name":  "capacityGb",
+                           "helpmessage":  "Disk capacity in gigabytes (GB)",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "addHardDisk"
+                                             ]
+                       },
+                       {
+                           "name":  "diskNumber",
+                           "helpmessage":  "Number of disks to add. Default is 1.",
+                           "parametersets":  [
+                                                 "addHardDisk"
+                                             ]
+                       },
+                       {
+                           "name":  "storageFormat",
+                           "helpmessage":  "Storage format. Default is Thin.",
+                           "options":  [
+                                           "Thin",
+                                           "Thick",
+                                           "EagarZeroedThick"
+                                       ],
+                           "type":  "option",
+                           "parametersets":  [
+                                                 "addHardDisk"
+                                             ]
+                       },
+                       {
+                           "name":  "persistence",
+                           "helpmessage":  "Persistence mode, default is IndependentPersistent.",
+                           "options":  [
+                                           "IndependentPersistent",
+                                           "IndependentNonPersistent",
+                                           "Persistent"
+                                       ],
+                           "type":  "option",
+                           "parametersets":  [
+                                                 "addHardDisk"
+                                             ]
+                       },
+                       {
+                           "name":  "addHardDisk",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "addHardDisk"
+                                             ]
+                       },
+                       {
+                           "name":  "portGroup",
+                           "helpmessage":  "Name of the port group",
+                           "mandatory":  1,
+                           "type":  "selectText",
+                           "parametersets":  [
+                                                 "setPortGroup"
+                                             ]
+                       },
+                       {
+                           "name":  "setPortGroup",
+                           "helpmessage":  "Add VM network card into specified port group",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "setPortGroup"
+                                             ]
+                       },
+                       {
+                           "name":  "memoryGb",
+                           "helpmessage":  "Memory size in gigabytes (GB)",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "setMemorySize"
+                                             ]
+                       },
+                       {
+                           "name":  "setMemorySize",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "setMemorySize"
+                                             ]
+                       },
+                       {
+                           "name":  "updateVmTools",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "updateVmTools"
+                                             ]
+                       },
+                       {
+                           "name":  "guestUser",
+                           "helpmessage":  "User of target VM (default is administrator)",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "runScript",
+                                                 "uploadFile"
+                                             ]
+                       },
+                       {
+                           "name":  "guestPassword",
+                           "helpmessage":  "Password of guestUser",
+                           "mandatory":  1,
+                           "type":  "password",
+                           "parametersets":  [
+                                                 "runScript",
+                                                 "uploadFile"
+                                             ]
+                       },
+                       {
+                           "name":  "scriptText",
+                           "helpmessage":  "Script text",
+                           "mandatory":  1,
+                           "type":  "textarea",
+                           "parametersets":  [
+                                                 "runScript"
+                                             ]
+                       },
+                       {
+                           "name":  "scriptType",
+                           "helpmessage":  "Script type. Default is \u0027Bat\u0027.",
+                           "options":  [
+                                           "Bat",
+                                           "Bash",
+                                           "Powershell"
+                                       ],
+                           "type":  "option",
+                           "parametersets":  [
+                                                 "runScript"
+                                             ]
+                       },
+                       {
+                           "name":  "runScript",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "runScript"
+                                             ]
+                       },
+                       {
+                           "name":  "file",
+                           "helpmessage":  "select a file",
+                           "mandatory":  1,
+                           "type":  "file",
+                           "parametersets":  [
+                                                 "setVmx",
+                                                 "uploadFile"
+                                             ]
+                       },
+                       {
+                           "name":  "destination",
+                           "helpmessage":  "Destination path, such as c:\\temp\\",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "uploadFile"
+                                             ]
+                       },
+                       {
+                           "name":  "uploadFile",
+                           "helpmessage":  "upload file to VM",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "uploadFile"
+                                             ]
+                       },
+                       {
+                           "name":  "getVmx",
+                           "helpmessage":  "get content of VMX file",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "getVmx"
+                                             ]
+                       },
+                       {
+                           "name":  "setVmx",
+                           "helpmessage":  "set content of VMX file",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "setVmx"
+                                             ]
+                       },
+                       {
+                           "name":  "listSnapshot",
+                           "helpmessage":  "List all snapshots of the VM",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "listSnapshot"
+                                             ]
+                       },
+                       {
+                           "name":  "ssName",
+                           "helpmessage":  "Snapshot name",
+                           "mandatory":  1,
+                           "parametersets":  [
+                                                 "removeSnapshot",
+                                                 "restoreSnapshot",
+                                                 "takeSnapshot"
+                                             ]
+                       },
+                       {
+                           "name":  "ssDescription",
+                           "helpmessage":  "Snapshot description",
+                           "parametersets":  [
+                                                 "takeSnapshot"
+                                             ]
+                       },
+                       {
+                           "name":  "takeSnapshot",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "takeSnapshot"
+                                             ]
+                       },
+                       {
+                           "name":  "restoreSnapshot",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "restoreSnapshot"
+                                             ]
+                       },
+                       {
+                           "name":  "removeSnapshot",
+                           "helpmessage":  null,
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "removeSnapshot"
+                                             ]
+                       },
+                       {
+                           "name":  "getIp",
+                           "helpmessage":  "Get VM IP address",
+                           "type":  "switch",
+                           "parametersets":  [
+                                                 "getIp"
+                                             ]
+                       }
+                   ]
+}

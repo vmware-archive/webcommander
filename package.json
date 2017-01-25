@@ -1,0 +1,14 @@
+{
+  "name": "webCommander_J",
+  "description": "webCommander J server",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "4.x",
+    "body-parser": "1.*",
+    "request": "2.*",
+    "async": "2.1.*",
+    "mongodb": "2.*",
+    "child_process": "1.0.2"
+  }
+}

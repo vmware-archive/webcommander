@@ -1,0 +1,57 @@
+{
+    "script":  "View\\Install\\interfaces.ps1",
+    "description":  "This command installs View components on remote Windows machine.",
+    "developer":  "liuj@vmware.com",
+    "functionalities":  [
+                            "View"
+                        ],
+    "synopsis":  "Install on Windows",
+    "parameters":  [
+                       {
+                           "name":  "winAddress",
+                           "helpmessage":  "IP / FQDN of target Windows machine",
+                           "mandatory":  1
+                       },
+                       {
+                           "name":  "winUser",
+                           "helpmessage":  "User of target Windows machine (default is administrator)"
+                       },
+                       {
+                           "name":  "winPassword",
+                           "helpmessage":  "Password of winUser",
+                           "type":  "password"
+                       },
+                       {
+                           "name":  "type",
+                           "helpmessage":  "Type of the View component to install",
+                           "options":  [
+                                           "blast",
+                                           "agent",
+                                           "agent-ts",
+                                           "agent-unmanaged",
+                                           "agent-composer",
+                                           "broker",
+                                           "broker-replica",
+                                           "broker-security",
+                                           "broker-transfer",
+                                           "other"
+                                       ],
+                           "mandatory":  1,
+                           "type":  "option"
+                       },
+                       {
+                           "name":  "installerUrl",
+                           "helpmessage":  "URL to the installer file",
+                           "mandatory":  1,
+                           "type":  "textarea"
+                       },
+                       {
+                           "name":  "stdBrokerIp",
+                           "helpmessage":  "IP of standard broker"
+                       },
+                       {
+                           "name":  "silentInstallParam",
+                           "helpmessage":  "Customized parameters for silent install"
+                       }
+                   ]
+}
