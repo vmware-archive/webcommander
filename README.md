@@ -17,7 +17,9 @@ Installation
 
 1. Download code from J branch
 2. cd into code folder and run the commands below:
+   
    npm install
+   
    node server.js
 3. Open browser and navigate to http://localhost:8080/default.html
 
