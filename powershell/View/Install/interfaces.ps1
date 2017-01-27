@@ -94,9 +94,9 @@ Param (
     $silentInstallParam
 )
 
-. ./utils.ps1
-
-iex (invoke-webrequest 'http://bit.ly/1Je9cuh').content # windows\object.ps1
+. .\utils.ps1
+$web = new-object net.webclient
+iex $web.downloadstring('http://bit.ly/1Je9cuh') # windows\object.ps1
 
 $remoteWin = newRemoteWin $winAddress $winUser $winPassword
 $installer = ($installerUrl.split("/"))[-1]

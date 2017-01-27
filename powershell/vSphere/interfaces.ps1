@@ -174,8 +174,8 @@ Param (
     $setInterVmPageSharing
 )
 
-. ./utils.ps1
-. ./vsphere/object.ps1
+. .\utils.ps1
+. .\vsphere\object.ps1
 
 $serverList = $serverAddress.split(",") | %{$_.trim()} | newServer -user $serverUser -password $serverPassword
 switch ($pscmdlet.parameterSetName) {

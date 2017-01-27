@@ -1,4 +1,4 @@
-. ./utils.ps1
+. .\utils.ps1
 
 $script = $args[0]
 if (test-path ".\$script") {
