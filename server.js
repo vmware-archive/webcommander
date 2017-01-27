@@ -73,7 +73,7 @@ app.get('/list-history', function (req, res) {
 app.post('/run-cmd', jsonParser, function(req, res) {
   res.setHeader("Content-Type", "application/json");
   var t1 = (new Date).getTime();
-  var cmd = "set runFromWeb=true & powershell -noninteractive ./exec.ps1 ";
+  var cmd = "powershell -noninteractive ./exec.ps1 ";
   var json = req.body;
   var script = json.script;
   cmd += script;

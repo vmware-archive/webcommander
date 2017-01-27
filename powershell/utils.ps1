@@ -1,7 +1,7 @@
 $global:result = @()
 $ErrorActionPreference = "stop"
 $WarningPreference = 0
-$runFromWeb = [boolean]$env:runFromWeb
+$runFromConsole = [boolean]$env:runFromConsole
 
 function addError {
   addToResult @{"message"=$_.exception.message; "code"=$_.scriptstacktrace} "err"
@@ -32,8 +32,8 @@ function endError {
 
 function endExec {
   writeResult
-  if ($runFromWeb) { [Environment]::exit("0") }
-  else { exit }
+  if ($runFromConsole) { exit }
+  else { [Environment]::exit("0") }
 }
 
 function getFileList {
@@ -55,14 +55,14 @@ function getFileList {
 }
 
 function writeResult {
-  if ($runFromWeb) {
+  if ($runFromConsole) {
+    $global:result | fl
+  } else {
     try {
       convertto-json @($global:result) -depth 3 | write-verbose -verbose
     } catch {
       $global:result 
       [Environment]::exit("1")
     }
-  } else {
-    $global:result | fl
   }
 }

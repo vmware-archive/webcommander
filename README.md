@@ -21,6 +21,7 @@ Installation
    npm install
    
    node server.js
+   
 3. Open browser and navigate to http://localhost:8080/default.html
 
 REST API
