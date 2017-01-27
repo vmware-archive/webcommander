@@ -639,11 +639,11 @@ Param (
     $setFarmHtmlAccess
 )
 
-. .\utils.ps1
-. .\view\broker\object.ps1
-. .\vsphere\object.ps1
-$web = new-object net.webclient
-iex $web.downloadstring('http://bit.ly/1Je9cuh') # windows\object.ps1
+. ./utils.ps1
+. ./view/broker/object.ps1
+. ./vsphere/object.ps1
+
+iex (invoke-webrequest 'http://bit.ly/1Je9cuh').content # windows\object.ps1
 
 $broker = newBroker $serverAddress $serverUser $serverPassword
 $broker.initialize()

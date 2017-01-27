@@ -165,7 +165,7 @@ Param (
     $staticIp = "DHCP"
 )
 
-. .\utils.ps1
+. ./utils.ps1
 
 add-pssnapin vmware.vimautomation.core -ea silentlycontinue
 $if = get-netipinterface -InterfaceAlias Ethernet -AddressFamily ipv4

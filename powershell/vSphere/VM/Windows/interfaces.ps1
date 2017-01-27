@@ -87,11 +87,11 @@ Param (
     $renewIp
 )
 
-. .\utils.ps1
-. .\vsphere\object.ps1
-. .\vsphere\vm\utils.ps1
-. .\vsphere\vm\object.ps1
-. .\vsphere\vm\windows\object.ps1
+. ./utils.ps1
+. ./vsphere/object.ps1
+. ./vsphere/vm/utils.ps1
+. ./vsphere/vm/object.ps1
+. ./vsphere/vm/windows/object.ps1
 
 $server = newServer $serverAddress $serverUser $serverPassword
 $vivmList = getVivmList $vmName $server
