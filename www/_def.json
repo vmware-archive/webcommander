@@ -1,6 +1,6 @@
 [
 {
-	"script": "View\\Broker\\interfaces.ps1",
+	"script": "View/Broker/interfaces.ps1",
 	"description": "Configurate VMware Horizon View Broker",
 	"developer": "whirls9@hotmail.com",
 	"functionalities": ["View"],
@@ -118,7 +118,7 @@
 	},
 	{
 		"name": "composerUser",
-		"helpmessage": "User name to connect to composer server (default is \n      local\\administrator)",
+		"helpmessage": "User name to connect to composer server (default is \n      local/administrator)",
 		"parametersets": ["addComposer"]
 	},
 	{
@@ -191,7 +191,7 @@
 	},
 	{
 		"name": "userName",
-		"helpmessage": "User name (in domain\\user format)",
+		"helpmessage": "User name (in domain/user format)",
 		"mandatory": 1,
 		"parametersets": ["entitlePool",
 		"entitleRdsAppPool"]
@@ -353,7 +353,7 @@
 	},
 	{
 		"name": "filePath",
-		"helpmessage": "Path to the broker settings file, default is c:\\temp\\broker.ldif",
+		"helpmessage": "Path to the broker settings file, default is c:/temp/broker.ldif",
 		"mandatory": 1,
 		"parametersets": ["exportSettings",
 		"importSettings"]
@@ -593,7 +593,7 @@
 	}]
 },
 {
-	"script": "View\\Install\\interfaces.ps1",
+	"script": "View/Install/interfaces.ps1",
 	"description": "Install VMware Horizon View components on Windows machine remotely",
 	"developer": "liuj@vmware.com",
 	"functionalities": ["View"],
@@ -644,7 +644,7 @@
 	}]
 },
 {
-	"script": "vSphere\\MakeVM\\Interfaces.ps1",
+	"script": "vSphere/MakeVM/Interfaces.ps1",
 	"description": "Deploy Windows VM on vSphere via ISO image",
 	"developer": "whirls9@hotmail.com",
 	"functionalities": ["vSphere"],
@@ -768,7 +768,7 @@
 	}]
 },
 {
-	"script": "vSphere\\OVA\\interfaces.ps1",
+	"script": "vSphere/OVA/interfaces.ps1",
 	"description": "Deploy OVA to VMware vSphere",
 	"developer": "liuj@vmware.com",
 	"functionalities": ["OVA"],
@@ -852,7 +852,7 @@
 	}]
 },
 {
-	"script": "vSphere\\VM\\Windows\\interfaces.ps1",
+	"script": "vSphere/VM/Windows/interfaces.ps1",
 	"description": "Configure Windows VM on vSphere",
 	"developer": "liuj@vmware.com",
 	"functionalities": ["VM"],
@@ -901,7 +901,7 @@
 	}]
 },
 {
-	"script": "vSphere\\VM\\interfaces.ps1",
+	"script": "vSphere/VM/interfaces.ps1",
 	"description": "Configure VM on vSphere",
 	"developer": "whirls9@hotmail.com",
 	"functionalities": [],
@@ -1099,7 +1099,7 @@
 	},
 	{
 		"name": "destination",
-		"helpmessage": "Destination path, such as c:\\temp\\",
+		"helpmessage": "Destination path, such as c:/temp/",
 		"mandatory": 1,
 		"parametersets": ["uploadFile"]
 	},
@@ -1166,7 +1166,7 @@
 	}]
 },
 {
-	"script": "vSphere\\interfaces.ps1",
+	"script": "vSphere/interfaces.ps1",
 	"description": "Configure VMware ESXi and vCenter",
 	"developer": "whirls9@hotmail.com",
 	"functionalities": [],
