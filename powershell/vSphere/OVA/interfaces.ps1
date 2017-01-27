@@ -128,8 +128,8 @@ Param (
     $deployToVc
 )
 
-. .\utils.ps1
-. .\vsphere\object.ps1
+. ./utils.ps1
+. ./vsphere/object.ps1
 
 switch ($pscmdlet.parameterSetName) {
   "deployToEsx" {
