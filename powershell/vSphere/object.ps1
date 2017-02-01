@@ -9,7 +9,7 @@ function newServer {
   )
 
   begin {
-    add-pssnapin vmware.vimautomation.core -ea silentlycontinue
+    Import-Module -Name VMware.VimAutomation.Core -ErrorAction SilentlyContinue
   }
   
   process {
