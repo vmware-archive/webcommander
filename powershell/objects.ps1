@@ -225,12 +225,11 @@ function newVmWin {
 	
 	$vm | add-member -MemberType ScriptMethod -Value { ##checkPs
 		$cmd = 'Powershell -noprofile -command $PSVersionTable.PSVersion.major'
-		[int]$psVer = $this.runScript($cmd, "Bat")
-		if ($psVer[0] -ge 2) {
-			writeCustomizedMsg "Info - Powershell $psVer is installed in target VM"
-			return $true
-		} 
-		else {
+    try {
+      [int]$psVer = $this.runScript($cmd, "Bat")
+      writeCustomizedMsg "Info - Powershell $psVer is installed in target VM"
+      return $true
+    } catch {
 			writeCustomizedMsg "Info - Powershell is NOT installed in target VM"
 			return $false
 		}
