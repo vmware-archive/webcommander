@@ -90,7 +90,7 @@ Param (
 
 foreach ($paramKey in $psboundparameters.keys) {
 	$oldValue = $psboundparameters.item($paramKey)
-	$newValue = [system.web.httputility]::urldecode("$oldValue")
+	$newValue = [System.Net.WebUtility]::urldecode("$oldValue")
 	set-variable -name $paramKey -value $newValue
 }
 
