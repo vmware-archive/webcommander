@@ -182,7 +182,7 @@ function newSshServer { ##Server supports SSH access
 function newServer { ##viServer, including ESX and VC
 	Param($address, $user, $password)
 
-	add-pssnapin vmware.vimautomation.core -ea silentlycontinue
+	Import-Module -Name VMware.VimAutomation.Core -ErrorAction SilentlyContinue
 	
 	try {
 		$viserver = connect-VIServer $address -user $user -password $password -NotDefault -wa 0 -EA stop
@@ -1780,7 +1780,7 @@ function writeStderr {
 function writeCustomizedMsg {
 	Param($message)
 	if($runFromWeb) {
-		$message = [System.Web.HttpUtility]::HtmlEncode($message)
+		$message = [System.Net.WebUtility]::HtmlEncode($message)
 		$logtime = get-date -format "[yyyy-MM-dd HH:mm:ss] "
 		Write-Host "<customizedOutput>$logtime$message</customizedOutput>"
 	} else {
