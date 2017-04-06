@@ -38,4 +38,4 @@ Contribution
 ============
 
 If you want to contribute code or get any idea to improve WebCommander,
-Please contact Jerry Liu (liuj@vmware.com, Skype: whirls9@hotmail.com).
+Please contact Jian Liu (Skype: whirls9@hotmail.com).
