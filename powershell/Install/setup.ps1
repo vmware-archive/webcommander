@@ -67,6 +67,7 @@ $download = {
 		write-output "`t WPI downloaded successfully."
 	}
 	write-output "Downloading WebCommander package..."
+	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 	$webClient.downloadfile($packageUrl, "C:\WebCommander\$packageName")
 	write-output "`t WebCommander package downloaded successfully"
 }
